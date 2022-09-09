@@ -2,8 +2,8 @@ CC=i686-elf-gcc
 AS=i686-elf-as
 LD=i686-elf-ld
 
-ASMS = src/loader.s
-SRCS = src/main.c
+ASMS = src/boot/loader.s
+SRCS = src/boot/main.c
 OBJS = $(ASMS:.s=.o) $(SRCS:.c=.o)
 
 all: os.iso

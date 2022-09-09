@@ -3,14 +3,14 @@ AS=i686-elf-as
 LD=i686-elf-ld
 
 ASMS = src/loader.s
-SRCS =
+SRCS = src/main.c
 OBJS = $(ASMS:.s=.o) $(SRCS:.c=.o)
 
 all: os.iso
 .PHONY: clean
 
 %.o: %.c
-	$(CC) -o $@ $^
+	$(CC) -o $@ -c $^
 
 %.o: %.s
 	$(AS) -o $@ $^

@@ -1,4 +1,5 @@
 .global loader
+.extern kmain
 
 .equ MULTIBOOT2_MAGIC,         0xE85250D6
 .equ MULTIBOOT2_ARCHITECTURE,  0x0
@@ -22,7 +23,19 @@ multiboot2_header_begin:
 
 multiboot2_header_end:
 
+.equ KERNEL_STACK_SIZE, 4096
+
+.section .bss
+
+kernel_stack:
+.fill KERNEL_STACK_SIZE, 1, 0
+
 .section .text
 loader:
+  xorl %ebp, %ebp
+  movl $(kernel_stack + KERNEL_STACK_SIZE), %esp
+  call kmain
+
+.loop:
   hlt
-  jmp loader
+  jmp .loop

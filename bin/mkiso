@@ -1,0 +1,9 @@
+#!/bin/sh -x
+
+tmp=$(mktemp -d)
+
+mkdir -p $tmp/boot/grub
+cp kernel       $tmp/boot
+cp src/grub.cfg $tmp/boot/grub
+grub-mkrescue -o os.iso $tmp
+rm -r $tmp

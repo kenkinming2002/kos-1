@@ -10,13 +10,13 @@ all: os.iso
 .PHONY: clean
 
 %.o: %.c
-	$(CC) -o $@ -c $^
+	$(CC) $(CFLAGS) -o $@ -c $^
 
 %.o: %.s
-	$(AS) -o $@ $^
+	$(AS) $(ASFLAGS) -o $@ $^
 
 kernel: src/link.ld $(OBJS)
-	$(LD) -T src/link.ld -o $@ $(OBJS)
+	$(LD) $(LDFLAGS) -T src/link.ld -o $@ $(OBJS)
 
 os.iso: kernel src/grub.cfg
 	./bin/mkiso

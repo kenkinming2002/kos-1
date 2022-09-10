@@ -1,10 +1,10 @@
 CC=i686-elf-gcc
 AS=i686-elf-as
 LD=i686-elf-ld
+OBJCOPY=i686-elf-objcopy
 
-ASMS = src/boot/loader.s
-SRCS = src/boot/main.c
-OBJS = $(ASMS:.s=.o) $(SRCS:.c=.o)
+OBJS = src/boot/loader.boot.o \
+       src/boot/main.boot.o
 
 all: os.iso
 .PHONY: clean
@@ -14,6 +14,9 @@ all: os.iso
 
 %.o: %.s
 	$(AS) $(ASFLAGS) -o $@ $^
+
+%.boot.o : %.o
+	$(OBJCOPY) --prefix-sections=.boot --prefix-symbols=boot_ $< $@
 
 kernel: src/link.ld $(OBJS)
 	$(LD) $(LDFLAGS) -T src/link.ld -o $@ $(OBJS)

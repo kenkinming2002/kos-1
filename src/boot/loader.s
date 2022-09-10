@@ -1,4 +1,4 @@
-.global loader
+.global entry
 .extern kmain
 
 .equ MULTIBOOT2_MAGIC,         0xE85250D6
@@ -31,7 +31,7 @@ kernel_stack:
 .fill KERNEL_STACK_SIZE, 1, 0
 
 .section .text
-loader:
+entry:
   xorl %ebp, %ebp
   movl $(kernel_stack + KERNEL_STACK_SIZE), %esp
   call kmain

@@ -3,8 +3,11 @@ AS=i686-elf-as
 LD=i686-elf-ld
 OBJCOPY=i686-elf-objcopy
 
-OBJS = src/boot/loader.boot.o \
+OBJS = src/types/paging.boot.o \
+       src/boot/loader.boot.o \
        src/boot/main.boot.o
+
+CFLAGS+=-Isrc/
 
 all: os.iso
 .PHONY: clean

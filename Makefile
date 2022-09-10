@@ -1,5 +1,4 @@
 CC=i686-elf-gcc
-AS=i686-elf-as
 LD=i686-elf-ld
 OBJCOPY=i686-elf-objcopy
 
@@ -18,7 +17,7 @@ all: os.iso
 	$(CC) $(CFLAGS) -o $@ -c $^
 
 %.o: %.s
-	$(AS) $(ASFLAGS) -o $@ $^
+	$(CC) $(ASFLAGS) -o $@ -c $^
 
 %.boot.o : %.o
 	$(OBJCOPY) --prefix-sections=.boot --prefix-symbols=boot_ $< $@

@@ -1,11 +1,6 @@
 #include "paging.h"
 
-void kassert(const char *file, int line)
-{
-  for(;;) asm volatile("hlt");
-}
-
-#define KASSERT(expr) do { if(!(expr)) kassert(__FILE__, __LINE__); } while(0)
+#include "core/assert.h"
 
 static uint32_t page_entry_make(
     enum PagePermission permission,

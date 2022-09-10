@@ -4,6 +4,7 @@ LD=i686-elf-ld
 OBJCOPY=i686-elf-objcopy
 
 OBJS = src/types/paging.boot.o \
+       src/core/assert.boot.o \
        src/boot/debug.boot.o \
        src/boot/loader.boot.o \
        src/boot/main.boot.o

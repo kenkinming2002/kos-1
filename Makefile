@@ -28,8 +28,9 @@ all: os.iso
 	$(OBJCOPY) --prefix-alloc-sections=.boot --prefix-symbols=boot_ $< $@
 
 # Libgcc
-libgcc.a:
-	cp $(shell i686-elf-gcc $(CFLAGS) -print-libgcc-file-name) libgcc.a
+SYSTEM_LIBGCC=$(shell i686-elf-gcc $(CFLAGS) -print-libgcc-file-name)
+libgcc.a: $(SYSTEM_LIBGCC)
+	$(OBJCOPY) --remove-section=.eh_frame $< $@
 
 # Kernel and iso
 kernel: src/link.ld $(OBJS) libgcc.boot.a libgcc.a

@@ -20,7 +20,7 @@ all: os.iso
 	$(CC) $(ASFLAGS) -o $@ -c $^
 
 %.boot.o : %.o
-	$(OBJCOPY) --prefix-sections=.boot --prefix-symbols=boot_ $< $@
+	$(OBJCOPY) --prefix-alloc-sections=.boot --prefix-symbols=boot_ $< $@
 
 kernel: src/link.ld $(OBJS)
 	$(LD) $(LDFLAGS) -T src/link.ld -o $@ $(OBJS)

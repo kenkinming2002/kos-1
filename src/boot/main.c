@@ -1,21 +1,35 @@
 #include "core/print.h"
+#include "core/string.h"
+
+#include "alloc.h"
 #include "debug.h"
 #include "multiboot2.h"
 
 #include <stdint.h>
 #include <stddef.h>
 
+struct boot_info_mb2
+{
+  uint32_t size;
+  uint32_t reserved;
+  struct multiboot_tag tags[];
+};
+
 void kmain(uint32_t magic, uint32_t addr)
 {
   debug_init();
 
   debug_printf("magic = %lx, addr = %lx\n", magic, addr);
-  debug_printf("Magic %s\n", magic == MULTIBOOT2_BOOTLOADER_MAGIC ? "match" : "mismatch");
+
+  // Make a copy of the multiboot2 boot_information
+  struct boot_info_mb2 *tmp = (struct boot_info_mb2 *)addr;
+  struct boot_info_mb2 *boot_info_mb2 = alloc_heap(tmp->size, 8);
+  memmove(boot_info_mb2, tmp, tmp->size);
 
   debug_write("Boot Information Begin\n");
-  for(struct multiboot_tag *tag = (struct multiboot_tag *)(addr + 8);
+  for(struct multiboot_tag *tag = boot_info_mb2->tags;
       tag->type != MULTIBOOT_TAG_TYPE_END;
-      tag = (struct multiboot_tag *)((uintptr_t)tag + tag->size + 7 & (~7)))
+      tag = (struct multiboot_tag *)(((uintptr_t)tag + tag->size + 7) & (~7)))
   {
     debug_write("New tag\n");
     switch(tag->type)

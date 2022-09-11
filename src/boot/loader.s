@@ -32,8 +32,11 @@ kernel_stack:
 
 .section .text
 entry:
-  xorl %ebp, %ebp
-  movl $(kernel_stack + KERNEL_STACK_SIZE), %esp
+  xor %ebp, %ebp
+  mov $(kernel_stack + KERNEL_STACK_SIZE), %esp
+
+  push %ebx
+  push %eax
   call kmain
 
 .loop:

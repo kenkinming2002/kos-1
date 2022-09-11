@@ -54,7 +54,7 @@ void debug_init()
   serial_init();
 }
 
-void fb_write(char c)
+void fb_put(char c)
 {
   // TODO: How do we support scrolling
   static unsigned i = 0;
@@ -71,17 +71,20 @@ bool serial_is_transmitter_empty()
   return inb(SERIAL_LINE_STATUS_PORT) & 0x20;
 }
 
-void serial_write(char c)
+void serial_put(char c)
 {
   while(!serial_is_transmitter_empty());
   outb(SERIAL_DATA_PORT, c);
 }
 
+void debug_put(char c)
+{
+  fb_put(c);
+  serial_put(c);
+}
+
 void debug_write(const char *str)
 {
   for(const char *p = str; *p != '\0'; ++p)
-  {
-    fb_write(*p);
-    serial_write(*p);
-  }
+    debug_put(*p);
 }

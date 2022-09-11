@@ -15,21 +15,25 @@ SECTIONS {
   .text ALIGN(0x1000) : AT(ADDR(.text) - 0xC0000000)
   {
     *(.text)
+    *(.text.*)
   }
 
   .rodata ALIGN(0x1000) : AT(ADDR(.rodata) - 0xC0000000)
   {
     *(.rodata)
+    *(.rodata.*)
   }
 
   .data ALIGN(0x1000) : AT(ADDR(.data) - 0xC0000000)
   {
     *(.data)
+    *(.data.*)
   }
 
   .bss ALIGN(0x1000) : AT(ADDR(.bss) - 0xC0000000)
   {
     *(.bss)
+    *(.bss.*)
   }
 
   /* Lower half */
@@ -38,20 +42,24 @@ SECTIONS {
   .boot.text ALIGN(0x1000) :
   {
     *(.boot.text)
+    *(.boot.text.*)
   }
 
   .boot.rodata ALIGN(0x1000) :
   {
     *(.boot.rodata)
+    *(.boot.rodata.*)
   }
 
   .boot.data ALIGN(0x1000) :
   {
     *(.boot.data)
+    *(.boot.data.*)
   }
 
   .boot.bss ALIGN(0x1000) :
   {
     *(.boot.bss)
+    *(.boot.bss.*)
   }
 }

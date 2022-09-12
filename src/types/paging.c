@@ -11,7 +11,7 @@ static uint32_t page_entry_make(
 {
   KASSERT((address & address_mask) != address);
 
-  uint32_t data;
+  uint32_t data = 0;
   data |= address;
   data |= (cache_mode == PAGE_UNCACHED)      << 4;
   data |= (write_mode == PAGE_WRITE_THROUGH) << 3;

@@ -10,7 +10,8 @@ OBJS = src/types/paging.boot.o \
        src/boot/debug.boot.o \
        src/boot/info.boot.o \
        src/boot/loader.boot.o \
-       src/boot/bmain.boot.o
+       src/boot/bmain.boot.o \
+       src/boot/kmain.o
 
 CFLAGS+=-fno-stack-protector
 CFLAGS+=-Isrc/

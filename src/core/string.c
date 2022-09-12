@@ -33,3 +33,15 @@ void *memmove(void *dst, const void *src, size_t n)
 {
   return _memmove(dst, src, n);
 }
+
+static char *_memset(char *dst, int c, size_t n)
+{
+  for(size_t i=0; i<n; ++i)
+    dst[i] = c;
+  return dst;
+}
+
+void *memset(void *dst, int c, size_t n)
+{
+  return _memset(dst, c, n);
+}

@@ -17,6 +17,12 @@ multiboot2_header_begin:
 .long MULTIBOOT2_HEADER_LENGTH
 .long MULTIBOOT2_CHECKSUM
 
+.short 1
+.short 0
+.long  12
+.long  6
+.long  0
+
 .short 0
 .short 0
 .long  8

@@ -38,7 +38,9 @@ SECTIONS {
   boot_heap_begin = .;
 
   /* Higher half */
-  . = 0xC0100000;
+  . = 0x00100000;
+
+  . += 0xC0000000;
 
   .text ALIGN(0x1000) : AT(ADDR(.text) - 0xC0000000)
   {
@@ -63,6 +65,8 @@ SECTIONS {
     *(.bss)
     *(.bss.*)
   }
+
+  . -= 0xC0000000;
 
   boot_memory_begin = .;
 }

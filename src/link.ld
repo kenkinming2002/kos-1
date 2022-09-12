@@ -38,7 +38,7 @@ SECTIONS {
   boot_heap_begin = .;
 
   /* Higher half */
-  . = 0x00100000;
+  . = 0x01000000;
 
   . += 0xC0000000;
 

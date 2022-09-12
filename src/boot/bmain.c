@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
-void kmain(uint32_t magic, uint32_t addr)
+void bmain(uint32_t magic, uint32_t addr)
 {
   debug_init();
   debug_printf("magic = %lx, addr = %lx\n", magic, addr);

@@ -1,5 +1,5 @@
 .global entry
-.extern kmain
+.extern bmain
 
 .equ MULTIBOOT2_MAGIC,         0xE85250D6
 .equ MULTIBOOT2_ARCHITECTURE,  0x0
@@ -43,7 +43,7 @@ entry:
 
   push %ebx
   push %eax
-  call kmain
+  call bmain
 
 .loop:
   hlt

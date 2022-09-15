@@ -1,6 +1,8 @@
 #ifndef TYPES_PAGING_H
 #define TYPES_PAGING_H
 
+#include "core/assert.h"
+
 #include <stdint.h>
 
 enum PageCacheMode
@@ -36,28 +38,61 @@ enum PageTLBMode
 struct pte { uint32_t data; };
 struct pde { uint32_t data; };
 
-// You could set the global bit for both page table entry and page directory entry
-// It is just that the global bit only matter for page table entry and page directory entry that refer to a huge page
-//
-struct pte page_table_entry_make(
+static inline uint32_t page_entry_make(
+    uint32_t address, uint32_t address_mask,
     enum PagePermission permission,
     enum PageAccess     access,
     enum PageWriteMode  write_mode,
-    enum PageCacheMode  cache_mode,
-    uint32_t address);
+    enum PageCacheMode  cache_mode)
+{
+  KASSERT((address & address_mask) == address);
 
-struct pde page_directory_entry_make(
+  uint32_t data = 0;
+  data |= address;
+  data |= (cache_mode == PAGE_UNCACHED)      << 4;
+  data |= (write_mode == PAGE_WRITE_THROUGH) << 3;
+  data |= (access     == PAGE_ACCESS_ANY)    << 2;
+  data |= (permission == PAGE_READ_WRITE)    << 1;
+  data |= 0x1; // present
+  return data;
+}
+
+static inline struct pte page_table_entry_make(
+    uint32_t address,
+    enum PagePermission permission,
+    enum PageAccess     access,
+    enum PageWriteMode  write_mode,
+    enum PageCacheMode  cache_mode)
+{
+  struct pte pte = {0};
+  pte.data = page_entry_make(address, 0xFFFFF000, permission, access, write_mode, cache_mode);
+  return pte;
+}
+
+static inline struct pde page_directory_entry_make(
     uint32_t address,
     enum PageCacheMode cache_mode,
     enum PageWriteMode write_mode,
     enum PageAccess access,
-    enum PagePermission permission);
+    enum PagePermission permission)
+{
+  struct pde pde = {0};
+  pde.data = page_entry_make(address, 0xFFFFF000, permission, access, write_mode, cache_mode);
+  return pde;
+}
 
-struct pde page_directory_entry_make_huge_page(
+static inline struct pde page_directory_entry_make_huge_page(
     uint32_t address,
     enum PageCacheMode cache_mode,
     enum PageWriteMode write_mode,
     enum PageAccess access,
-    enum PagePermission permission);
+    enum PagePermission permission)
+{
+  struct pde pde = {0};
+  pde.data = page_entry_make(address, 0xFFC00000, permission, access, write_mode, cache_mode);
+  pde.data |= 0x00000080;
+  return pde;
+}
+
 
 #endif // TYPES_PAGING_H

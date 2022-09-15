@@ -2,8 +2,7 @@ CC=i686-elf-gcc
 LD=i686-elf-ld
 OBJCOPY=i686-elf-objcopy
 
-OBJS = src/types/paging.o \
-       src/core/assert.o \
+OBJS = src/core/assert.o \
        src/core/print.o \
        src/core/string.o \
        src/boot/debug.o \

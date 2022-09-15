@@ -53,4 +53,11 @@ struct pde page_directory_entry_make(
     enum PageAccess access,
     enum PagePermission permission);
 
+struct pde page_directory_entry_make_huge_page(
+    uint32_t address,
+    enum PageCacheMode cache_mode,
+    enum PageWriteMode write_mode,
+    enum PageAccess access,
+    enum PagePermission permission);
+
 #endif // TYPES_PAGING_H

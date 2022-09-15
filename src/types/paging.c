@@ -9,7 +9,7 @@ static uint32_t page_entry_make(
     enum PageCacheMode  cache_mode,
     uint32_t address, uint32_t address_mask)
 {
-  KASSERT((address & address_mask) != address);
+  KASSERT((address & address_mask) == address);
 
   uint32_t data = 0;
   data |= address;
@@ -45,3 +45,17 @@ struct pde page_directory_entry_make(
   pde.data = page_entry_make(permission, access, write_mode, cache_mode, address, 0xFFFFF000);
   return pde;
 }
+
+struct pde page_directory_entry_make_huge_page(
+    uint32_t address,
+    enum PageCacheMode cache_mode,
+    enum PageWriteMode write_mode,
+    enum PageAccess access,
+    enum PagePermission permission)
+{
+  struct pde pde = {0};
+  pde.data = page_entry_make(permission, access, write_mode, cache_mode, address, 0xFFC00000);
+  pde.data |= 0x00000080;
+  return pde;
+}
+

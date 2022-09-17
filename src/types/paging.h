@@ -5,6 +5,12 @@
 
 #include <stdint.h>
 
+#define PAGE_SHIFT      12
+#define HUGE_PAGE_SHIFT 22
+
+#define PAGE_SIZE      1 << PAGE_SHIFT
+#define HUGE_PAGE_SIZE 1 << HUGE_PAGE_SHIFT
+
 enum PageCacheMode
 {
   PAGE_CACHED,

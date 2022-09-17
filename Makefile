@@ -7,7 +7,8 @@ OBJS = src/core/assert.o \
        src/core/string.o \
        src/boot/debug.o \
        src/boot/loader.o \
-       src/boot/kmain.o
+       src/boot/kmain.o \
+       src/mm/mapping.o
 
 CFLAGS+=-fno-stack-protector
 CFLAGS+=-Isrc/

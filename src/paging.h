@@ -1,5 +1,5 @@
-#ifndef TYPES_PAGING_H
-#define TYPES_PAGING_H
+#ifndef PAGING_H
+#define PAGING_H
 
 #include "core/assert.h"
 
@@ -101,4 +101,4 @@ static inline struct pde page_directory_entry_make_huge_page(
 }
 
 
-#endif // TYPES_PAGING_H
+#endif // PAGING_H

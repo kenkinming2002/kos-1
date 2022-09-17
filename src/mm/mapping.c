@@ -1,6 +1,6 @@
 #include "mapping.h"
 
-#include "types/paging.h"
+#include "paging.h"
 
 #define KERNEL_IDENTITY_MAP_BEGIN 0x0
 #define KERNEL_IDENTITY_MAP_END   0xC0000000

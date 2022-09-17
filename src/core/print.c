@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "boot/debug.h"
+#include "debug.h"
 
 static void debug_print_uintmax(uintmax_t val, unsigned base, const char *mappings)
 {

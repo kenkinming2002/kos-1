@@ -5,9 +5,9 @@ OBJCOPY=i686-elf-objcopy
 OBJS = src/core/assert.o \
        src/core/print.o \
        src/core/string.o \
-       src/boot/debug.o \
-       src/boot/loader.o \
-       src/boot/kmain.o \
+       src/debug.o \
+       src/kmain.o \
+       src/loader.o \
        src/mm/mapping.o
 
 CFLAGS+=-fno-stack-protector

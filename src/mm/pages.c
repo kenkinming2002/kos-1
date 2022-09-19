@@ -1,8 +1,10 @@
 #include "pages.h"
 
 #include "bitmap.h"
+#include "boot_params.h"
 
 #include "core/assert.h"
+#include "core/print.h"
 #include "core/string.h"
 
 #include <limits.h>
@@ -11,51 +13,63 @@
 #define PAGE_SIZE 4096
 #define PAGE_COUNT 1024
 
-__attribute__((aligned(PAGE_SIZE))) struct page
+#define ALIGN_UP(value, align)   ((value + align - 1) / align * align)
+#define ALIGN_DOWN(value, align) (value / align * align)
+
+static struct bitmap bm;
+
+static void mm_add_region(uintptr_t addr, size_t length)
 {
-  char data[PAGE_SIZE];
-};
+  uintptr_t new_addr   = ALIGN_UP(addr, PAGE_SIZE);
+  size_t    new_length = length - (new_addr - addr);
+  bm_fill(bm, new_addr / PAGE_SIZE, ALIGN_DOWN(new_length, PAGE_SIZE) / PAGE_SIZE, false);
+}
 
-struct arena
+static void mm_del_region(uintptr_t addr, size_t length)
 {
-  struct page pages[PAGE_COUNT];
-  struct bitmap bm;
+  uintptr_t new_addr   = ALIGN_DOWN(addr, PAGE_SIZE);
+  size_t    new_length = length + (addr - new_addr);
+  bm_fill(bm, new_addr / PAGE_SIZE, ALIGN_UP(new_length, PAGE_SIZE) / PAGE_SIZE, true);
+}
 
-  unsigned bits[PAGE_COUNT / UINT_BIT];
-};
-
-struct arena arena;
+extern char kernel_begin[];
+extern char kernel_end[];
 
 void mm_init_pages_allocator()
 {
-  arena.bm.size = PAGE_COUNT;
-  arena.bm.bits = arena.bits;
-  bm_fill(arena.bm, 0, arena.bm.size, false);
-}
+  // 1: Find maximum page frame number
+  uintptr_t max_addr = 0;
+  for(size_t i=0; i<boot_params.mmap_entry_count; ++i)
+    if(max_addr < boot_params.mmap_entries[i].addr)
+      max_addr = boot_params.mmap_entries[i].addr;
 
-struct page *_alloc_pages(unsigned count)
-{
-  size_t offset = bm_search(arena.bm, count, false);
-  if(offset == BM_SEARCH_NONE)
-    return NULL;
+  size_t page_count = max_addr / PAGE_SIZE;
 
-  bm_fill(arena.bm, offset, count, true);
-  return &arena.pages[offset];
-}
+  bm.size = page_count;
+  bm.bits = (unsigned *)kernel_end;
+  bm_fill(bm, 0, bm.size, true);
 
-static void _free_pages(struct page *pages, unsigned count)
-{
-  size_t offset = pages - arena.pages;
-  bm_fill(arena.bm, offset, count, false);
+  for(size_t i=0; i<boot_params.mmap_entry_count; ++i)
+    if(boot_params.mmap_entries[i].type == MEMORY_AVAILABLE)
+      mm_add_region(boot_params.mmap_entries[i].addr, boot_params.mmap_entries[i].length);
+
+  mm_del_region((uintptr_t)kernel_begin, kernel_end-kernel_begin);
+  mm_del_region((uintptr_t)bm.bits, bm.size * sizeof(unsigned) / UINT_BIT);
 }
 
 void *alloc_pages(unsigned count)
 {
-  return _alloc_pages(count);
+  size_t n = bm_search(bm, count, false);
+  if(n == BM_SEARCH_NONE)
+    return ALLOC_FAILED;
+
+  bm_fill(bm, n, count, true);
+  return (void *)(PAGE_SIZE * n);
 }
 
 void free_pages(void *pages, unsigned count)
 {
-  _free_pages(pages, count);
+  size_t n = (uintptr_t)pages / PAGE_SIZE;
+  bm_fill(bm, n, count, false);
 }
 

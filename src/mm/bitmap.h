@@ -4,6 +4,8 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+#define UINT_BIT (CHAR_BIT * sizeof(unsigned))
+
 struct bitmap
 {
   size_t size;

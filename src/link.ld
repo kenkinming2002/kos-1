@@ -3,6 +3,8 @@ ENTRY(entry)
 SECTIONS {
   . = 0x01000000;
 
+  kernel_begin = .;
+
   .text :
   {
     *(.text)
@@ -26,4 +28,6 @@ SECTIONS {
     *(.bss)
     *(.bss.*)
   }
+
+  kernel_end = .;
 }

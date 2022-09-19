@@ -2,8 +2,6 @@
 
 #include <limits.h>
 
-#define UINT_BIT (CHAR_BIT * sizeof(unsigned))
-
 void bm_set(struct bitmap bm, size_t i, bool value)
 {
   const size_t index = i / UINT_BIT;

@@ -1,5 +1,7 @@
-#include "debug.h"
 #include "core/print.h"
+
+#include "boot_params.h"
+#include "debug.h"
 
 #include "mm/mapping.h"
 #include "mm/pages.h"
@@ -8,10 +10,12 @@
 
 #define TEST_COUNT 10
 
-void kmain()
+void kmain(uint32_t magic, uint32_t addr)
 {
   debug_init();
   debug_printf("hello\n");
+
+  boot_params_init(magic, addr);
 
   mm_init_pages_allocator();
 

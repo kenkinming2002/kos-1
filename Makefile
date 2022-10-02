@@ -22,7 +22,7 @@ all: os.iso
 %.o: %.c
 	$(CC) $(CFLAGS) -o $@ -c $^
 
-%.o: %.s
+%.o: %.S
 	$(CC) $(ASFLAGS) -o $@ -c $^
 
 # Kernel and iso

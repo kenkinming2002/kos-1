@@ -64,6 +64,9 @@
     xor %ebp, %ebp
     mov $(bootstrap_stack + PAGE_SIZE), %esp
 
+    push %eax
+    push %ebx
+
     mov $(BOOT_MAP_BEGIN      \/ LARGE_PAGE_SIZE), %eax
     mov $(BOOT_MAP_LENGTH     \/ LARGE_PAGE_SIZE), %ebx
     mov $(BOOT_PHYSICAL_BEGIN \/ LARGE_PAGE_SIZE), %ecx
@@ -90,9 +93,10 @@
     or  $0x80000001, %eax
     mov %eax, %cr0
 
-  0:
-    hlt
-    jmp 0b
+    push %ebx
+    push %eax
+
+    jmp higher_half
 
   /* eax: virtual index
    * ebx: count
@@ -108,3 +112,20 @@
     dec %ebx
     jnz do_linear_map
     ret
+
+/* Higher half code */
+.section .bss
+  .align PAGE_SIZE
+  initial_stack: .fill PAGE_SIZE, 1, 0
+
+.section .text
+  higher_half:
+    xor %ebp, %ebp
+    mov $(initial_stack + PAGE_SIZE), %esp
+
+    push %eax
+    push %ebx
+    call kmain
+  0:
+    hlt
+    jmp 0b

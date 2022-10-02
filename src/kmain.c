@@ -14,8 +14,8 @@ void kmain(uint32_t magic, uint32_t addr)
 {
   debug_init();
   debug_printf("hello\n");
-
   boot_params_init(magic, addr);
+  for(;;) asm volatile("hlt");
 
   mm_init_pages_allocator();
 

@@ -2,6 +2,7 @@
 
 #include "bitmap.h"
 #include "boot_params.h"
+#include "linear.h"
 
 #include "core/assert.h"
 #include "core/print.h"
@@ -10,8 +11,6 @@
 #include <limits.h>
 
 #define UINT_BIT (CHAR_BIT * sizeof(unsigned))
-#define PAGE_SIZE 4096
-#define PAGE_COUNT 1024
 
 #define ALIGN_UP(value, align)   ((value + align - 1) / align * align)
 #define ALIGN_DOWN(value, align) (value / align * align)
@@ -31,6 +30,9 @@ static void mm_del_region(uintptr_t addr, size_t length)
   size_t    new_length = length + (addr - new_addr);
   bm_fill(bm, new_addr / PAGE_SIZE, ALIGN_UP(new_length, PAGE_SIZE) / PAGE_SIZE, true);
 }
+
+extern char boot_begin[];
+extern char boot_end[];
 
 extern char kernel_begin[];
 extern char kernel_end[];
@@ -53,8 +55,9 @@ void mm_init_pages_allocator()
     if(boot_params.mmap_entries[i].type == MEMORY_AVAILABLE)
       mm_add_region(boot_params.mmap_entries[i].addr, boot_params.mmap_entries[i].length);
 
-  mm_del_region((uintptr_t)kernel_begin, kernel_end-kernel_begin);
-  mm_del_region((uintptr_t)bm.bits, bm.size * sizeof(unsigned) / UINT_BIT);
+  mm_del_region(virt_to_phys(boot_begin),   boot_end   - boot_begin);
+  mm_del_region(virt_to_phys(kernel_begin), kernel_end - kernel_begin);
+  mm_del_region(virt_to_phys(kernel_end),   page_count * sizeof(unsigned) / UINT_BIT);
 }
 
 void *alloc_pages(unsigned count)

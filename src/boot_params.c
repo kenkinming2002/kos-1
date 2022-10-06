@@ -3,6 +3,7 @@
 #include "core/assert.h"
 #include "core/string.h"
 
+#include "mm/linear.h"
 #include "multiboot2.h"
 
 struct boot_params boot_params;
@@ -64,6 +65,6 @@ static void boot_params_init_multiboot2(struct multiboot_boot_information *boot_
 void boot_params_init(uint32_t magic, uint32_t addr)
 {
   KASSERT(magic == MULTIBOOT2_BOOTLOADER_MAGIC);
-  boot_params_init_multiboot2((struct multiboot_boot_information *)addr);
+  boot_params_init_multiboot2((struct multiboot_boot_information *)phys_to_virt(addr));
 }
 

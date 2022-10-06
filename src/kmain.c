@@ -15,7 +15,6 @@ void kmain(uint32_t magic, uint32_t addr)
   debug_init();
   debug_printf("hello\n");
   boot_params_init(magic, addr);
-  for(;;) asm volatile("hlt");
 
   mm_init_pages_allocator();
 
@@ -39,5 +38,5 @@ void kmain(uint32_t magic, uint32_t addr)
   for(int i=0; i<TEST_COUNT; ++i)
     free_pages(pages[i], TEST_COUNT-i);
 
-  mm_init_kernel_mapping();
+  for(;;) asm volatile("hlt");
 }

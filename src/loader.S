@@ -69,8 +69,8 @@
     or  $0x80000001, %eax
     mov %eax, %cr0
 
-    push %ebx
-    push %eax
+    pop %ebx
+    pop %eax
 
     jmp higher_half
 
@@ -99,8 +99,8 @@
     xor %ebp, %ebp
     mov $(initial_stack + PAGE_SIZE), %esp
 
-    push %eax
     push %ebx
+    push %eax
     call kmain
   0:
     hlt

@@ -1,10 +1,10 @@
 #include "pages.h"
 
-#include "bitmap.h"
 #include "boot_params.h"
 #include "linear.h"
 
 #include "core/assert.h"
+#include "core/bitmap.h"
 #include "core/print.h"
 #include "core/string.h"
 

@@ -3,13 +3,13 @@ LD=i686-elf-ld
 OBJCOPY=i686-elf-objcopy
 
 OBJS = src/core/assert.o \
+       src/core/bitmap.o \
        src/core/print.o \
        src/core/string.o \
        src/boot_params.o \
        src/debug.o \
        src/kmain.o \
        src/loader.o \
-       src/mm/bitmap.o \
        src/mm/pages.o
 
 CFLAGS+=-fno-stack-protector

@@ -8,10 +8,6 @@
 #include "core/print.h"
 #include "core/string.h"
 
-#include <limits.h>
-
-#define UINT_BIT (CHAR_BIT * sizeof(unsigned))
-
 #define ALIGN_UP(value, align)   ((value + align - 1) / align * align)
 #define ALIGN_DOWN(value, align) (value / align * align)
 

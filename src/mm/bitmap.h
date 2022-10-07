@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include <stdbool.h>
+#include <limits.h>
 
 #define UINT_BIT (CHAR_BIT * sizeof(unsigned))
 

@@ -1,7 +1,5 @@
 #include "bitmap.h"
 
-#include <limits.h>
-
 void bm_set(struct bitmap bm, size_t i, bool value)
 {
   const size_t index = i / UINT_BIT;

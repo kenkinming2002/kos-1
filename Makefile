@@ -9,7 +9,6 @@ OBJS = src/core/assert.o \
        src/debug.o \
        src/kmain.o \
        src/loader.o \
-       src/mm/mapping.o \
        src/mm/bitmap.o \
        src/mm/pages.o
 

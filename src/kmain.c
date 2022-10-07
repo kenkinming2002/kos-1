@@ -3,7 +3,6 @@
 #include "boot_params.h"
 #include "debug.h"
 
-#include "mm/mapping.h"
 #include "mm/pages.h"
 
 #include <stdint.h>

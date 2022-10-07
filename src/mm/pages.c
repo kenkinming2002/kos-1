@@ -8,6 +8,20 @@
 #include "core/print.h"
 #include "core/string.h"
 
+extern char boot_begin[];
+extern char boot_end[];
+
+extern char kernel_begin[];
+extern char kernel_end[];
+
+#define BOOT_BEGIN ((void *)boot_begin)
+#define BOOT_END   ((void *)boot_end)
+#define BOOT_LENGTH ((uintptr_t)BOOT_END - (uintptr_t)BOOT_BEGIN)
+
+#define KERNEL_BEGIN ((void *)kernel_begin)
+#define KERNEL_END   ((void *)kernel_end)
+#define KERNEL_LENGTH ((uintptr_t)KERNEL_END - (uintptr_t)KERNEL_BEGIN)
+
 #define ALIGN_UP(value, align)   ((value + align - 1) / align * align)
 #define ALIGN_DOWN(value, align) (value / align * align)
 
@@ -27,12 +41,6 @@ static void mm_del_region(uintptr_t addr, size_t length)
   bm_fill(bm, new_addr / PAGE_SIZE, ALIGN_UP(new_length, PAGE_SIZE) / PAGE_SIZE, true);
 }
 
-extern char boot_begin[];
-extern char boot_end[];
-
-extern char kernel_begin[];
-extern char kernel_end[];
-
 void mm_init_pages_allocator()
 {
   // 1: Find maximum page frame number
@@ -51,9 +59,9 @@ void mm_init_pages_allocator()
     if(boot_params.mmap_entries[i].type == MEMORY_AVAILABLE)
       mm_add_region(boot_params.mmap_entries[i].addr, boot_params.mmap_entries[i].length);
 
-  mm_del_region(virt_to_phys(boot_begin),   boot_end   - boot_begin);
-  mm_del_region(virt_to_phys(kernel_begin), kernel_end - kernel_begin);
-  mm_del_region(virt_to_phys(kernel_end),   page_count * sizeof(unsigned) / UINT_BIT);
+  mm_del_region(virt_to_phys(BOOT_BEGIN),   BOOT_LENGTH);
+  mm_del_region(virt_to_phys(KERNEL_BEGIN), KERNEL_LENGTH);
+  mm_del_region(virt_to_phys(KERNEL_END),   page_count * sizeof(unsigned) / UINT_BIT);
 }
 
 void *alloc_pages(unsigned count)

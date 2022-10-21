@@ -1,5 +1,3 @@
-#include "core/print.h"
-
 #include "core/debug.h"
 
 #include <stdarg.h>

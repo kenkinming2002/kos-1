@@ -5,7 +5,7 @@
 
 #include "core/assert.h"
 #include "core/bitmap.h"
-#include "core/print.h"
+#include "core/debug.h"
 #include "core/string.h"
 
 extern char boot_begin[];

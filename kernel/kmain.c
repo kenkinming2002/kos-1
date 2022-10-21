@@ -1,6 +1,5 @@
-#include "core/print.h"
-
 #include "core/debug.h"
+#include "debug.h"
 
 #include "boot_params.h"
 

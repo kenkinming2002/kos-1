@@ -1,6 +1,6 @@
-#include "assert.h"
+#include "core/assert.h"
 
-#include "print.h"
+#include "core/print.h"
 
 void kassert(const char *file, int line)
 {

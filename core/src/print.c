@@ -1,10 +1,10 @@
-#include "print.h"
+#include "core/print.h"
+
+#include "core/debug.h"
 
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
-
-#include "debug.h"
 
 static void debug_print_uintmax(uintmax_t val, unsigned base, const char *mappings)
 {

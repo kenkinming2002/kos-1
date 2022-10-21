@@ -1,9 +1,10 @@
 CC=i686-elf-gcc
 LD=i686-elf-ld
+AR=i686-elf-ar
 OBJCOPY=i686-elf-objcopy
 
 CFLAGS+=-fno-stack-protector
-CFLAGS+=-Iboot -Ikernel
+CFLAGS+=-Icore/include -Iboot -Ikernel
 
 all: os.iso
 
@@ -14,6 +15,7 @@ all: os.iso
 %.o: %.S
 	$(CC) $(ASFLAGS) -o $@ -c $^
 
+include core.mk
 include boot.mk
 include kernel.mk
 

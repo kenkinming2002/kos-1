@@ -1,4 +1,4 @@
-#include "string.h"
+#include "core/string.h"
 
 static char *_memcpy(char *restrict dst, const char *restrict src, size_t n)
 {

@@ -15,7 +15,7 @@ OBJS = src/core/assert.o \
 CFLAGS+=-fno-stack-protector
 CFLAGS+=-Isrc/
 
-all: os.iso
+all: os.iso boot.elf
 
 # Generic rules
 %.o: %.c
@@ -23,6 +23,8 @@ all: os.iso
 
 %.o: %.S
 	$(CC) $(ASFLAGS) -o $@ -c $^
+
+include boot.mk
 
 # Kernel and iso
 kernel: src/link.ld $(OBJS)

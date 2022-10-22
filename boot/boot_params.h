@@ -5,30 +5,35 @@
 #include <stddef.h>
 
 #define MAX_CMDLINE_LENGTH 256
-#define MAX_MMAP_ENTRIES   32
+#define MAX_MEM_AREA_COUNT 32
 
-enum MemoryType
+struct mem_area
 {
-  MEMORY_AVAILABLE,
-  MEMORY_RESERVED,
-  MEMORY_ACPI_RECLAIMABLE,
-  MEMORY_NVS,
-  MEMORY_BADRAM,
+  uintptr_t addr;
+  size_t    length;
 };
 
-struct mmap_entry
+struct mem_region
 {
-  uintptr_t       addr;
-  size_t          length;
-  enum MemoryType type;
+  struct mem_area areas[MAX_MEM_AREA_COUNT];
+  size_t          count;
+};
+
+struct mmap
+{
+  struct mem_region usable;
+
+  struct mem_region acpi_reclaimable;
+  struct mem_region acpi_nvs;
+
+  struct mem_region reserved;
+  struct mem_region bad;
 };
 
 struct boot_params
 {
   char cmdline[MAX_CMDLINE_LENGTH];
-
-  struct mmap_entry mmap_entries[MAX_MMAP_ENTRIES];
-  size_t            mmap_entry_count;
+  struct mmap mmap;
 };
 extern struct boot_params boot_params;
 

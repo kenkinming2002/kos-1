@@ -7,7 +7,7 @@ static void debug_print_mem_region(const char * name, struct mem_region *region)
 {
   debug_printf("region: %s\n", name);
   for(size_t i=0; i<region->count; ++i)
-    debug_printf(" => addr=0x%lx, length=0x%lx\n", region->areas[i].addr, region->areas[i].length);
+    debug_printf(" => begin=0x%lx, end=0x%lx\n", region->areas[i].begin, region->areas[i].end);
 }
 
 void bmain(uint32_t magic, uint32_t addr)

@@ -7,15 +7,14 @@
 #include "multiboot2.h"
 
 /* mem region */
-static void mem_region_insert(struct mem_region *region, uintptr_t addr, size_t length)
+static void mem_region_insert(struct mem_region *region, uintptr_t begin, uintptr_t end)
 {
   KASSERT(region->count < MAX_MEM_AREA_COUNT);
-  region->areas[region->count++] = (struct mem_area){.addr = addr, .length = length};
+  region->areas[region->count++] = (struct mem_area){.begin = begin, .end = end};
 }
 
-static void mem_region_remove(struct mem_region *region, uintptr_t addr, size_t length)
+static void mem_region_remove(struct mem_region *region, uintptr_t begin, uintptr_t end)
 {
-  // TODO:
 }
 
 static void mem_region_sanitize(struct mem_region *arr)
@@ -54,18 +53,18 @@ static void boot_params_init_multiboot2_mmap(struct multiboot_tag_mmap *tag)
   {
     switch(entry->type)
     {
-    case MULTIBOOT_MEMORY_AVAILABLE:        mem_region_insert(&boot_params.mmap.usable,           entry->addr, entry->len); break;
-    case MULTIBOOT_MEMORY_ACPI_RECLAIMABLE: mem_region_insert(&boot_params.mmap.acpi_reclaimable, entry->addr, entry->len); break;
-    case MULTIBOOT_MEMORY_NVS:              mem_region_insert(&boot_params.mmap.acpi_nvs,         entry->addr, entry->len); break;
-    case MULTIBOOT_MEMORY_RESERVED:         mem_region_insert(&boot_params.mmap.reserved,         entry->addr, entry->len); break;
-    case MULTIBOOT_MEMORY_BADRAM:           mem_region_insert(&boot_params.mmap.bad,              entry->addr, entry->len); break;
+    case MULTIBOOT_MEMORY_AVAILABLE:        mem_region_insert(&boot_params.mmap.usable,           entry->addr, entry->addr + entry->len - 1); break;
+    case MULTIBOOT_MEMORY_ACPI_RECLAIMABLE: mem_region_insert(&boot_params.mmap.acpi_reclaimable, entry->addr, entry->addr + entry->len - 1); break;
+    case MULTIBOOT_MEMORY_NVS:              mem_region_insert(&boot_params.mmap.acpi_nvs,         entry->addr, entry->addr + entry->len - 1); break;
+    case MULTIBOOT_MEMORY_RESERVED:         mem_region_insert(&boot_params.mmap.reserved,         entry->addr, entry->addr + entry->len - 1); break;
+    case MULTIBOOT_MEMORY_BADRAM:           mem_region_insert(&boot_params.mmap.bad,              entry->addr, entry->addr + entry->len - 1); break;
     }
   }
 }
 
 static void boot_params_init_multiboot2_module(struct multiboot_tag_module *tag)
 {
-  mem_region_remove(&boot_params.mmap.usable, tag->mod_start, tag->mod_end - tag->mod_start);
+  mem_region_remove(&boot_params.mmap.usable, tag->mod_start, tag->mod_end - 1);
 }
 
 static void boot_params_init_multiboot2(struct multiboot_boot_information *boot_info)

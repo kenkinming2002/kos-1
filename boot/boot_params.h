@@ -5,33 +5,35 @@
 #include <stddef.h>
 
 #define MAX_CMDLINE_LENGTH 256
-#define MAX_MEM_AREA_COUNT 32
+#define MAX_MMAP_ENTRIES   32
 
-struct mem_area
+enum MemoryType
+{
+  MEMORY_AVAILABLE,
+
+  MEMORY_ACPI_RECLAIMABLE,
+  MEMORY_ACPI_NVS,
+
+  MEMORY_RESERVED,
+  MEMORY_BAD,
+};
+
+struct mmap_entry
 {
   // Note: Includes the byte pointed to by end.
   // 1: The APIC mmio region is at the end of 4GiB address space, so there is
   //    no address pointing to the bytes 1 passed it.
   // 2: It is pointless to store empty area anyway.
-  uintptr_t begin;
-  uintptr_t end;
-};
+  uintptr_t addr;
+  size_t    length;
 
-struct mem_region
-{
-  struct mem_area areas[MAX_MEM_AREA_COUNT];
-  size_t          count;
+  enum MemoryType type;
 };
 
 struct mmap
 {
-  struct mem_region usable;
-
-  struct mem_region acpi_reclaimable;
-  struct mem_region acpi_nvs;
-
-  struct mem_region reserved;
-  struct mem_region bad;
+  struct mmap_entry entries[MAX_MMAP_ENTRIES];
+  size_t            count;
 };
 
 struct boot_params

@@ -63,6 +63,11 @@ static void boot_params_init_multiboot2_mmap(struct multiboot_tag_mmap *tag)
   }
 }
 
+static void boot_params_init_multiboot2_module(struct multiboot_tag_module *tag)
+{
+  mem_region_remove(&boot_params.mmap.usable, tag->mod_start, tag->mod_end - tag->mod_start);
+}
+
 static void boot_params_init_multiboot2(struct multiboot_boot_information *boot_info)
 {
   MULTIBOOT_FOREACH_TAG(boot_info, tag)

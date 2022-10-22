@@ -29,15 +29,10 @@ struct mmap_entry
   enum MemoryType type;
 };
 
-#define MAX_MMAP_ENTRIES   32
+#define MAX_MMAP_ENTRIES 32
 
-struct mmap
-{
-  struct mmap_entry entries[MAX_MMAP_ENTRIES];
-  size_t            count;
-};
-
-extern struct mmap mmap;
+extern struct mmap_entry mmap_entries[MAX_MMAP_ENTRIES];
+extern size_t            mmap_entry_count;
 
 void mmap_init(struct multiboot_boot_information *boot_info);
 

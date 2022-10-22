@@ -2,20 +2,25 @@
 
 #include "core/assert.h"
 
-struct mmap mmap;
-
-/* mem region */
-static void mmap_insert(uintptr_t addr, size_t length, enum MemoryType type)
-{
-  KASSERT(mmap.count < MAX_MMAP_ENTRIES);
-  mmap.entries[mmap.count++] = (struct mmap_entry){.addr = addr, .length = length, .type = type};
-}
+struct mmap_entry mmap_entries[MAX_MMAP_ENTRIES];
+size_t            mmap_entry_count;
 
 static void mmap_sanitize()
 {
   // TODO:
 }
 
+static enum MemoryType as_memory_type(multiboot_uint32_t type)
+{
+  switch(type)
+  {
+  case MULTIBOOT_MEMORY_AVAILABLE:        return MEMORY_AVAILABLE;
+  case MULTIBOOT_MEMORY_ACPI_RECLAIMABLE: return MEMORY_ACPI_RECLAIMABLE;
+  case MULTIBOOT_MEMORY_NVS:              return MEMORY_ACPI_NVS;
+  case MULTIBOOT_MEMORY_RESERVED:         return MEMORY_RESERVED;
+  case MULTIBOOT_MEMORY_BADRAM:           return MEMORY_BAD;
+  }
+}
 
 void mmap_init(struct multiboot_boot_information *boot_info)
 {
@@ -26,14 +31,12 @@ void mmap_init(struct multiboot_boot_information *boot_info)
       struct multiboot_tag_mmap *mmap_tag = (struct multiboot_tag_mmap *)tag;
       MULTIBOOT_FOREACH_MMAP_ENTRY(mmap_tag, entry)
       {
-        switch(entry->type)
-        {
-        case MULTIBOOT_MEMORY_AVAILABLE:        mmap_insert(entry->addr, entry->len, MEMORY_AVAILABLE);        break;
-        case MULTIBOOT_MEMORY_ACPI_RECLAIMABLE: mmap_insert(entry->addr, entry->len, MEMORY_ACPI_RECLAIMABLE); break;
-        case MULTIBOOT_MEMORY_NVS:              mmap_insert(entry->addr, entry->len, MEMORY_ACPI_NVS);         break;
-        case MULTIBOOT_MEMORY_RESERVED:         mmap_insert(entry->addr, entry->len, MEMORY_RESERVED);         break;
-        case MULTIBOOT_MEMORY_BADRAM:           mmap_insert(entry->addr, entry->len, MEMORY_BAD);              break;
-        }
+        KASSERT(mmap_entry_count < MAX_MMAP_ENTRIES);
+        mmap_entries[mmap_entry_count++] = (struct mmap_entry){
+          .addr = entry->addr,
+          .length = entry->len,
+          .type = as_memory_type(entry->type),
+        };
       }
     }
   }

@@ -1,5 +1,7 @@
 #include "core/string.h"
 
+#include "core/debug.h"
+
 static char *_memcpy(char *restrict dst, const char *restrict src, size_t n)
 {
   for(size_t i=0; i<n; ++i)
@@ -14,14 +16,14 @@ void *memcpy(void *restrict dst, const void *restrict src, size_t n)
 
 static char *_memmove_forward(char *dst, const char *src, size_t n)
 {
-  for(size_t i=0; i<n; ++i)
+  for(size_t i=n-1; i<n; --i)
     dst[i] = src[i];
   return dst;
 }
 
 static char *_memmove_backward(char *dst, const char *src, size_t n)
 {
-  for(size_t i=n-1; i<n; --i)
+  for(size_t i=0; i<n; ++i)
     dst[i] = src[i];
   return dst;
 }

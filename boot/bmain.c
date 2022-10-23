@@ -5,6 +5,7 @@
 #include "debug.h"
 #include "modules.h"
 #include "mmap.h"
+#include "pages.h"
 
 void bmain(uint32_t magic, struct multiboot_boot_information *boot_info)
 {
@@ -28,4 +29,6 @@ void bmain(uint32_t magic, struct multiboot_boot_information *boot_info)
     debug_printf(" => addr=0x%lx, length=0x%lx\n",
         modules[i].addr,
         modules[i].length);
+
+  pages_init();
 }

@@ -3,6 +3,7 @@ BOOT_OBJS = boot/loader.o \
 	    boot/bmain.o \
 	    boot/mmap.o \
 	    boot/modules.o \
+	    boot/pages.o \
 	    boot/boot_params.o
 
 boot.elf: boot/link.ld $(BOOT_OBJS) libcore.a

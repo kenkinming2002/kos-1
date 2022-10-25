@@ -15,7 +15,7 @@ all: os.iso
 %.o: %.S
 	$(CC) $(ASFLAGS) -o $@ -c $^
 
-include core.mk
+include libcore.mk
 include boot.mk
 include kernel.mk
 

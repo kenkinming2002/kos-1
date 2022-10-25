@@ -1,4 +1,5 @@
-PAGE_OBJS = libpage/src/region.o
+PAGE_OBJS = libpage/src/region.o \
+	    libpage/src/watermark.o
 
 libpage.a: CFLAGS+=-Ilibpage/include
 

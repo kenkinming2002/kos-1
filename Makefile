@@ -4,7 +4,7 @@ AR=i686-elf-ar
 OBJCOPY=i686-elf-objcopy
 
 CFLAGS+=-fno-stack-protector
-CFLAGS+=-Icore/include -Iboot -Ikernel
+CFLAGS+=-Ikernel
 
 all: os.iso
 

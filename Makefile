@@ -17,6 +17,7 @@ all: os.iso
 
 include libcore.mk
 include libpage.mk
+include libx86.mk
 include boot.mk
 include kernel.mk
 

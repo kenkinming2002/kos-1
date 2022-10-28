@@ -1,7 +1,7 @@
-CC=i686-elf-gcc
-LD=i686-elf-ld
-AR=i686-elf-ar
-OBJCOPY=i686-elf-objcopy
+CC=x86_64-elf-gcc
+LD=x86_64-elf-ld
+AR=x86_64-elf-ar
+OBJCOPY=x86_64-elf-objcopy
 
 CFLAGS+=-fno-stack-protector
 CFLAGS+=-Ikernel

@@ -8,6 +8,7 @@
   initial_stack: .fill STACK_SIZE, 1, 0
 
 .section .text
+.code32
   entry:
     xor %ebp, %ebp
     mov $(initial_stack + STACK_SIZE), %esp

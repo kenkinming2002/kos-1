@@ -7,7 +7,7 @@
 #include "mmap.h"
 #include "pages.h"
 
-void bmain(uint32_t magic, struct multiboot_boot_information *boot_info)
+void bmain(uint64_t magic, struct multiboot_boot_information *boot_info)
 {
   debug_init();
   debug_printf("hello magic=0x%lx, addr=0x%lx\n", magic, (uintptr_t)boot_info);

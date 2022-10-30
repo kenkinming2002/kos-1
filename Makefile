@@ -5,6 +5,7 @@ OBJCOPY=x86_64-elf-objcopy
 
 CFLAGS+=-fno-stack-protector
 CFLAGS+=-Ikernel
+LDFLAGS+=-z max-page-size=4096
 
 all: os.iso
 

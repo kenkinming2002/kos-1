@@ -1,8 +1,8 @@
 BOOT_OBJS = boot/loader.o \
 	    boot/debug.o \
 	    boot/bmain.o \
-	    boot/mmap.o \
-	    boot/modules.o \
+	    boot/info/mmap.o \
+	    boot/info/modules.o \
 	    boot/pages.o \
 	    boot/boot_params.o
 

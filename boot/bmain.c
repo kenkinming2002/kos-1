@@ -3,8 +3,8 @@
 #include "core/debug.h"
 
 #include "debug.h"
-#include "modules.h"
-#include "mmap.h"
+#include "info/mmap.h"
+#include "info/modules.h"
 #include "pages.h"
 
 void bmain(uint64_t magic, struct multiboot_boot_information *boot_info)

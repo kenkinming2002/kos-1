@@ -1,7 +1,7 @@
-#include "pages.h"
+#include "mm.h"
 
-#include "mmap.h"
-#include "modules.h"
+#include "info/mmap.h"
+#include "info/modules.h"
 
 #include "core/debug.h"
 
@@ -13,7 +13,7 @@ struct region used_region;
 
 struct watermark_allocator allocator;
 
-void pages_init()
+void mm_init()
 {
   for(size_t i=0; i<mmap_entry_count; ++i)
     if(mmap_entries[i].type == MEMORY_AVAILABLE)

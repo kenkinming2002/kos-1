@@ -5,7 +5,7 @@
 #include "debug.h"
 #include "info/mmap.h"
 #include "info/modules.h"
-#include "pages.h"
+#include "mm.h"
 
 void bmain(uint64_t magic, struct multiboot_boot_information *boot_info)
 {
@@ -30,5 +30,5 @@ void bmain(uint64_t magic, struct multiboot_boot_information *boot_info)
         modules[i].addr,
         modules[i].length);
 
-  pages_init();
+  mm_init();
 }

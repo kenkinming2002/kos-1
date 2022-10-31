@@ -12,3 +12,6 @@ boot.elf: LIBS    += -nostdlib -lx86 -lmm -lcore -lgcc
 
 boot.elf: boot/link.ld $(BOOT_OBJS) libcore.a libmm.a libx86.a
 	$(CC) $(LDFLAGS) -o $@ $(BOOT_OBJS) $(LIBS)
+
+ALL_OBJS += $(BOOT_OBJS)
+ALL_ELFS += boot.elf

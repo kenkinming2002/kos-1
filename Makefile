@@ -28,4 +28,7 @@ os.iso: grub.cfg boot.elf kernel.elf
 # PHONY rule
 .PHONY: clean
 clean:
-	- rm -f $(OBJS) boot.elf kernel.elf os.iso
+	- rm -f $(ALL_OBJS)
+	- rm -f $(ALL_ARS)
+	- rm -f $(ALL_ELFS)
+	- rm -f os.iso

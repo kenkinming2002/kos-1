@@ -10,3 +10,6 @@ kernel.elf: LIBS    += -nostdlib -lmm -lcore -lgcc
 kernel.elf: kernel/link.ld $(KERNEL_OBJS) libcore.a libmm.a
 	$(CC) $(LDFLAGS) -o $@ $(KERNEL_OBJS) $(LIBS)
 
+ALL_OBJS += $(KERNEL_OBJS)
+ALL_ELFS += kernel.elf
+

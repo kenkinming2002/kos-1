@@ -8,3 +8,5 @@ libcore.a: CFLAGS+=-Ilibcore/include
 libcore.a: $(CORE_OBJS)
 	$(AR) rcs $@ $(CORE_OBJS)
 
+ALL_OBJS += $(CORE_OBJS)
+ALL_ARS  += libcore.a

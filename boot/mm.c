@@ -5,8 +5,8 @@
 
 #include "core/debug.h"
 
-#include "page/region.h"
-#include "page/watermark.h"
+#include "mm/page/region.h"
+#include "mm/page/watermark.h"
 
 struct region usable_region;
 struct region used_region;

@@ -3,10 +3,10 @@ KERNEL_OBJS = kernel/debug.o \
        	      kernel/loader.o
        	      #kernel/mm/pages.o
 
-kernel.elf: CFLAGS  += -Ilibcore/include -Ilibpage/include -Ikernel
+kernel.elf: CFLAGS  += -Ilibcore/include -Ilibmm/include -Ikernel
 kernel.elf: LDFLAGS += -T kernel/link.ld -L.
-kernel.elf: LIBS    += -nostdlib -lpage -lcore -lgcc
+kernel.elf: LIBS    += -nostdlib -lmm -lcore -lgcc
 
-kernel.elf: kernel/link.ld $(KERNEL_OBJS) libcore.a libpage.a
+kernel.elf: kernel/link.ld $(KERNEL_OBJS) libcore.a libmm.a
 	$(CC) $(LDFLAGS) -o $@ $(KERNEL_OBJS) $(LIBS)
 

@@ -6,7 +6,7 @@ BOOT_OBJS = boot/loader.o \
 	    boot/mm.o \
 	    boot/boot_params.o
 
-boot.elf: CFLAGS  += -Ilibcore/include -Ilibmm/include -Ilibx86 -Iboot
+boot.elf: CFLAGS  += -Ilibcore/include -Ilibmm/include -Ilibx86/include -Iboot
 boot.elf: LDFLAGS += -T boot/link.ld -L.
 boot.elf: LIBS    += -nostdlib -lx86 -lmm -lcore -lgcc
 

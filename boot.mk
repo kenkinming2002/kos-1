@@ -1,4 +1,5 @@
-BOOT_OBJS = boot/loader.o \
+BOOT_OBJS = boot/entry.o \
+	    boot/multiboot2.o \
 	    boot/debug.o \
 	    boot/bmain.o \
 	    boot/info/mmap.o \

@@ -17,7 +17,7 @@ static enum MemoryType as_memory_type(multiboot_uint32_t type)
   case MULTIBOOT_MEMORY_AVAILABLE:        return MEMORY_AVAILABLE;
   case MULTIBOOT_MEMORY_ACPI_RECLAIMABLE: return MEMORY_ACPI_RECLAIMABLE;
   case MULTIBOOT_MEMORY_NVS:              return MEMORY_ACPI_NVS;
-  case MULTIBOOT_MEMORY_RESERVED:         return MEMORY_RESERVED;
+  case MULTIBOOT_MEMORY_RESERVED:         return MEMORY_RESERVED_SYSTEM;
   case MULTIBOOT_MEMORY_BADRAM:           return MEMORY_BAD;
   }
 }

@@ -31,11 +31,10 @@
 .section .bss
   stack: .fill STACK_SIZE, 1, 0
 
+.section .bss
   .align 0x1000
-  bootstrap_pml4: .fill 0x1000, 1, 0
-  bootstrap_pml3: .fill 0x1000, 1, 0
-  bootstrap_pml2: .fill 0x1000, 1, 0
-  bootstrap_pml1: .fill 0x1000, 1, 0
+  bootstrap_pml4: .fill 0x1000,   1, 0
+  bootstrap_pml3: .fill 0x100000, 1, 0 // 1GiB
 
 .section .rodata
   .align 8
@@ -57,8 +56,25 @@
     .word bootstrap_gdt_end - bootstrap_gdt - 1
     .quad bootstrap_gdt
 
+// edi:     address of pml*
+// eax:edx: address to map with required mask
+// ebx:     increment
+// ecx:     count
 .section .text
+pml_init:
+.code32
+0:
+  mov %eax, 0(%edi)
+  mov %edx, 4(%edi)
+  add $0x8, %edi
+  add %ebx, %eax
+  jnc 1f
+  inc %edx
+1:
+  loop 0b
+  ret
 
+.section .text
 entry32:
 .code32
   xor %ebp, %ebp
@@ -67,22 +83,19 @@ entry32:
   push %eax
   push %ebx
 
-  // At this point we could only use 32 bit registers so setting up identity
-  // paging for half of the address space i.e. 128TB would be cumbersome.
-  // That's why we only identity map the first 2MB to begin with.
-  movl $(bootstrap_pml3 + 0x3), bootstrap_pml4
-  movl $(bootstrap_pml2 + 0x3), bootstrap_pml3
-  movl $(bootstrap_pml1 + 0x3), bootstrap_pml2
+  mov $bootstrap_pml4, %edi
+  mov $(bootstrap_pml3 + 0x3), %eax
+  xor %edx, %edx
+  mov $0x1000, %ebx
+  mov $0x100,  %ecx
+  call pml_init
 
-  // Fill PML1
-  mov $0x3,            %esi
-  mov $bootstrap_pml1, %edi
-  mov $0x200,          %ecx
-0:
-  mov %esi, (%edi)
-  add $0x1000, %esi
-  add $0x8,    %edi
-  loop 0b
+  mov $bootstrap_pml3, %edi
+  mov $0x83, %eax
+  xor %edx, %edx
+  mov $0x40000000, %ebx
+  mov $0x20000,  %ecx
+  call pml_init
 
   // Point cr3 to PML4
   mov $bootstrap_pml4, %ecx
@@ -112,6 +125,7 @@ entry32:
 
   ljmp $0x08, $entry64
 
+.section .text
 entry64:
 .code64
   xor %rbp, %rbp

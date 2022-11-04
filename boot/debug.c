@@ -81,7 +81,7 @@ void serial_put(char c)
 
 void debug_put(char c)
 {
-  fb_put(c);
+  //fb_put(c);
   serial_put(c);
 }
 

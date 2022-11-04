@@ -38,5 +38,6 @@ extern struct mmap_entry mmap_entries[MAX_MMAP_ENTRIES];
 extern size_t            mmap_entry_count;
 
 void mmap_init(struct multiboot_boot_information *boot_info);
+void *mmap_alloc(size_t count);
 
 #endif // BOOT_INFO_MMAP_H

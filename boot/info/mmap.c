@@ -33,8 +33,6 @@ static void mmap_append_entry(struct mmap_entry new_entry)
   KASSERT(mmap_entry_count != MAX_MMAP_ENTRIES);
   mmap_entries[mmap_entry_count++] = new_entry;
 
-  debug_printf("append entry addr=0x%lx, length=0x%lx\n", new_entry.addr, new_entry.length);
-
   // Sort:
   for(size_t i=1; i<mmap_entry_count; ++i)
     for(size_t j=0; j<mmap_entry_count-i; ++j)
@@ -46,12 +44,13 @@ static void mmap_append_entry(struct mmap_entry new_entry)
       }
 
   // Merge:
-  size_t j=0;
-  for(size_t i=0; i<mmap_entry_count; ++i)
-    if(mmap_entries[j].addr + mmap_entries[j].length == mmap_entries[i].addr)
-      mmap_entries[j].addr += mmap_entries[i].length;
+  size_t j=1;
+  for(size_t i=1; i<mmap_entry_count; ++i)
+    if(mmap_entries[j-1].type == mmap_entries[i].type && mmap_entries[j-1].addr + mmap_entries[j-1].length == mmap_entries[i].addr)
+      mmap_entries[j-1].length += mmap_entries[i].length;
     else
       mmap_entries[j++] = mmap_entries[i];
+  mmap_entry_count = j;
 }
 
 static void mmap_replace_entry(struct mmap_entry new_entry)
@@ -90,4 +89,26 @@ void mmap_init(struct multiboot_boot_information *boot_info)
       struct multiboot_tag_module *module_tag = (struct multiboot_tag_module *)tag;
       mmap_replace_entry(mmap_entry_make_be(module_tag->mod_start, module_tag->mod_end, MEMORY_RESERVED_MODULE));
     }
+
+  for(size_t i=0; i<100; ++i)
+    debug_printf("mmap alloc = 0x%lx\n", (uintptr_t)mmap_alloc(2));
 }
+
+void *mmap_alloc(size_t count)
+{
+  for(size_t i=0; i<mmap_entry_count; ++i)
+  {
+    if(mmap_entries[i].type != MEMORY_AVAILABLE)
+      continue;
+
+    uintptr_t begin = (mmap_entries[i].addr + 0x1000 - 1) / 0x1000 * 0x1000;
+    uintptr_t end   = begin + count * 0x1000;
+    struct mmap_entry alloc_entry = mmap_entry_make_be(begin, end, MEMORY_RESERVED_BOOTLOADER);
+    if(!mmap_entry_contain(mmap_entries[i], alloc_entry))
+      continue;
+
+    mmap_replace_entry(alloc_entry);
+    return (void*)begin;
+  }
+}
+

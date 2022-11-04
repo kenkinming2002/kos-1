@@ -89,9 +89,6 @@ void mmap_init(struct multiboot_boot_information *boot_info)
       struct multiboot_tag_module *module_tag = (struct multiboot_tag_module *)tag;
       mmap_replace_entry(mmap_entry_make_be(module_tag->mod_start, module_tag->mod_end, MEMORY_RESERVED_MODULE));
     }
-
-  for(size_t i=0; i<100; ++i)
-    debug_printf("mmap alloc = 0x%lx\n", (uintptr_t)mmap_alloc(2));
 }
 
 void *mmap_alloc(size_t count)

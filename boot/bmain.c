@@ -5,7 +5,6 @@
 #include "debug.h"
 #include "info/mmap.h"
 #include "info/modules.h"
-#include "mm.h"
 
 void bmain(uint64_t magic, struct multiboot_boot_information *boot_info)
 {
@@ -30,5 +29,6 @@ void bmain(uint64_t magic, struct multiboot_boot_information *boot_info)
         modules[i].addr,
         modules[i].length);
 
-  mm_init();
+  for(size_t i=0; i<100; ++i)
+    debug_printf("mmap alloc = 0x%lx\n", (uintptr_t)mmap_alloc(2));
 }

@@ -3,13 +3,20 @@
 
 #define STACK_SIZE 0x1000
 
+#define PAGE_SIZE (1 << 12)
+
+#define PML1_SIZE (1 << 12)
+#define PML2_SIZE (1 << 21)
+#define PML3_SIZE (1 << 30)
+#define PML4_SIZE (1 << 39)
+
 .section .bss
   stack: .fill STACK_SIZE, 1, 0
 
 .section .bss
   .align 0x1000
-  bootstrap_pml4: .fill 0x1000,   1, 0
-  bootstrap_pml3: .fill 0x100000, 1, 0 // 1GiB
+  bootstrap_pml4: .fill 512,       8, 0
+  bootstrap_pml3: .fill 512 * 512, 8, 0
 
 .section .rodata
   .align 8
@@ -40,18 +47,16 @@ entry32:
   push %eax
   push %ebx
 
-  mov $bootstrap_pml4, %edi
+  mov $bootstrap_pml4,         %edi
   mov $(bootstrap_pml3 + 0x3), %eax
-  xor %edx, %edx
-  mov $0x1000, %ebx
-  mov $0x100,  %ecx
+  mov $PAGE_SIZE,              %ebx
+  mov $(512),                  %ecx
   call pml_init
 
   mov $bootstrap_pml3, %edi
-  mov $0x83, %eax
-  xor %edx, %edx
-  mov $0x40000000, %ebx
-  mov $0x20000,  %ecx
+  mov $0x83,           %eax
+  mov $PML3_SIZE,      %ebx
+  mov $(512 * 512),    %ecx
   call pml_init
 
   // Point cr3 to PML4
@@ -96,13 +101,14 @@ entry64:
   hlt
   jmp 0b
 
-// edi:     address of pml*
-// eax:edx: address to map with required mask
-// ebx:     increment
-// ecx:     count
+// edi: address of pml*
+// eax: address to map with required mask
+// ebx: increment
+// ecx: count
 .section .text
 pml_init:
 .code32
+  xor %edx, %edx
 0:
   mov %eax, 0(%edi)
   mov %edx, 4(%edi)

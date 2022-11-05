@@ -3,9 +3,8 @@
 #include "core/debug.h"
 
 #include "debug.h"
-#include "info/modules.h"
-
 #include "mm.h"
+#include "modules.h"
 
 void bmain(uint64_t magic, struct multiboot_boot_information *boot_info)
 {

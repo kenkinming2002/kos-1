@@ -1,5 +1,5 @@
-#ifndef BOOT_INFO_MODULES_H
-#define BOOT_INFO_MODULES_H
+#ifndef BOOT_MODULES_H
+#define BOOT_MODULES_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -23,5 +23,5 @@ extern size_t        module_count;
 
 void modules_init(struct multiboot_boot_information *boot_info);
 
-#endif // BOOT_INFO_MODULES_H
+#endif // BOOT_MODULES_H
 

@@ -1,4 +1,4 @@
-#include "mmap.h"
+#include "mm.h"
 
 #include "core/assert.h"
 #include "core/debug.h"
@@ -73,7 +73,7 @@ static void mmap_replace_entry(struct mmap_entry new_entry)
   KASSERT(false && "Failed to replace region");
 }
 
-void mmap_init(struct multiboot_boot_information *boot_info)
+void mm_init(struct multiboot_boot_information *boot_info)
 {
   MULTIBOOT_FOREACH_TAG(boot_info, tag)
     if(tag->type == MULTIBOOT_TAG_TYPE_MMAP)
@@ -91,7 +91,7 @@ void mmap_init(struct multiboot_boot_information *boot_info)
     }
 }
 
-void *mmap_alloc(size_t count)
+void *mm_alloc(size_t count)
 {
   for(size_t i=0; i<mmap_entry_count; ++i)
   {

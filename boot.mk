@@ -2,7 +2,7 @@ BOOT_OBJS = boot/entry.o \
 	    boot/multiboot2.o \
 	    boot/debug.o \
 	    boot/bmain.o \
-	    boot/info/mmap.o \
+	    boot/mm.o \
 	    boot/info/modules.o \
 	    boot/boot_params.o
 

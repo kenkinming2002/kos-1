@@ -24,10 +24,6 @@ enum MemoryType
 
 struct mmap_entry
 {
-  // Note: Includes the byte pointed to by end.
-  // 1: The APIC mmio region is at the end of 4GiB address space, so there is
-  //    no address pointing to the bytes 1 passed it.
-  // 2: It is pointless to store empty area anyway.
   uintptr_t addr;
   size_t    length;
 

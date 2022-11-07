@@ -31,9 +31,12 @@ struct mmap_entry
 };
 
 #define MAX_MMAP_ENTRIES 32
-
-extern struct mmap_entry mmap_entries[MAX_MMAP_ENTRIES];
-extern size_t            mmap_entry_count;
+struct mmap
+{
+  struct mmap_entry entries[MAX_MMAP_ENTRIES];
+  size_t            count;
+};
+extern struct mmap mmap;
 
 void mm_init(struct multiboot_boot_information *boot_info);
 void *mm_alloc(size_t count);

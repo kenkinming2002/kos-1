@@ -31,4 +31,11 @@ void bmain(uint64_t magic, struct multiboot_boot_information *boot_info)
 
   for(size_t i=0; i<100; ++i)
     debug_printf("mmap alloc = 0x%lx\n", (uintptr_t)mm_alloc(2));
+
+  debug_printf("mmap\n");
+  for(size_t i=0; i<mmap_entry_count; ++i)
+    debug_printf(" => addr=0x%lx, length=0x%lx, type=%u\n",
+        mmap_entries[i].addr,
+        mmap_entries[i].length,
+        mmap_entries[i].type);
 }

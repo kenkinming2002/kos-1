@@ -10,12 +10,14 @@ enum MemoryType
 {
   MEMORY_AVAILABLE,
 
-  MEMORY_RESERVED_MODULE,
-  MEMORY_RESERVED_SYSTEM,
-  MEMORY_RESERVED_BOOTLOADER, /* Memory used by bootloader e.g. page maps and kernel image*/
+  MEMORY_BOOTLOADER_RECLAIMABLE, /* Memory used by bootloader */
 
   MEMORY_ACPI_RECLAIMABLE,
   MEMORY_ACPI_NVS,
+
+  MEMORY_RESERVED,
+  MEMORY_KERNEL,
+  MEMORY_INITRD,
 
   MEMORY_BAD,
 };

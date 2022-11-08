@@ -93,6 +93,13 @@ void mm_init(struct multiboot_boot_information *boot_info)
     }
 
   mmap_replace_entry(mmap_entry_make_be((uintptr_t)boot_begin, (uintptr_t)boot_end, MEMORY_BOOTLOADER_RECLAIMABLE));
+
+  debug_printf("mmap\n");
+  for(size_t i=0; i<mmap.count; ++i)
+    debug_printf(" => addr=0x%lx, length=0x%lx, type=%u\n",
+        mmap.entries[i].addr,
+        mmap.entries[i].length,
+        mmap.entries[i].type);
 }
 
 void *mm_alloc(size_t count)

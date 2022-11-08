@@ -4,13 +4,13 @@
 
 #include "debug.h"
 #include "mm.h"
-#include "modules.h"
+#include "files.h"
 
 void bmain(uint64_t magic, struct multiboot_boot_information *boot_info)
 {
   debug_init();
   mm_init(boot_info);
-  modules_init(boot_info);
+  files_init(boot_info);
 
   boot_params_init(magic, (uintptr_t)boot_info);
 }

@@ -3,7 +3,7 @@ BOOT_OBJS = boot/entry.o \
 	    boot/debug.o \
 	    boot/bmain.o \
 	    boot/mm.o \
-	    boot/modules.o \
+	    boot/files.o \
 	    boot/boot_params.o
 
 boot.elf: CFLAGS  += -Ilibcore/include -Ilibmm/include -Ilibx86/include -Iboot

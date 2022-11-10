@@ -1,4 +1,4 @@
-#include "files.h"
+#include "fs.h"
 
 #include "core/assert.h"
 #include "core/debug.h"
@@ -7,7 +7,7 @@
 struct file files[MAX_FILES];
 size_t      file_count;
 
-void files_init(struct multiboot_boot_information *boot_info)
+void fs_init(struct multiboot_boot_information *boot_info)
 {
   MULTIBOOT_FOREACH_TAG(boot_info, tag)
   {

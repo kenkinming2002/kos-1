@@ -1,5 +1,5 @@
-#ifndef BOOT_FILES_H
-#define BOOT_FILES_H
+#ifndef BOOT_FS_H
+#define BOOT_FS_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -20,7 +20,7 @@ struct file
 extern struct file files[MAX_FILES];
 extern size_t      file_count;
 
-void files_init(struct multiboot_boot_information *boot_info);
+void fs_init(struct multiboot_boot_information *boot_info);
 
-#endif // BOOT_FILES_H
+#endif // BOOT_FS_H
 

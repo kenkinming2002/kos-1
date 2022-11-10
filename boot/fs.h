@@ -17,9 +17,13 @@ struct file
   size_t    length;
 };
 
-extern struct file files[MAX_FILES];
-extern size_t      file_count;
+struct fs
+{
+  struct file files[MAX_FILES];
+  size_t      count;
+};
 
+extern struct fs fs;
 void fs_init(struct multiboot_boot_information *boot_info);
 
 #endif // BOOT_FS_H

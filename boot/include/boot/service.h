@@ -28,9 +28,9 @@ struct boot_mmap_entry
   size_t                length;
 };
 
-typedef void(*boot_mmap_iterate_t)(void(*)(struct boot_mmap_entry *mmap_entry));
-typedef void *(*boot_mmap_alloc_pages_t)(size_t count);
-typedef void (*boot_mmap_free_pages_t)(void *ptr, size_t count);
+typedef void(*boot_mm_iterate_t)(void(*)(struct boot_mmap_entry *mmap_entry));
+typedef void *(*boot_mm_alloc_pages_t)(size_t count);
+typedef void (*boot_mm_free_pages_t)(void *ptr, size_t count);
 
 // Filesystem Services
 struct boot_file;
@@ -42,9 +42,9 @@ typedef void(*boot_fs_write_t)(struct boot_file *file, size_t offset, size_t len
 struct boot_service
 {
   // Memory services
-  boot_mmap_iterate_t      mmap_iterate;
-  boot_mmap_alloc_pages_t  mmap_alloc_pages;
-  boot_mmap_free_pages_t   mmap_free_pages;
+  boot_mm_iterate_t      mm_iterate;
+  boot_mm_alloc_pages_t  mm_alloc_pages;
+  boot_mm_free_pages_t   mm_free_pages;
 
   // Filesystem Services
   boot_fs_iterate_t fs_iterate;

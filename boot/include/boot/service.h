@@ -1,6 +1,9 @@
 #ifndef BOOT_SERVICE_H
 #define BOOT_SERVICE_H
 
+#include <stddef.h>
+#include <stdint.h>
+
 #define PATH_MAX 256
 
 // Memory Services
@@ -17,9 +20,9 @@ typedef void (*boot_mmap_free_pages_t)(void *ptr, size_t count);
 // Filesystem Services
 struct boot_file;
 
-typedef void(boot_fs_iterate_t)(void(*)(struct file *file));
-typedef void(*boot_fs_read_t) (struct file *file, size_t offset, size_t length, char *buffer);
-typedef void(*boot_fs_write_t)(struct file *file, size_t offset, size_t length, const char *buffer);
+typedef void(*boot_fs_iterate_t)(void(*)(struct boot_file *file));
+typedef void(*boot_fs_read_t) (struct boot_file *file, size_t offset, size_t length, char *buffer);
+typedef void(*boot_fs_write_t)(struct boot_file *file, size_t offset, size_t length, const char *buffer);
 
 struct boot_service
 {

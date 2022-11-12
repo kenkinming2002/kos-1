@@ -1,10 +1,10 @@
-BOOT_OBJS = boot/entry.o \
-	    boot/multiboot2.o \
-	    boot/debug.o \
-	    boot/bmain.o \
-	    boot/mm.o \
-	    boot/fs.o \
-	    boot/boot_params.o
+BOOT_OBJS = boot/src/entry.o \
+	    boot/src/multiboot2.o \
+	    boot/src/debug.o \
+	    boot/src/bmain.o \
+	    boot/src/mm.o \
+	    boot/src/fs.o \
+	    boot/src/boot_params.o
 
 boot.elf: CFLAGS  += -Ilibcore/include -Ilibmm/include -Ilibx86/include -Iboot
 boot.elf: LDFLAGS += -T boot/link.ld -L.

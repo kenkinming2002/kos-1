@@ -7,10 +7,25 @@
 #define PATH_MAX 256
 
 // Memory Services
+enum boot_memory_type
+{
+  BOOT_MEMORY_AVAILALBE,
+
+  BOOT_MEMORY_BOOTLOADER_RECLAIMABLE,
+  BOOT_MEMORY_BOOTLOADER_FILESYSTEM,
+
+  BOOT_MEMORY_ACPI_RECLAIMABLE,
+  BOOT_MEMORY_ACPI_NVS,
+
+  BOOT_MEMORY_RESERVED,
+  BOOT_MEMORY_BAD,
+};
+
 struct boot_mmap_entry
 {
-  uintptr_t addr;
-  size_t    length;
+  enum boot_memory_type type;
+  uintptr_t             addr;
+  size_t                length;
 };
 
 typedef void(*boot_mmap_iterate_t)(void(*)(struct boot_mmap_entry *mmap_entry));

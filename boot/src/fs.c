@@ -50,6 +50,16 @@ void boot_fs_iterate(void(*iterate)(struct boot_file *file))
     iterate(&files[i]);
 }
 
+const char *boot_fs_get_name(struct boot_file *file)
+{
+  return file->name;
+}
+
+size_t boot_fs_get_length(struct boot_file *file)
+{
+  return file->length;
+}
+
 void boot_fs_read(struct boot_file *file, size_t offset, size_t length, char *buffer)
 {
   KASSERT(offset <= offset + length);

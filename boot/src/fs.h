@@ -11,6 +11,10 @@
 void fs_init(struct multiboot_boot_information *boot_info);
 
 void boot_fs_iterate(void(*)(struct boot_file *file));
+
+const char *boot_fs_get_name(struct boot_file *file);
+size_t boot_fs_get_length(struct boot_file *file);
+
 void boot_fs_read(struct boot_file *file, size_t offset, size_t length, char *buffer);
 void boot_fs_write(struct boot_file *file, size_t offset, size_t length, const char *buffer);
 

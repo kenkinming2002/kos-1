@@ -102,6 +102,7 @@ static const char *as_string(enum boot_memory_type type)
     case BOOT_MEMORY_AVAILABLE:              return "available";
     case BOOT_MEMORY_BOOTLOADER_RECLAIMABLE: return "bootloader reclaimable";
     case BOOT_MEMORY_BOOTLOADER_FILESYSTEM:  return "bootloader filesystem";
+    case BOOT_MEMORY_BOOTLOADER_ALLOCATED:   return "bootloader allocated";
     case BOOT_MEMORY_ACPI_RECLAIMABLE:       return "acpi reclaimable";
     case BOOT_MEMORY_ACPI_NVS:               return "acpi nvs";
     case BOOT_MEMORY_RESERVED:               return "reserved";
@@ -160,7 +161,7 @@ void *boot_mm_alloc_pages(size_t alloc_count)
       continue;
 
     uintptr_t begin = (entries[i].addr + 0x1000 - 1) / 0x1000 * 0x1000;
-    struct boot_mmap_entry alloc_entry = mmap_entry_make_al(begin, alloc_count * 0x1000, BOOT_MEMORY_BOOTLOADER_RECLAIMABLE);
+    struct boot_mmap_entry alloc_entry = mmap_entry_make_al(begin, alloc_count * 0x1000, BOOT_MEMORY_BOOTLOADER_ALLOCATED);
     if(!mmap_entry_contain(entries[i], alloc_entry))
       continue;
 

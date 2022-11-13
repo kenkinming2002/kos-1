@@ -8,6 +8,8 @@ struct boot_service boot_service = {
   .mm_alloc_pages = boot_mm_alloc_pages,
   .mm_free_pages  = boot_mm_free_pages,
   .fs_iterate     = boot_fs_iterate,
+  .fs_get_name    = NULL,
+  .fs_get_length  = NULL,
   .fs_read        = boot_fs_read,
   .fs_write       = boot_fs_write,
 };

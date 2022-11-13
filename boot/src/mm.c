@@ -92,6 +92,7 @@ static enum boot_memory_type as_memory_type(multiboot_uint32_t type)
   case MULTIBOOT_MEMORY_RESERVED:         return BOOT_MEMORY_RESERVED;
   case MULTIBOOT_MEMORY_BADRAM:           return BOOT_MEMORY_BAD;
   }
+  KASSERT_UNREACHABLE;
 }
 
 static const char *as_string(enum boot_memory_type type)
@@ -106,6 +107,7 @@ static const char *as_string(enum boot_memory_type type)
     case BOOT_MEMORY_RESERVED:               return "reserved";
     case BOOT_MEMORY_BAD:                    return "bad";
   }
+  KASSERT_UNREACHABLE;
 }
 
 extern char boot_begin[];

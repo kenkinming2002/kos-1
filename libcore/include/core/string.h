@@ -8,6 +8,7 @@ void *memmove(void *dst, const void *src, size_t n);
 void *memset(void *dst, int c, size_t n);
 
 size_t strlen(const char *s);
+int strcmp(const char *s1, const char *s2);
 
 /* Copy string from src to a buffer pointed to by dst of length size.
  * Return the length of string copied. */

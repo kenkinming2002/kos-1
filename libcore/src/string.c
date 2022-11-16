@@ -78,3 +78,14 @@ size_t kstrcpy(char *restrict dst, const char *restrict src, size_t size)
   return len;
 }
 
+static int _strcmp(const unsigned char *s1, const unsigned char *s2)
+{
+  while(*s1 && *s2 && *s1 == *s2) ++s1, ++s2;
+  return (int)*s1 - (int)*s2;
+}
+
+int strcmp(const char *s1, const char *s2)
+{
+  return _strcmp((const unsigned char *)s1, (const unsigned char *)s2);
+}
+

@@ -13,7 +13,7 @@ static const char *filename_allocate(const char *filename)
   static size_t index                  = 0;
 
   KASSERT(index + strlen(filename) + 1 <= MAX_FILENAMES);
-  const char *new_filename = &storage[index];
+  char *new_filename = &storage[index];
   index += strlen(filename) + 1;
 
   strcpy(new_filename, filename);

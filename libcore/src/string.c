@@ -60,6 +60,13 @@ void *memset(void *dst, int c, size_t n)
   return _memset(dst, c, n);
 }
 
+char *strcpy(char *restrict dst, const char *restrict src)
+{
+  char *res = dst;
+  while((*dst++ = *src++) != '\0');
+  return res;
+}
+
 size_t strlen(const char *s)
 {
   size_t i=0;

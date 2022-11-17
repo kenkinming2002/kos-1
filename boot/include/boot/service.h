@@ -34,15 +34,18 @@ typedef void *(*boot_mm_alloc_pages_t)(size_t count);
 typedef void (*boot_mm_free_pages_t)(void *ptr, size_t count);
 
 // Filesystem Services
-struct boot_file;
+struct boot_file
+{
+  const char *name;
+
+  char   *data;
+  size_t  length;
+};
 
 typedef void(*boot_fs_iterate_t)(void(*)(struct boot_file *file));
 
 typedef const char *(*boot_fs_get_name_t)  (struct boot_file *file);
 typedef size_t      (*boot_fs_get_length_t)(struct boot_file *file);
-
-typedef void(*boot_fs_read_t) (struct boot_file *file, size_t offset, size_t length, char *buffer);
-typedef void(*boot_fs_write_t)(struct boot_file *file, size_t offset, size_t length, const char *buffer);
 
 struct boot_service
 {
@@ -53,12 +56,6 @@ struct boot_service
 
   // Filesystem Services
   boot_fs_iterate_t fs_iterate;
-
-  boot_fs_get_name_t   fs_get_name;
-  boot_fs_get_length_t fs_get_length;
-
-  boot_fs_read_t    fs_read;
-  boot_fs_write_t   fs_write;
 };
 
 #endif // BOOT_SERVICE_H

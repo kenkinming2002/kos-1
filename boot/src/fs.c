@@ -4,16 +4,21 @@
 #include "core/debug.h"
 #include "core/string.h"
 
-#define MAX_FILES           32
-#define MAX_FILENAME_LENGTH 256
+#define MAX_FILES     32
+#define MAX_FILENAMES 256
 
-struct boot_file
+static const char *filename_allocate(const char *filename)
 {
-  char name[MAX_FILENAME_LENGTH];
+  static char   storage[MAX_FILENAMES] = {};
+  static size_t index                  = 0;
 
-  char  *data;
-  size_t length;
-};
+  KASSERT(index + strlen(filename) + 1 <= MAX_FILENAMES);
+  const char *new_filename = &storage[index];
+  index += strlen(filename) + 1;
+
+  strcpy(new_filename, filename);
+  return new_filename;
+}
 
 struct boot_file files[MAX_FILES];
 size_t           count;
@@ -27,12 +32,11 @@ void fs_init(struct multiboot_boot_information *boot_info)
       struct multiboot_tag_module *module_tag = (struct multiboot_tag_module *)tag;
 
       KASSERT(count != MAX_FILES);
-
-      kstrcpy(files[count].name, module_tag->cmdline, sizeof files[count].name);
-      files[count].data   = (char *)(uintptr_t)module_tag->mod_start;
-      files[count].length = module_tag->mod_end - module_tag->mod_start;
-
-      ++count;
+      files[count++] = (struct boot_file){
+        .name   = filename_allocate(module_tag->cmdline),
+        .data   = (char *)(uintptr_t)module_tag->mod_start,
+        .length = module_tag->mod_end - module_tag->mod_start,
+      };
     }
   }
 
@@ -48,29 +52,5 @@ void boot_fs_iterate(void(*iterate)(struct boot_file *file))
 {
   for(size_t i=0; i<count; ++i)
     iterate(&files[i]);
-}
-
-const char *boot_fs_get_name(struct boot_file *file)
-{
-  return file->name;
-}
-
-size_t boot_fs_get_length(struct boot_file *file)
-{
-  return file->length;
-}
-
-void boot_fs_read(struct boot_file *file, size_t offset, size_t length, char *buffer)
-{
-  KASSERT(offset <= offset + length);
-  KASSERT(offset + length <= file->length);
-  memcpy(buffer, &file->data[offset], length);
-}
-
-void boot_fs_write(struct boot_file *file, size_t offset, size_t length, const char *buffer)
-{
-  KASSERT(offset <= offset + length);
-  KASSERT(offset + length <= file->length);
-  memcpy(&file->data[offset], buffer, length);
 }
 

@@ -54,3 +54,11 @@ void boot_fs_iterate(void(*iterate)(struct boot_file *file))
     iterate(&files[i]);
 }
 
+struct boot_file *boot_fs_lookup(const char *path)
+{
+  for(size_t i=0; i<count; ++i)
+    if(strcmp(files[i].name, path) == 0)
+      return &files[i];
+
+  return NULL;
+}

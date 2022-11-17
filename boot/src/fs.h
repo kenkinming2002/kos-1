@@ -11,6 +11,7 @@
 void fs_init(struct multiboot_boot_information *boot_info);
 
 void boot_fs_iterate(void(*)(struct boot_file *file));
+struct boot_file *boot_fs_lookup(const char *path);
 
 #endif // BOOT_FS_H
 

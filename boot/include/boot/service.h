@@ -43,6 +43,7 @@ struct boot_file
 };
 
 typedef void(*boot_fs_iterate_t)(void(*)(struct boot_file *file));
+typedef struct boot_file *(*boot_fs_lookup_t)(const char *path);
 
 typedef const char *(*boot_fs_get_name_t)  (struct boot_file *file);
 typedef size_t      (*boot_fs_get_length_t)(struct boot_file *file);
@@ -56,6 +57,7 @@ struct boot_service
 
   // Filesystem Services
   boot_fs_iterate_t fs_iterate;
+  boot_fs_lookup_t  fs_lookup;
 };
 
 #endif // BOOT_SERVICE_H

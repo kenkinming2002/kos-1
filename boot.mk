@@ -4,9 +4,10 @@ BOOT_OBJS = boot/src/entry.o \
 	    boot/src/bmain.o \
 	    boot/src/mm.o \
 	    boot/src/fs.o \
+	    boot/src/kernel.o \
 	    boot/src/service.o
 
-boot.elf: CFLAGS  += -Ilibcore/include -Ilibmm/include -Ilibx86/include -I boot/include -Iboot
+boot.elf: CFLAGS  += -Ilibcore/include -Ilibmm/include -Ilibx86/include -Ilibelf/include -I boot/include -Iboot
 boot.elf: LDFLAGS += -T boot/link.ld -L.
 boot.elf: LIBS    += -nostdlib -lx86 -lmm -lcore -lgcc
 

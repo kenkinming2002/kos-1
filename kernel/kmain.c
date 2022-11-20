@@ -5,7 +5,7 @@
 
 #define TEST_COUNT 10
 
-void kmain(uint32_t magic, uint32_t addr)
+void kmain()
 {
   debug_init();
   debug_printf("hello\n");

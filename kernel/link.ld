@@ -1,4 +1,4 @@
-ENTRY(entry)
+ENTRY(kmain)
 
 SECTIONS {
   .text   : { *(.text   .text.*   ) }

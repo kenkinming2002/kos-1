@@ -1,6 +1,5 @@
 KERNEL_OBJS = kernel/debug.o \
        	      kernel/kmain.o \
-       	      kernel/loader.o
        	      #kernel/mm/pages.o
 
 kernel.elf: CFLAGS  += -Ilibcore/include -Ilibmm/include -Ikernel

@@ -80,6 +80,8 @@ static void kernel_iterate_phdr2(Elf64_Phdr *phdr)
   memcpy(memory + addr, data + phdr->p_offset, phdr->p_filesz);
 }
 
+typedef void(*entry_t)();
+
 void load_kernel()
 {
   struct boot_file *file = boot_fs_lookup("kernel");
@@ -94,4 +96,11 @@ void load_kernel()
   elf64_iterate_phdr(elf64_file, &kernel_iterate_phdr1);
   memory = boot_mm_alloc_pages((max_end + PAGE_SIZE - 1) / PAGE_SIZE);
   elf64_iterate_phdr(elf64_file, &kernel_iterate_phdr2);
+
+  debug_printf("entry = 0x%lx\n", elf64_file.ehdr->e_entry);
+  debug_printf("max_end = 0x%lx\n", max_end);
+  KASSERT(elf64_file.ehdr->e_entry <= max_end);
+  entry_t entry = (entry_t)(memory + elf64_file.ehdr->e_entry);
+  entry();
+  KASSERT(false && "Unreachable");
 }

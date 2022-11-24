@@ -1,7 +1,7 @@
 #include "pages.h"
 
-int liballoc_lock() { }
-int liballoc_unlock() { }
+int liballoc_lock()   { return 0; }
+int liballoc_unlock() { return 0; }
 
 void* liballoc_alloc(size_t count)
 {

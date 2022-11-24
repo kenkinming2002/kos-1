@@ -17,8 +17,6 @@ all: os.iso
 	$(CC) $(ASFLAGS) -o $@ -c $^
 
 include libcore.mk
-include libmm.mk
-include libx86.mk
 include boot.mk
 include kernel.mk
 

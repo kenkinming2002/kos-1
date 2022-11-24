@@ -7,11 +7,11 @@ BOOT_OBJS = boot/src/entry.o \
 	    boot/src/kernel.o \
 	    boot/src/service.o
 
-boot.elf: CFLAGS  += -Ilibcore/include -Ilibmm/include -Ilibx86/include -Ilibelf/include -I boot/include -Iboot
+boot.elf: CFLAGS  += -Ilibcore/include -Iboot/include -Iboot
 boot.elf: LDFLAGS += -T boot/link.ld -L.
-boot.elf: LIBS    += -nostdlib -lx86 -lmm -lcore -lgcc
+boot.elf: LIBS    += -nostdlib -lcore -lgcc
 
-boot.elf: boot/link.ld $(BOOT_OBJS) libcore.a libmm.a libx86.a
+boot.elf: boot/link.ld $(BOOT_OBJS) libcore.a
 	$(CC) $(LDFLAGS) -o $@ $(BOOT_OBJS) $(LIBS)
 
 ALL_OBJS += $(BOOT_OBJS)

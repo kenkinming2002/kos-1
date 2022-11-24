@@ -2,8 +2,8 @@ KERNEL_OBJS = kernel/debug.o \
        	      kernel/kmain.o \
        	      kernel/mm.o
 
-kernel.elf: CFLAGS  += -Ilibcore/include -Ilibmm/include -Iboot/include -Ikernel -fPIE
-kernel.elf: LDFLAGS += -T kernel/link.ld -L. -fPIE
+kernel.elf: CFLAGS  += -Ilibcore/include -Ilibmm/include -Iboot/include -Ikernel
+kernel.elf: LDFLAGS += -T kernel/link.ld -L.
 kernel.elf: LIBS    += -nostdlib -lmm -lcore -lgcc
 
 kernel.elf: kernel/link.ld $(KERNEL_OBJS) libcore.a libmm.a

@@ -1,4 +1,4 @@
-#include "mm.h"
+#include "pages.h"
 
 #include <core/bitmap.h>
 
@@ -44,7 +44,7 @@ static void iterate_init(struct boot_mmap_entry *entry)
 extern char kernel_begin[];
 extern char kernel_end[];
 
-void mm_init(struct boot_service *boot_service)
+void mm_init_pages(struct boot_service *boot_service)
 {
   boot_service->mm_iterate(&iterate_get_max_addr);
 

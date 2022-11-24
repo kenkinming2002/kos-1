@@ -1,5 +1,7 @@
 #include "kernel.h"
 
+#include <boot/service.h>
+
 #include "core/assert.h"
 #include "core/debug.h"
 #include "core/string.h"
@@ -80,7 +82,8 @@ static void kernel_iterate_phdr2(Elf64_Phdr *phdr)
   memcpy(memory + addr, data + phdr->p_offset, phdr->p_filesz);
 }
 
-typedef void(*entry_t)();
+extern struct boot_service boot_service;
+typedef void(*entry_t)(struct boot_service *);
 
 void load_kernel()
 {
@@ -101,6 +104,6 @@ void load_kernel()
   debug_printf("max_end = 0x%lx\n", max_end);
   KASSERT(elf64_file.ehdr->e_entry <= max_end);
   entry_t entry = (entry_t)(memory + elf64_file.ehdr->e_entry);
-  entry();
+  entry(&boot_service);
   KASSERT(false && "Unreachable");
 }

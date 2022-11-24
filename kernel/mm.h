@@ -3,6 +3,8 @@
 
 #include <boot/service.h>
 
+#define ALLOC_FAILED (void*)(-1);
+
 void mm_init(struct boot_service *boot_service);
 
 void *alloc_pages(unsigned count);

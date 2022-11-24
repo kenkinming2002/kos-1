@@ -57,3 +57,20 @@ void mm_init(struct boot_service *boot_service)
   boot_service->mm_iterate(&iterate_init);
   mm_del((uintptr_t)kernel_begin, kernel_end - kernel_begin);
 }
+
+void *alloc_pages(unsigned count)
+{
+  size_t n = bm_search(bm, count, false);
+  if(n == BM_SEARCH_NONE)
+    return ALLOC_FAILED;
+
+  bm_fill(bm, n, count, true);
+  return (void *)(PAGE_SIZE * n);
+}
+
+void free_pages(void *pages, unsigned count)
+{
+  size_t n = (uintptr_t)pages / PAGE_SIZE;
+  bm_fill(bm, n, count, false);
+}
+

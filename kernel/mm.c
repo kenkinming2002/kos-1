@@ -48,9 +48,10 @@ void mm_init(struct boot_service *boot_service)
 {
   boot_service->mm_iterate(&iterate_get_max_addr);
 
-  size_t page_count = (max_addr + PAGE_SIZE - 1) / PAGE_SIZE;
+  size_t page_count  = (max_addr   + PAGE_SIZE - 1) / PAGE_SIZE;
+  size_t bitmap_size = (page_count + CHAR_BIT  - 1) / CHAR_BIT;
   bm.size = page_count;
-  bm.bits = boot_service->mm_alloc_pages(page_count);
+  bm.bits = boot_service->mm_alloc_pages((bitmap_size + PAGE_SIZE - 1) / PAGE_SIZE);
 
   mm_clear();
   boot_service->mm_iterate(&iterate_init);

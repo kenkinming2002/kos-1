@@ -2,6 +2,8 @@
 
 #include <core/bitmap.h>
 
+#include <stdalign.h>
+
 #define PAGE_SIZE 0x1000
 
 static struct bitmap bm;
@@ -48,10 +50,9 @@ void mm_init_pages(struct boot_service *boot_service)
 {
   boot_service->mm_iterate(&iterate_get_max_addr);
 
-  size_t page_count  = (max_addr   + PAGE_SIZE - 1) / PAGE_SIZE;
-  size_t bitmap_size = (page_count + CHAR_BIT  - 1) / CHAR_BIT;
+  size_t page_count = (max_addr + PAGE_SIZE - 1) / PAGE_SIZE;
   bm.size = page_count;
-  bm.bits = boot_service->mm_alloc_pages((bitmap_size + PAGE_SIZE - 1) / PAGE_SIZE);
+  bm.bits = boot_service->mm_alloc(page_count / CHAR_BIT, alignof(unsigned));
 
   mm_clear();
   boot_service->mm_iterate(&iterate_init);

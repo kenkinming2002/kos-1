@@ -97,7 +97,7 @@ void load_kernel()
 
   data = elf64_file.data;
   elf64_iterate_phdr(elf64_file, &kernel_iterate_phdr1);
-  memory = boot_mm_alloc_pages((max_end + PAGE_SIZE - 1) / PAGE_SIZE);
+  memory = boot_mm_alloc(max_end, PAGE_SIZE);
   elf64_iterate_phdr(elf64_file, &kernel_iterate_phdr2);
 
   debug_printf("entry = 0x%lx\n", elf64_file.ehdr->e_entry);

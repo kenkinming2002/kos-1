@@ -8,12 +8,7 @@
 #define MMAP_ENTRY_AL(_type, _owner, _addr, _length) (struct boot_mmap_entry){ .type = (_type), .owner = (_owner), .addr = (_addr),  .length = (_length) }
 #define MMAP_ENTRY_BE(_type, _owner, _begin, _end)   (struct boot_mmap_entry){ .type = (_type), .owner = (_owner), .addr = (_begin), .length = (_end) - (_begin) }
 
-static bool mmap_entry_contain(struct boot_mmap_entry outer, struct boot_mmap_entry inner)
-{
-  return outer.addr <= inner.addr && inner.addr + inner.length <= outer.addr + outer.length;
-}
-
-// Basics
+// MMAP
 #define MAX_MMAP_ENTRIES 128
 static struct boot_mmap_entry entries[MAX_MMAP_ENTRIES];
 static size_t                 count;
@@ -51,24 +46,6 @@ static void mmap_append_entry(struct boot_mmap_entry new_entry)
   entries[count++] = new_entry;
 }
 
-static void mmap_replace_entry(struct boot_mmap_entry new_entry)
-{
-  for(size_t i=0; i<count; ++i)
-  {
-    struct boot_mmap_entry old_entry = entries[i];
-    if(mmap_entry_contain(old_entry, new_entry))
-    {
-      struct boot_mmap_entry new_entry1 = MMAP_ENTRY_BE(old_entry.type, old_entry.owner, old_entry.addr,                    new_entry.addr);
-      struct boot_mmap_entry new_entry2 = MMAP_ENTRY_BE(old_entry.type, old_entry.owner, new_entry.addr + new_entry.length, old_entry.addr + old_entry.length);
-      entries[i] = new_entry;
-      if(new_entry1.length) mmap_append_entry(new_entry1);
-      if(new_entry2.length) mmap_append_entry(new_entry2);
-      return;
-    }
-  }
-  KASSERT(false && "Failed to replace region");
-}
-
 static void mmap_sanitize()
 {
   // sort
@@ -86,11 +63,53 @@ static void mmap_sanitize()
   for(size_t i=1; i<count; ++i)
     if(entries[j-1].type == entries[i].type && entries[j-1].owner == entries[i].owner && entries[j-1].addr + entries[j-1].length == entries[i].addr)
       entries[j-1].length += entries[i].length;
-    else
+    else if(entries[i].length != 0)
       entries[j++] = entries[i];
   count = j;
 }
 
+// Services
+void boot_mm_iterate(void(*iterate)(struct boot_mmap_entry *mmap_entry))
+{
+  for(size_t i=0; i<count; ++i)
+    iterate(&entries[i]);
+}
+
+uintptr_t boot_mm_lookup(size_t length, size_t alignment, enum boot_memory_type type, enum boot_memory_owner owner)
+{
+  for(size_t i=0; i<count; ++i)
+  {
+    uintptr_t addr = (entries[i].addr + alignment - 1) / alignment * alignment;
+    if(entries[i].type  == type  &&
+       entries[i].owner == owner &&
+       entries[i].addr <= addr && addr + length <= entries[i].addr + entries[i].length)
+      return addr;
+  }
+}
+
+void boot_mm_transfer(uintptr_t addr, size_t length, enum boot_memory_type type, enum boot_memory_owner from, enum boot_memory_owner to)
+{
+  for(size_t i=0; i<count; ++i)
+  {
+    if(entries[i].type == type &&
+       entries[i].owner == from &&
+       entries[i].addr <= addr && addr + length <= entries[i].addr + entries[i].length)
+    {
+      struct boot_mmap_entry entry1 = MMAP_ENTRY_BE(type, from, entries[i].addr, addr);
+      struct boot_mmap_entry entry2 = MMAP_ENTRY_BE(type, to,   addr, addr + length);
+      struct boot_mmap_entry entry3 = MMAP_ENTRY_BE(type, from, addr + length, entries[i].addr + entries[i].length);
+      entries[i].length = 0;
+      if(entry1.length) mmap_append_entry(entry1);
+      if(entry2.length) mmap_append_entry(entry2);
+      if(entry3.length) mmap_append_entry(entry3);
+      mmap_sanitize();
+      return;
+    }
+  }
+  KASSERT(false && "Failed to transfer region");
+}
+
+// Init
 void mm_init(struct multiboot_boot_information *boot_info)
 {
   // 1: Mark memory as in multiboot2 memory map
@@ -140,53 +159,36 @@ void mm_init(struct multiboot_boot_information *boot_info)
     if(tag->type == MULTIBOOT_TAG_TYPE_MODULE)
     {
       struct multiboot_tag_module *module_tag = (struct multiboot_tag_module *)tag;
-      mmap_replace_entry(MMAP_ENTRY_BE(BOOT_MEMORY_CONVENTIONAL, BOOT_MEMORY_BOOTLOADER, module_tag->mod_start, module_tag->mod_end));
+      boot_mm_transfer(module_tag->mod_start, module_tag->mod_end - module_tag->mod_start, BOOT_MEMORY_CONVENTIONAL,
+          BOOT_MEMORY_UNOWNED,
+          BOOT_MEMORY_BOOTLOADER);
     }
-  mmap_replace_entry(MMAP_ENTRY_BE(BOOT_MEMORY_CONVENTIONAL, BOOT_MEMORY_BOOTLOADER, (uintptr_t)boot_begin, (uintptr_t)boot_end));
-  mmap_sanitize();
+
+  boot_mm_transfer((uintptr_t)boot_begin, boot_end - boot_begin, BOOT_MEMORY_CONVENTIONAL,
+      BOOT_MEMORY_UNOWNED,
+      BOOT_MEMORY_BOOTLOADER);
 
   mmap_debug();
-
   // 3: Testing
   for(size_t i=0; i<32; ++i)
-    debug_printf("alloc_pages(%lu) = 0x%lx\n", i, (uintptr_t)boot_mm_alloc_pages(i));
-
+    debug_printf("alloc(0x%lx) = 0x%lx\n", i * 400, (uintptr_t)boot_mm_alloc(i * 400, 16));
   mmap_debug();
 }
 
-void boot_mm_iterate(void(*iterate)(struct boot_mmap_entry *mmap_entry))
+void* boot_mm_alloc(size_t size, size_t alignment)
 {
-  for(size_t i=0; i<count; ++i)
-    iterate(&entries[i]);
+  uintptr_t addr = boot_mm_lookup(size, alignment, BOOT_MEMORY_CONVENTIONAL, BOOT_MEMORY_UNOWNED);
+  boot_mm_transfer(addr, size, BOOT_MEMORY_CONVENTIONAL, BOOT_MEMORY_UNOWNED, BOOT_MEMORY_KERNEL);
+
+  debug_printf("alloc(size=0x%lx,alignment=0x%lx) = 0x%lx\n", size, alignment, addr);
+  return (void*)addr;
 }
 
-void *boot_mm_alloc_pages(size_t alloc_count)
+void boot_mm_free(void *ptr, size_t size)
 {
-  for(size_t i=0; i<count; ++i)
-  {
-    if(entries[i].type != BOOT_MEMORY_CONVENTIONAL || entries[i].owner != BOOT_MEMORY_UNOWNED)
-      continue;
-
-    uintptr_t begin  = (entries[i].addr + 0x1000 - 1) / 0x1000 * 0x1000;
-    uintptr_t length = alloc_count * 0x1000;
-    struct boot_mmap_entry alloc_entry = MMAP_ENTRY_AL(BOOT_MEMORY_CONVENTIONAL, BOOT_MEMORY_KERNEL, begin, length);
-
-    if(!mmap_entry_contain(entries[i], alloc_entry)) continue;
-
-    mmap_replace_entry(alloc_entry);
-    mmap_sanitize();
-    return (void*)begin;
-  }
-  KASSERT(false && "Unreachable");
-}
-
-void boot_mm_free_pages(void *ptr, size_t alloc_count)
-{
-  uintptr_t begin = (uintptr_t)ptr;
-  uintptr_t length = alloc_count * 0x1000;
-  struct boot_mmap_entry alloc_entry = MMAP_ENTRY_AL(BOOT_MEMORY_CONVENTIONAL, BOOT_MEMORY_KERNEL, begin, length);
-  mmap_replace_entry(alloc_entry);
-  mmap_sanitize();
+  uintptr_t addr = (uintptr_t)ptr;
+  boot_mm_transfer(addr, size, BOOT_MEMORY_CONVENTIONAL, BOOT_MEMORY_KERNEL, BOOT_MEMORY_UNOWNED);
+  debug_printf("free(ptr=0x%lx,size=0x%lx)\n", (uintptr_t)ptr, size);
 }
 
 

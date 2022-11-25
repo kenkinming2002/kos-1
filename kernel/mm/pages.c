@@ -37,7 +37,7 @@ static void iterate_get_max_addr(struct boot_mmap_entry *entry)
 
 static void iterate_init(struct boot_mmap_entry *entry)
 {
-  if(entry->type == BOOT_MEMORY_AVAILABLE)
+  if(entry->type == BOOT_MEMORY_CONVENTIONAL && entry->owner == BOOT_MEMORY_UNOWNED)
     mm_add(entry->addr, entry->length);
 }
 

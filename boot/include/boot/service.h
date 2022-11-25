@@ -7,24 +7,45 @@
 #define PATH_MAX 256
 
 // Memory Services
+//
+// Separate into -
+//  type:   conventional, reserved, nvs, bad
+//  owner:  none, bootloader, kernel, acpi
+//
+// Example(Mapping for multiboot2 memory type) -
+//  available        => conventional + none
+//  acpi reclaimable => conventional + acpi
+//  nvs              => nvs          + acpi
+//  reserved         => reserved     + none
+//  bad              => bad          + none
+//
+// memory allocatable/usable by the pages allocator <=> type = conventional + owner = none
+// memory allocatable/usable by the mmio layer      <=> type = reserved     + owner = none
+//
+// Type of memory cannot change, but ownership can transffer
+//
 enum boot_memory_type
 {
-  BOOT_MEMORY_AVAILABLE,
-
-  BOOT_MEMORY_BOOTLOADER_RECLAIMABLE,
-  BOOT_MEMORY_BOOTLOADER_FILESYSTEM,
-  BOOT_MEMORY_BOOTLOADER_ALLOCATED,
-
-  BOOT_MEMORY_ACPI_RECLAIMABLE,
-  BOOT_MEMORY_ACPI_NVS,
-
+  BOOT_MEMORY_CONVENTIONAL,
   BOOT_MEMORY_RESERVED,
+  BOOT_MEMORY_NVS,
   BOOT_MEMORY_BAD,
+};
+
+enum boot_memory_owner
+{
+  BOOT_MEMORY_UNOWNED,
+  BOOT_MEMORY_ACPI,
+  BOOT_MEMORY_BOOTLOADER,
+  BOOT_MEMORY_KERNEL,
 };
 
 struct boot_mmap_entry
 {
-  enum boot_memory_type type;
+  // TODO: Consider using bit mask or bit field
+  enum boot_memory_type  type;
+  enum boot_memory_owner owner;
+
   uintptr_t             addr;
   size_t                length;
 };

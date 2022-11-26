@@ -5,8 +5,8 @@ KERNEL_OBJS = kernel/debug.o \
        	      kernel/mm/liballoc_hooks.o
 
 kernel.elf: CFLAGS  += -Ilibcore/include -Iboot/include -Ikernel
-kernel.elf: LDFLAGS += -T kernel/link.ld -L.
-kernel.elf: LIBS    += -nostdlib -lcore -lgcc
+kernel.elf: LDFLAGS += -T kernel/link.ld
+kernel.elf: LIBS    += -lcore
 kernel.elf: kernel/link.ld libcore.a $(KERNEL_OBJS)
 
 ALL_OBJS += $(KERNEL_OBJS)

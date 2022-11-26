@@ -3,9 +3,9 @@ LD=x86_64-elf-ld
 AR=x86_64-elf-ar
 OBJCOPY=x86_64-elf-objcopy
 
-CFLAGS+=-ffreestanding -fno-stack-protector -mgeneral-regs-only -fPIE
-CFLAGS+=-Ikernel
-LDFLAGS+=-z max-page-size=4096 -fPIE
+CFLAGS  += -ffreestanding -fno-stack-protector -mgeneral-regs-only -fPIE
+LDFLAGS += -nostdlib -z max-page-size=4096 -fPIE
+LIBS    += -L. -lgcc
 
 all: os.iso
 

@@ -8,8 +8,8 @@ BOOT_OBJS = boot/src/entry.o \
 	    boot/src/service.o
 
 boot.elf: CFLAGS  += -Ilibcore/include -Iboot/include -Iboot
-boot.elf: LDFLAGS += -T boot/link.ld -L.
-boot.elf: LIBS    += -nostdlib -lcore -lgcc
+boot.elf: LDFLAGS += -T boot/link.ld
+boot.elf: LIBS    += -lcore
 boot.elf: boot/link.ld libcore.a $(BOOT_OBJS)
 
 ALL_OBJS += $(BOOT_OBJS)

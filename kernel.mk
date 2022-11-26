@@ -5,7 +5,7 @@ KERNEL_OBJS = kernel/debug.o \
        	      kernel/mm/liballoc_hooks.o
 
 kernel.elf: CFLAGS  += -Ilibcore/include -Iboot/include -Ikernel
-kernel.elf: LDFLAGS += -T kernel/link.ld
+kernel.elf: LDFLAGS += -T kernel/link.ld -pie -Wl,--no-dynamic-linker
 kernel.elf: LIBS    += -lcore
 kernel.elf: kernel/link.ld libcore.a $(KERNEL_OBJS)
 

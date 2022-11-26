@@ -11,10 +11,16 @@ all: os.iso
 
 # Generic rules
 %.o: %.c
-	$(CC) $(CFLAGS) -o $@ -c $^
+	$(CC) -c $(CFLAGS) -o $@ $^
 
 %.o: %.S
-	$(CC) $(ASFLAGS) -o $@ -c $^
+	$(CC) -c $(ASFLAGS) -o $@ $^
+
+%.a:
+	$(AR) rcs $@ $^
+
+%.elf:
+	$(CC) $(LDFLAGS) -o $@ $(filter %.o, $^) $(LIBS)
 
 include libcore.mk
 include boot.mk

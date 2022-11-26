@@ -10,9 +10,7 @@ BOOT_OBJS = boot/src/entry.o \
 boot.elf: CFLAGS  += -Ilibcore/include -Iboot/include -Iboot
 boot.elf: LDFLAGS += -T boot/link.ld -L.
 boot.elf: LIBS    += -nostdlib -lcore -lgcc
-
-boot.elf: boot/link.ld $(BOOT_OBJS) libcore.a
-	$(CC) $(LDFLAGS) -o $@ $(BOOT_OBJS) $(LIBS)
+boot.elf: boot/link.ld libcore.a $(BOOT_OBJS)
 
 ALL_OBJS += $(BOOT_OBJS)
 ALL_ELFS += boot.elf

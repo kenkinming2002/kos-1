@@ -3,6 +3,7 @@ KERNEL_OBJS = kernel/debug.o \
        	      kernel/mm/pages.o \
        	      kernel/mm/liballoc_1_1.o \
        	      kernel/mm/liballoc_hooks.o \
+       	      kernel/hal/irqs.o \
        	      kernel/hal/ports.o
 
 kernel.elf: CFLAGS  += -Ilibcore/include -Iboot/include -Ikernel

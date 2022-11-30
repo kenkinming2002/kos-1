@@ -8,13 +8,13 @@ struct ports
 {
   struct ll_node node;
 
-  struct driver *driver;
+  struct module *module;
   uint16_t begin;
   uint16_t count;
 };
 
 LL_DEFINE(ports_list);
-int acquire_ports(struct driver *driver, uint16_t begin, uint16_t count)
+int acquire_ports(struct module *module, uint16_t begin, uint16_t count)
 {
   LL_FOREACH(ports_list, node)
   {
@@ -24,19 +24,19 @@ int acquire_ports(struct driver *driver, uint16_t begin, uint16_t count)
   }
 
   struct ports *ports = kmalloc(sizeof *ports);
-  ports->driver = driver;
+  ports->module = module;
   ports->begin  = begin;
   ports->count  = count;
   ll_append(&ports_list, &ports->node);
   return 0;
 }
 
-int release_ports(struct driver *driver, uint16_t begin, uint16_t count)
+int release_ports(struct module *module, uint16_t begin, uint16_t count)
 {
   LL_FOREACH(ports_list, node)
   {
     struct ports *ports = (struct ports *)node;
-    if(ports->driver == driver && ports->begin == begin && ports->count == count)
+    if(ports->module == module && ports->begin == begin && ports->count == count)
     {
       ll_delete(&ports->node);
       kfree(ports);

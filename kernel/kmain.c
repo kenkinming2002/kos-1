@@ -11,7 +11,7 @@
 
 #define TEST_COUNT 10
 
-struct driver dummy = {
+struct module dummy = {
   .name = "dummy"
 };
 

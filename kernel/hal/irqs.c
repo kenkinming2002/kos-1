@@ -4,42 +4,42 @@
 
 struct irq_line
 {
-  struct driver *driver;
+  struct module *module;
   irq_handler_t handler;
 };
 
 #define MAX_IRQS 32
 struct irq_line lines[MAX_IRQS];
 
-int acquire_irq(struct driver *driver, unsigned irq, irq_handler_t handler)
+int acquire_irq(struct module *module, unsigned irq, irq_handler_t handler)
 {
   if(irq >= MAX_IRQS)
     return -1;
 
-  if(lines[irq].driver || lines[irq].handler)
+  if(lines[irq].module || lines[irq].handler)
     return -1;
 
-  lines[irq].driver  = driver;
+  lines[irq].module  = module;
   lines[irq].handler = handler;
   return 0;
 }
 
-int release_irq(struct driver *driver, unsigned irq, irq_handler_t handler)
+int release_irq(struct module *module, unsigned irq, irq_handler_t handler)
 {
   if(irq >= MAX_IRQS)
     return -1;
 
-  if(lines[irq].driver != driver || lines[irq].handler != handler)
+  if(lines[irq].module != module || lines[irq].handler != handler)
     return -1;
 
-  lines[irq].driver  = NULL;
+  lines[irq].module  = NULL;
   lines[irq].handler = NULL;
   return 0;
 }
 
 int trigger_irq(unsigned irq)
 {
-  if(!lines[irq].driver || !lines[irq].handler)
+  if(!lines[irq].module || !lines[irq].handler)
     return -1;
 
   lines[irq].handler();

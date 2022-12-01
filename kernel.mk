@@ -4,7 +4,9 @@ KERNEL_OBJS = kernel/debug.o \
        	      kernel/mm/liballoc_1_1.o \
        	      kernel/mm/liballoc_hooks.o \
        	      kernel/hal/irqs.o \
-       	      kernel/hal/ports.o
+       	      kernel/hal/ports.o \
+       	      kernel/hal/idt.o \
+       	      kernel/hal/isrs.o
 
 kernel.elf: CFLAGS  += -Ilibcore/include -Iboot/include -Ikernel
 kernel.elf: LDFLAGS += -T kernel/link.ld -pie -Wl,--no-dynamic-linker

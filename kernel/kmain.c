@@ -4,6 +4,7 @@
 #include "debug.h"
 #include "mm/pages.h"
 #include "hal/ports.h"
+#include "hal/idt.h"
 
 #include <boot/service.h>
 
@@ -31,6 +32,8 @@ void kmain(struct boot_service *service)
   KASSERT(acquire_ports(&dummy, 3, 5)   ==  0);
 
   debug_printf("success\n");
+
+  idt_init();
 
   for(;;) asm volatile("hlt");
 }

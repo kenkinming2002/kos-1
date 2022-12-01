@@ -3,12 +3,11 @@
 
 #include "module.h"
 
+typedef unsigned irq_t;
 typedef void(*irq_handler_t)();
 
-/* Note: irq refers to the irq number as in the pic without any offsets */
-int acquire_irq(struct module *module, unsigned irq, irq_handler_t handler);
-int release_irq(struct module *module, unsigned irq, irq_handler_t handler);
-
-int trigger_irq(unsigned irq);
+int acquire_irq(struct module *module, irq_t irq, irq_handler_t handler);
+int release_irq(struct module *module, irq_t irq, irq_handler_t handler);
+int trigger_irq(irq_t irq);
 
 #endif // HAL_IRQS_H

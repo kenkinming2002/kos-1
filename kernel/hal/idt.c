@@ -2,13 +2,14 @@
 
 #include "isrs.h"
 
+#include <core/debug.h>
+
 #include <stdint.h>
 
 struct __attribute__((packed)) idt_entry
 {
   uint16_t offset_low1;
   uint16_t segment_selector;
-  uint16_t offset_low2;
 
   uint16_t ist       : 3;
   uint16_t reserved1 : 5;
@@ -16,6 +17,8 @@ struct __attribute__((packed)) idt_entry
   uint16_t reserved2 : 1;
   uint16_t dpl       : 2;
   uint16_t present   : 1;
+
+  uint16_t offset_low2;
 
   uint32_t offset_high;
   uint32_t reserved3;
@@ -57,15 +60,16 @@ void idt_init()
 {
   for(unsigned i=0; i<256; ++i)
     idt[i] = (struct idt_entry){
-      .offset_low1 = ((uint64_t)isrs[i] >> 0) & 0xFF,
-      .offset_low2 = ((uint64_t)isrs[i] >> 2) & 0xFF,
-      .offset_high = ((uint64_t)isrs[i] >> 4) & 0xFFFF,
+      .offset_low1 = ((uint64_t)isrs[i] >> 0)  & 0xFFFF,
+      .offset_low2 = ((uint64_t)isrs[i] >> 16) & 0xFFFF,
+      .offset_high = ((uint64_t)isrs[i] >> 32) & 0xFFFFFFFF,
 
       .segment_selector = 0x8, /* tantative */
 
-      .ist  = 0,   /* no ist */
-      .type = 0xe, /* 64-bit interrupt gate */
-      .dpl  = 0,   /* kernel only */
+      .ist     = 0,   /* no ist */
+      .type    = 0xe, /* 64-bit interrupt gate */
+      .dpl     = 0,   /* kernel only */
+      .present = 1,
 
       .reserved1 = 0,
       .reserved2 = 0,
@@ -75,8 +79,7 @@ void idt_init()
   asm volatile ("lidt %0" : : "m"(idt_desc));
 }
 
-void isr()
+void isr(uint64_t index, uint64_t ec)
 {
-  // TODO: Call exception or irq handlers
 }
 

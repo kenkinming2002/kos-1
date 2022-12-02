@@ -1,6 +1,7 @@
+.extern isr
+
 isr_common:
   push %rax
-  push %rbx
   push %rcx
   push %rdx
 
@@ -12,10 +13,9 @@ isr_common:
   push %r10
   push %r11
 
-  push 0x50(%rsp) /* Error code */
-  push 0x50(%rsp) /* Index */
+  mov 0x48(%rsp), %rdi /* Index */
+  mov 0x50(%rsp), %rsi /* Error code */
   call isr
-  add 0x10, %rsp
 
   pop %r11
   pop %r10
@@ -29,7 +29,7 @@ isr_common:
   pop %rcx
   pop %rax
 
-  add $0x8, %rsp
+  add $0x10, %rsp
   iretq
 
 .macro isr_no_error_code n

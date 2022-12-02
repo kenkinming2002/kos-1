@@ -4,6 +4,7 @@
 #include "debug.h"
 #include "mm/pages.h"
 #include "hal/ports.h"
+#include "hal/gdt.h"
 #include "hal/idt.h"
 
 #include <boot/service.h>
@@ -33,7 +34,9 @@ void kmain(struct boot_service *service)
 
   debug_printf("success\n");
 
+  gdt_init();
   idt_init();
 
+  asm volatile ("int $0x80");
   for(;;) asm volatile("hlt");
 }

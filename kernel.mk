@@ -4,6 +4,7 @@ KERNEL_OBJS = kernel/debug.o \
        	      kernel/mm/liballoc_1_1.o \
        	      kernel/mm/liballoc_hooks.o \
        	      kernel/hal/irqs.o \
+       	      kernel/hal/exceptions.o \
        	      kernel/hal/ports.o \
        	      kernel/hal/gdt.o \
        	      kernel/hal/idt.o \

@@ -1,8 +1,8 @@
 #include "idt.h"
 
+#include "exceptions.h"
+#include "irqs.h"
 #include "isrs.h"
-
-#include <core/debug.h>
 
 #include <stdint.h>
 
@@ -81,5 +81,9 @@ void idt_init()
 
 void isr(uint64_t index, uint64_t ec)
 {
+  if(index <= 32)
+    trigger_exception(index);
+  else
+    trigger_irq(index - 32);
 }
 

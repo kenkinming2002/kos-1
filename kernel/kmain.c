@@ -22,6 +22,11 @@ void handle_device_not_available()
   debug_printf("device not available\n");
 }
 
+void handle_timer()
+{
+  debug_printf("timer interrupt\n");
+}
+
 void kmain(struct boot_service *service)
 {
   debug_init();
@@ -45,6 +50,7 @@ void kmain(struct boot_service *service)
   asm volatile ("int $0x80");
 
   pic8259_init();
+  isa_irq_register(&dummy, 0, &handle_timer);
 
   asm volatile ("sti");
   for(;;) asm volatile("hlt");

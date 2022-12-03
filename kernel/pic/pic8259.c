@@ -1,12 +1,23 @@
 #include "pic8259.h"
 
-#include "hal.h"
-
 #include <core/assert.h>
 
-static struct module module = {
+#include <stdbool.h>
+#include <stddef.h>
+
+static struct module pic8259_module = {
   .name = "pic8259",
 };
+
+static unsigned base_master;
+static unsigned base_slave;
+
+struct isa_irq_line
+{
+  struct module *module;
+  handler_t handler;
+};
+static struct isa_irq_line isa_irq_lines[16];
 
 #define PIC_IOPORTS_BEGIN_MASTER 0x0020
 #define PIC_IOPORTS_BEGIN_SLAVE  0x00A0
@@ -17,9 +28,6 @@ static struct module module = {
 
 #define PIC_DATA_MASTER (PIC_IOPORTS_BEGIN_MASTER+1)
 #define PIC_DATA_SLAVE  (PIC_IOPORTS_BEGIN_SLAVE+1)
-
-static unsigned base_master;
-static unsigned base_slave;
 
 #define ICW1_ICW4	0x01
 #define ICW1_SINGLE	0x02
@@ -36,11 +44,11 @@ static unsigned base_slave;
 void pic8259_init()
 {
   // TODO: Check for failure
-  acquire_ports(&module, PIC_IOPORTS_BEGIN_MASTER, PIC_IOPORTS_COUNT);
-  acquire_ports(&module, PIC_IOPORTS_BEGIN_SLAVE,  PIC_IOPORTS_COUNT);
+  acquire_ports(&pic8259_module, PIC_IOPORTS_BEGIN_MASTER, PIC_IOPORTS_COUNT);
+  acquire_ports(&pic8259_module, PIC_IOPORTS_BEGIN_SLAVE,  PIC_IOPORTS_COUNT);
 
-  base_master = idt_alloc_range(&module, 8);
-  base_slave  = idt_alloc_range(&module, 8);
+  base_master = idt_alloc_range(&pic8259_module, 8);
+  base_slave  = idt_alloc_range(&pic8259_module, 8);
 
   KASSERT(base_master != IDT_INVALID_VECTOR);
   KASSERT(base_slave  != IDT_INVALID_VECTOR);
@@ -62,3 +70,42 @@ void pic8259_init()
   outb(PIC_DATA_MASTER, 0xFB);
   outb(PIC_DATA_SLAVE,  0xFF);
 }
+
+static unsigned isa_irq_to_vector(unsigned irq)
+{
+  if(irq<8)
+    return base_master + irq;
+  else if(irq<16)
+    return base_slave + irq;
+  else
+    KASSERT_UNREACHABLE;
+}
+
+int isa_irq_register(struct module *module, unsigned irq, handler_t handler)
+{
+  if(isa_irq_lines[irq].module != NULL ||
+     isa_irq_lines[irq].handler != NULL)
+    return -1;
+
+  if(idt_register(&pic8259_module, isa_irq_to_vector(irq), handler) != 0)
+    return -1;
+
+  isa_irq_lines[irq].module  = module;
+  isa_irq_lines[irq].handler = handler;
+  return 0;
+}
+
+int isa_irq_deregister(struct module *module, unsigned irq, handler_t handler)
+{
+  if(isa_irq_lines[irq].module  != module ||
+     isa_irq_lines[irq].handler != handler)
+    return -1;
+
+  if(idt_deregister(&pic8259_module, isa_irq_to_vector(irq), handler) != 0)
+    return -1;
+
+  isa_irq_lines[irq].module  = NULL;
+  isa_irq_lines[irq].handler = NULL;
+  return 0;
+}
+

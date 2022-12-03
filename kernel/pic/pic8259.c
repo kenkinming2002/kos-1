@@ -1,6 +1,7 @@
 #include "pic8259.h"
 
 #include <core/assert.h>
+#include <core/debug.h>
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -15,6 +16,7 @@ struct pic8259_line
 
 struct pic8259
 {
+  uint16_t ports;
   unsigned base;
   struct pic8259_line lines[16];
 };
@@ -41,9 +43,10 @@ static void pic8259_init(struct pic8259* pic, uint16_t ports, uint8_t config, ui
 {
   // TODO: Check for failure
   acquire_ports(THIS_MODULE, ports, 2);
+  pic->ports = ports;
 
-  uint16_t command_port = ports;
-  uint16_t data_port    = ports + 1;
+  uint16_t command_port = pic->ports;
+  uint16_t data_port    = pic->ports + 1;
 
   // FIXME: This need to be 8-byte aligned
   pic->base = idt_alloc_range(THIS_MODULE, 8);
@@ -85,6 +88,30 @@ static int pic8259_irq_deregister(struct pic8259* pic, struct module *module, un
   return 0;
 }
 
+static void pic8259_irq_acknowledge(struct pic8259 *pic)
+{
+  uint16_t command_port = pic->ports;
+  outb(command_port, 0x20);
+}
+
+static void pic8259_irq_mask(struct pic8259 *pic, unsigned irq)
+{
+  uint16_t data_port = pic->ports + 1;
+  uint8_t mask = inb(data_port);
+  mask |= 1 << irq;
+  outb(data_port, mask);
+
+}
+
+static void pic8259_irq_unmask(struct pic8259 *pic, unsigned irq)
+{
+  uint16_t data_port = pic->ports + 1;
+  uint8_t mask = inb(data_port);
+  mask &= ~(1 << irq);
+  outb(data_port, mask);
+}
+
+
 struct pic8259 master_pic;
 struct pic8259 slave_pic;
 
@@ -94,33 +121,66 @@ void pic8259s_init()
   pic8259_init(&slave_pic,  PIC_IOPORTS_SLAVE,  2,   0xFF);
 }
 
-static struct pic8259 *pic8259s_map_pic(unsigned irq)
-{
-  if(irq<8)
-    return &master_pic;
-  else if(irq<16)
-    return &slave_pic;
-  else
-    KASSERT_UNREACHABLE;
-}
-
-static unsigned pic8259s_map_irq(unsigned irq)
-{
-  if(irq<8)
-    return irq;
-  else if(irq<16)
-    return irq - 8;
-  else
-    KASSERT_UNREACHABLE;
-}
-
 int pic8259s_irq_register(struct module *module, unsigned irq, handler_t handler)
 {
-  return pic8259_irq_register(pic8259s_map_pic(irq), module, pic8259s_map_irq(irq), handler);
+  struct pic8259 *pic;
+  if(irq<8)
+    pic = &master_pic;
+  else if(irq<16)
+    pic = &slave_pic;
+  else
+    KASSERT_UNREACHABLE;
+  irq %= 8;
+
+  return pic8259_irq_register(pic, module, irq, handler);
 }
 
 int pic8259s_irq_deregister(struct module *module, unsigned irq, handler_t handler)
 {
-  return pic8259_irq_deregister(pic8259s_map_pic(irq), module, pic8259s_map_irq(irq), handler);
+  struct pic8259 *pic;
+  if(irq<8)
+    pic = &master_pic;
+  else if(irq<16)
+    pic = &slave_pic;
+  else
+    KASSERT_UNREACHABLE;
+  irq %= 8;
+
+  return pic8259_irq_deregister(pic, module, irq, handler);
+}
+
+void pic8259s_irq_acknowledge(unsigned irq)
+{
+  pic8259_irq_acknowledge(&master_pic);
+  if(8 <= irq && irq < 16)
+    pic8259_irq_acknowledge(&slave_pic);
+}
+
+void pic8259s_irq_mask(unsigned irq)
+{
+  struct pic8259 *pic;
+  if(irq<8)
+    pic = &master_pic;
+  else if(irq<16)
+    pic = &slave_pic;
+  else
+    KASSERT_UNREACHABLE;
+  irq %= 8;
+
+  pic8259_irq_mask(pic, irq);
+}
+
+void pic8259s_irq_unmask(unsigned irq)
+{
+  struct pic8259 *pic;
+  if(irq<8)
+    pic = &master_pic;
+  else if(irq<16)
+    pic = &slave_pic;
+  else
+    KASSERT_UNREACHABLE;
+  irq %= 8;
+
+  pic8259_irq_unmask(pic, irq);
 }
 

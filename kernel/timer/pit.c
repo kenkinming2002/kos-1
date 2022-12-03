@@ -63,6 +63,7 @@ static void pit_handler()
     struct timer_record *record = (struct timer_record *)node;
     record->callback();
   }
+  isa_irq_acknowledge(0);
 }
 
 void pit_init()
@@ -73,6 +74,7 @@ void pit_init()
   outb(PIT_SELECT_CHANNEL0, 0xFF);
 
   KASSERT(isa_irq_register(THIS_MODULE, 0, &pit_handler) != -1);
+  isa_irq_unmask(0);
 }
 
 int pit_register_callback(struct module *module, timer_callback_t callback)

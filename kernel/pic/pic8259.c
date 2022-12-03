@@ -5,9 +5,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-static struct module pic8259_module = {
-  .name = "pic8259",
-};
+DEFINE_MODULE(pic8259);
 
 static unsigned base_master;
 static unsigned base_slave;
@@ -44,11 +42,11 @@ static struct isa_irq_line isa_irq_lines[16];
 void pic8259_init()
 {
   // TODO: Check for failure
-  acquire_ports(&pic8259_module, PIC_IOPORTS_BEGIN_MASTER, PIC_IOPORTS_COUNT);
-  acquire_ports(&pic8259_module, PIC_IOPORTS_BEGIN_SLAVE,  PIC_IOPORTS_COUNT);
+  acquire_ports(THIS_MODULE, PIC_IOPORTS_BEGIN_MASTER, PIC_IOPORTS_COUNT);
+  acquire_ports(THIS_MODULE, PIC_IOPORTS_BEGIN_SLAVE,  PIC_IOPORTS_COUNT);
 
-  base_master = idt_alloc_range(&pic8259_module, 8);
-  base_slave  = idt_alloc_range(&pic8259_module, 8);
+  base_master = idt_alloc_range(THIS_MODULE, 8);
+  base_slave  = idt_alloc_range(THIS_MODULE, 8);
 
   KASSERT(base_master != IDT_INVALID_VECTOR);
   KASSERT(base_slave  != IDT_INVALID_VECTOR);
@@ -87,7 +85,7 @@ int isa_irq_register(struct module *module, unsigned irq, handler_t handler)
      isa_irq_lines[irq].handler != NULL)
     return -1;
 
-  if(idt_register(&pic8259_module, isa_irq_to_vector(irq), handler) != 0)
+  if(idt_register(THIS_MODULE, isa_irq_to_vector(irq), handler) != 0)
     return -1;
 
   isa_irq_lines[irq].module  = module;
@@ -101,7 +99,7 @@ int isa_irq_deregister(struct module *module, unsigned irq, handler_t handler)
      isa_irq_lines[irq].handler != handler)
     return -1;
 
-  if(idt_deregister(&pic8259_module, isa_irq_to_vector(irq), handler) != 0)
+  if(idt_deregister(THIS_MODULE, isa_irq_to_vector(irq), handler) != 0)
     return -1;
 
   isa_irq_lines[irq].module  = NULL;

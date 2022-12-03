@@ -47,8 +47,8 @@ void kmain(struct boot_service *service)
   asm volatile ("int $0x7");
   asm volatile ("int $0x80");
 
-  pic8259_init();
-  isa_irq_register(THIS_MODULE, 0, &handle_timer);
+  pic8259s_init();
+  pic8259s_irq_register(THIS_MODULE, 0, &handle_timer);
 
   asm volatile ("sti");
   for(;;) asm volatile("hlt");

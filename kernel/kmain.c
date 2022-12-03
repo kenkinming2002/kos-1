@@ -5,6 +5,7 @@
 #include "hal.h"
 #include "mm/pages.h"
 
+#include "pic/isa.h"
 #include "pic/pic8259.h"
 
 #include <boot/service.h>
@@ -48,7 +49,7 @@ void kmain(struct boot_service *service)
   asm volatile ("int $0x80");
 
   pic8259s_init();
-  pic8259s_irq_register(THIS_MODULE, 0, &handle_timer);
+  isa_irq_register(THIS_MODULE, 0, &handle_timer);
 
   asm volatile ("sti");
   for(;;) asm volatile("hlt");

@@ -10,6 +10,7 @@ KERNEL_OBJS = kernel/debug.o \
        	      kernel/hal/idt.o \
        	      kernel/hal/segs.o \
        	      kernel/hal/isrs.o \
+       	      kernel/pic/isa.o \
        	      kernel/pic/pic8259.o
 
 kernel.elf: CFLAGS  += -Ilibcore/include -Iboot/include -Ikernel

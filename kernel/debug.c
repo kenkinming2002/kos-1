@@ -22,11 +22,6 @@ static void io_wait()
   outb(0x80, 0);
 }
 
-void fb_init()
-{
-  // Nothing to do
-}
-
 static const uint16_t SERIAL_COM1_BASE          = 0x3F8;     /* COM1 base port */
 
 static const uint16_t SERIAL_DATA_PORT          = SERIAL_COM1_BASE;
@@ -52,20 +47,7 @@ void serial_init()
 
 void debug_init()
 {
-  fb_init();
   serial_init();
-}
-
-void fb_put(char c)
-{
-  // TODO: How do we support scrolling
-  static unsigned i = 0;
-
-  char *fb = (char *)0xb8000;
-  fb[i*2] = c;
-  fb[i*2 + 1] = 0xF0;
-
-  ++i;
 }
 
 bool serial_is_transmitter_empty()
@@ -81,7 +63,6 @@ void serial_put(char c)
 
 void debug_put(char c)
 {
-  fb_put(c);
   serial_put(c);
 }
 

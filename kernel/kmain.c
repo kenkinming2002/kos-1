@@ -6,6 +6,7 @@
 #include "hal/ports.h"
 #include "hal/gdt.h"
 #include "hal/idt.h"
+#include "hal/exceptions.h"
 
 #include <boot/service.h>
 
@@ -16,6 +17,11 @@
 struct module dummy = {
   .name = "dummy"
 };
+
+void handle_device_not_available()
+{
+  debug_printf("device not available\n");
+}
 
 void kmain(struct boot_service *service)
 {
@@ -36,7 +42,9 @@ void kmain(struct boot_service *service)
 
   gdt_init();
   idt_init();
+  exceptions_init();
 
+  asm volatile ("int $0x7");
   asm volatile ("int $0x80");
   for(;;) asm volatile("hlt");
 }

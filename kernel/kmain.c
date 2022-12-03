@@ -5,6 +5,8 @@
 #include "hal.h"
 #include "mm.h"
 
+#include "timer/pit.h"
+
 #include "pic/isa.h"
 #include "pic/pic8259.h"
 
@@ -33,16 +35,10 @@ void kmain(struct boot_service *service)
 
   mm_init(service);
   hal_init();
-  pic8259s_init();
-  isa_irq_register(THIS_MODULE, 0, &handle_timer);
 
-  KASSERT(acquire_ports(THIS_MODULE, 0, 16)  ==  0);
-  KASSERT(acquire_ports(THIS_MODULE, 2, 4)   == -1);
-  KASSERT(acquire_ports(THIS_MODULE, 16, 24) ==  0);
-  KASSERT(release_ports(THIS_MODULE, 2, 4)   == -1);
-  KASSERT(acquire_ports(THIS_MODULE, 3, 5)   == -1);
-  KASSERT(release_ports(THIS_MODULE, 0, 16)  ==  0);
-  KASSERT(acquire_ports(THIS_MODULE, 3, 5)   ==  0);
+  pic8259s_init();
+  pit_init();
+  pit_register_callback(THIS_MODULE, &handle_timer);
 
   debug_printf("success\n");
 

@@ -3,7 +3,7 @@ LD=x86_64-elf-ld
 AR=x86_64-elf-ar
 OBJCOPY=x86_64-elf-objcopy
 
-CFLAGS  += -ffreestanding -fno-stack-protector -mgeneral-regs-only -fPIE
+CFLAGS  += -ffreestanding -fno-stack-protector -mgeneral-regs-only -mno-red-zone -fPIE
 LDFLAGS += -nostdlib -z max-page-size=4096
 LIBS    += -L. -lgcc
 

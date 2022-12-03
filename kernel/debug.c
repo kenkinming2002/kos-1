@@ -5,19 +5,19 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-void outb(uint16_t port, uint8_t data)
+static void outb(uint16_t port, uint8_t data)
 {
   asm volatile ("out %[data], %[port]" : : [port]"d"(port), [data]"a"(data));
 }
 
-uint8_t inb(uint16_t port)
+static uint8_t inb(uint16_t port)
 {
   uint8_t byte;
   asm volatile ("in %[port], %[byte] " : [byte]"=a"(byte) : [port]"d"(port));
   return byte;
 }
 
-void io_wait()
+static void io_wait()
 {
   outb(0x80, 0);
 }

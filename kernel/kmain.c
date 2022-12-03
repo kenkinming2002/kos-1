@@ -13,9 +13,7 @@
 
 #define TEST_COUNT 10
 
-struct module dummy = {
-  .name = "dummy"
-};
+DEFINE_MODULE(dummy);
 
 void handle_device_not_available()
 {
@@ -34,13 +32,13 @@ void kmain(struct boot_service *service)
 
   mm_init_pages(service);
 
-  KASSERT(acquire_ports(&dummy, 0, 16)  ==  0);
-  KASSERT(acquire_ports(&dummy, 2, 4)   == -1);
-  KASSERT(acquire_ports(&dummy, 16, 24) ==  0);
-  KASSERT(release_ports(&dummy, 2, 4)   == -1);
-  KASSERT(acquire_ports(&dummy, 3, 5)   == -1);
-  KASSERT(release_ports(&dummy, 0, 16)  ==  0);
-  KASSERT(acquire_ports(&dummy, 3, 5)   ==  0);
+  KASSERT(acquire_ports(THIS_MODULE, 0, 16)  ==  0);
+  KASSERT(acquire_ports(THIS_MODULE, 2, 4)   == -1);
+  KASSERT(acquire_ports(THIS_MODULE, 16, 24) ==  0);
+  KASSERT(release_ports(THIS_MODULE, 2, 4)   == -1);
+  KASSERT(acquire_ports(THIS_MODULE, 3, 5)   == -1);
+  KASSERT(release_ports(THIS_MODULE, 0, 16)  ==  0);
+  KASSERT(acquire_ports(THIS_MODULE, 3, 5)   ==  0);
 
   debug_printf("success\n");
 
@@ -50,7 +48,7 @@ void kmain(struct boot_service *service)
   asm volatile ("int $0x80");
 
   pic8259_init();
-  isa_irq_register(&dummy, 0, &handle_timer);
+  isa_irq_register(THIS_MODULE, 0, &handle_timer);
 
   asm volatile ("sti");
   for(;;) asm volatile("hlt");

@@ -1,9 +1,11 @@
 #include "idt.h"
 
-#include "exceptions.h"
-#include "irqs.h"
 #include "isrs.h"
 
+#include <core/assert.h>
+#include <core/debug.h>
+
+#include <stddef.h>
 #include <stdint.h>
 
 struct __attribute__((packed)) idt_entry
@@ -56,6 +58,13 @@ isr_t isrs[256] = {
   &isr240, &isr241, &isr242, &isr243, &isr244, &isr245, &isr246, &isr247, &isr248, &isr249, &isr250, &isr251, &isr252, &isr253, &isr254, &isr255,
 };
 
+struct idt_line
+{
+  struct module *module;
+  handler_t      handler;
+};
+struct idt_line idt_lines[256];
+
 void idt_init()
 {
   for(unsigned i=0; i<256; ++i)
@@ -79,11 +88,84 @@ void idt_init()
   asm volatile ("lidt %0" : : "m"(idt_desc));
 }
 
-void isr(uint64_t index, uint64_t ec)
+int idt_acquire_range(struct module *module, unsigned base, unsigned count)
 {
-  if(index <= 32)
-    trigger_exception(index);
-  else
-    trigger_irq(index - 32);
+  KASSERT(base+count<=IDT_MAX_VECTOR);
+
+  for(unsigned i=base; i<base+count; ++i)
+    if(idt_lines[i].module  != NULL ||
+       idt_lines[i].handler != NULL)
+      return -1;
+
+  for(unsigned i=base; i<base+count; ++i)
+    idt_lines[i].module = module;
+
+  return 0;
+}
+
+int idt_release_range(struct module *module, unsigned base, unsigned count)
+{
+  KASSERT(base+count<=IDT_MAX_VECTOR);
+
+  for(unsigned i=base; i<base+count; ++i)
+    if(idt_lines[i].module != module ||
+       idt_lines[i].module != NULL)
+      return -1;
+
+  for(unsigned i=base; i<base+count; ++i)
+    idt_lines[i].module = NULL;
+
+  return 0;
+}
+
+int idt_register(struct module *module, unsigned vector, handler_t handler)
+{
+  KASSERT(vector<IDT_MAX_VECTOR);
+  if(idt_lines[vector].module  != module ||
+     idt_lines[vector].handler != NULL)
+    return -1;
+
+  idt_lines[vector].handler = handler;
+  return 0;
+}
+
+int idt_deregister(struct module *module, unsigned vector, handler_t handler)
+{
+  KASSERT(vector<IDT_MAX_VECTOR);
+  if(idt_lines[vector].module  != module ||
+     idt_lines[vector].handler != handler)
+    return -1;
+
+  idt_lines[vector].handler = NULL;
+  return 0;
+}
+
+unsigned idt_alloc_range(struct module *module, unsigned count)
+{
+  if(count > IDT_MAX_VECTOR)
+    return IDT_INVALID_VECTOR;
+
+  for(unsigned base=0; base<IDT_MAX_VECTOR-count; ++base)
+    if(idt_acquire_range(module, base, count) == 0)
+      return base;
+
+  return IDT_INVALID_VECTOR;
+}
+
+void idt_free_range(struct module *module, unsigned base, unsigned count)
+{
+  int res = idt_release_range(module, base, count);
+  KASSERT(res != 0);
+}
+
+void isr(uint64_t vector, uint64_t ec)
+{
+  if(idt_lines[vector].module == NULL ||
+     idt_lines[vector].handler == NULL)
+  {
+    debug_printf("unhandled interrupt vector %lu\n", vector);
+    return;
+  }
+  idt_lines[vector].handler();
 }
 

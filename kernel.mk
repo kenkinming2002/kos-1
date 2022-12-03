@@ -1,5 +1,6 @@
 KERNEL_OBJS = kernel/debug.o \
        	      kernel/kmain.o \
+       	      kernel/mm.o \
        	      kernel/mm/pages.o \
        	      kernel/mm/liballoc_1_1.o \
        	      kernel/mm/liballoc_hooks.o \

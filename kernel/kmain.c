@@ -3,7 +3,7 @@
 
 #include "debug.h"
 #include "hal.h"
-#include "mm/pages.h"
+#include "mm.h"
 
 #include "pic/isa.h"
 #include "pic/pic8259.h"
@@ -31,7 +31,10 @@ void kmain(struct boot_service *service)
   debug_init();
   debug_printf("hello\n");
 
-  mm_init_pages(service);
+  mm_init(service);
+  hal_init();
+  pic8259s_init();
+  isa_irq_register(THIS_MODULE, 0, &handle_timer);
 
   KASSERT(acquire_ports(THIS_MODULE, 0, 16)  ==  0);
   KASSERT(acquire_ports(THIS_MODULE, 2, 4)   == -1);
@@ -43,14 +46,9 @@ void kmain(struct boot_service *service)
 
   debug_printf("success\n");
 
-  hal_init();
-
   asm volatile ("int $0x7");
   asm volatile ("int $0x80");
-
-  pic8259s_init();
-  isa_irq_register(THIS_MODULE, 0, &handle_timer);
-
   asm volatile ("sti");
+
   for(;;) asm volatile("hlt");
 }

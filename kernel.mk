@@ -5,6 +5,7 @@ KERNEL_OBJS = kernel/debug.o \
        	      kernel/mm/liballoc_hooks.o \
        	      kernel/hal/irqs.o \
        	      kernel/hal/exceptions.o \
+       	      kernel/hal.o \
        	      kernel/hal/ports.o \
        	      kernel/hal/gdt.o \
        	      kernel/hal/idt.o \

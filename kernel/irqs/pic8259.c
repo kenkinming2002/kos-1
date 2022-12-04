@@ -111,11 +111,7 @@ void pic8259_init()
   pic8259_master = &master->source;
   pic8259_slave  = &slave->source;
 
-  // TODO: Attach them
-  acquire_irqs(THIS_MODULE, 0x20, 0x8);
-  acquire_irqs(THIS_MODULE, 0x28, 0x8);
-
-  irqs_attach_source(THIS_MODULE, 0x20, 0x8, pic8259_master);
-  irqs_attach_source(THIS_MODULE, 0x28, 0x8, pic8259_slave);
+  acquire_irqs(THIS_MODULE, 0x20, 0x8, pic8259_master);
+  acquire_irqs(THIS_MODULE, 0x28, 0x8, pic8259_slave);
 }
 

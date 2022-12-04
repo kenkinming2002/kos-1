@@ -41,7 +41,6 @@ struct cpu_exceptions *cpu_exceptions;
 void exceptions_init()
 {
   cpu_exceptions = cpu_exceptions_create();
-  acquire_irqs(THIS_MODULE, 0x0, 0x20);
-  irqs_attach_source(THIS_MODULE, 0x0, 0x20, &cpu_exceptions->source);
+  acquire_irqs(THIS_MODULE, 0x0, 0x20, &cpu_exceptions->source);
 }
 

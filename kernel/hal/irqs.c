@@ -28,7 +28,7 @@ struct irqs
 };
 
 LL_DEFINE(irqs_list);
-int acquire_irqs(struct module *module, unsigned begin, unsigned count)
+int acquire_irqs(struct module *module, unsigned begin, unsigned count, struct irqs_source *source)
 {
   LL_FOREACH(irqs_list, node)
   {
@@ -45,56 +45,23 @@ int acquire_irqs(struct module *module, unsigned begin, unsigned count)
   irqs->lines   = kmalloc(sizeof *irqs->lines * irqs->count);
   memset(irqs->lines, 0, sizeof *irqs->lines * irqs->count);
 
-  irqs->source  = NULL;
+  irqs->source = source;
+  irqs->source->set_base(irqs->source, irqs->begin);
+
   ll_append(&irqs_list, &irqs->node);
   return 0;
 }
 
-int release_irqs(struct module *module, unsigned begin, unsigned count)
+int release_irqs(struct module *module, unsigned begin, unsigned count, struct irqs_source *source)
 {
   LL_FOREACH(irqs_list, node)
   {
     struct irqs *irqs = (struct irqs *)node;
-    if(irqs->module == module && irqs->begin == begin && irqs->count == count)
+    if(irqs->module == module && irqs->begin == begin && irqs->count == count && irqs->source == source)
     {
       kfree(irqs->lines);
       ll_delete(&irqs->node);
       kfree(irqs);
-      return 0;
-    }
-  }
-  return -1;
-}
-
-int irqs_attach_source(struct module *module, unsigned begin, unsigned count, struct irqs_source *source)
-{
-  LL_FOREACH(irqs_list, node)
-  {
-    struct irqs *irqs = (struct irqs *)node;
-    if(irqs->module == module && irqs->begin == begin && irqs->count == count)
-    {
-      if(irqs->source != NULL)
-        return -1;
-
-      irqs->source = source;
-      irqs->source->set_base(irqs->source, irqs->begin);
-      return 0;
-    }
-  }
-  return -1;
-}
-
-int irqs_detach_source(struct module *module, unsigned begin, unsigned count, struct irqs_source *source)
-{
-  LL_FOREACH(irqs_list, node)
-  {
-    struct irqs *irqs = (struct irqs *)node;
-    if(irqs->module == module && irqs->begin == begin && irqs->count == count)
-    {
-      if(irqs->source != source)
-        return -1;
-
-      irqs->source = NULL;
       return 0;
     }
   }

@@ -2,16 +2,12 @@
 #include "core/debug.h"
 
 #include "debug.h"
+#include "mm.h"
 #include "pal.h"
 #include "hal.h"
-#include "mm.h"
-
-#include "hal/irqs.h"
+#include "irqs.h"
 
 #include "timer/pit.h"
-
-#include "pic/isa.h"
-#include "pic/pic8259.h"
 
 #include <boot/service.h>
 
@@ -39,8 +35,8 @@ void kmain(struct boot_service *service)
   mm_init(service);
   pal_init();
   hal_init();
+  irqs_init();
 
-  pic8259s_init();
   pit_init();
   pit_register_callback(THIS_MODULE, &handle_timer);
 

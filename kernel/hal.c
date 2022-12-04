@@ -2,5 +2,4 @@
 
 void hal_init()
 {
-  exceptions_init();
 }

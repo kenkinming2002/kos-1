@@ -1,8 +1,8 @@
 #include "pit.h"
 
-#include "hal.h"
 #include "mm.h"
-#include "pic/isa.h"
+#include "hal.h"
+#include "irqs.h"
 
 #include <core/assert.h>
 #include <core/ll.h>
@@ -56,14 +56,13 @@ struct timer_record
 };
 static LL_DEFINE(timer_records);
 
-static void pit_handler()
+static void pit_handler(void *)
 {
   LL_FOREACH(timer_records, node)
   {
     struct timer_record *record = (struct timer_record *)node;
     record->callback();
   }
-  isa_irq_acknowledge(0);
 }
 
 void pit_init()
@@ -73,8 +72,7 @@ void pit_init()
   outb(PIT_SELECT_CHANNEL0, 0xFF);
   outb(PIT_SELECT_CHANNEL0, 0xFF);
 
-  KASSERT(isa_irq_register(THIS_MODULE, 0, &pit_handler) != -1);
-  isa_irq_unmask(0);
+  KASSERT(isa_irq_register(THIS_MODULE, 0, &pit_handler, NULL) != -1);
 }
 
 int pit_register_callback(struct module *module, timer_callback_t callback)

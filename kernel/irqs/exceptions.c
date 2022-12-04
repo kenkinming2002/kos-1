@@ -1,6 +1,6 @@
 #include "exceptions.h"
 
-#include "irqs.h"
+#include "hal/irqs.h"
 #include "mm.h"
 
 #include <core/assert.h>

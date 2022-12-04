@@ -1,8 +1,8 @@
 #include "pit.h"
 
-#include "hal.h"
 #include "mm.h"
-#include "pic/isa.h"
+#include "hal.h"
+#include "irqs.h"
 
 #include <core/assert.h>
 #include <core/ll.h>

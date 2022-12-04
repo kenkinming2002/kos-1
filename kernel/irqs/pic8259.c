@@ -48,13 +48,13 @@ static void pic8259_set_base(struct irqs_source *source, unsigned base)
   outb(data_port,    pic->mask);             io_wait();
 }
 
-static void pic8259_acknowledge(struct irqs_source *source, unsigned irq)
+static void pic8259_acknowledge(struct irqs_source *source)
 {
   struct pic8259 *pic = (struct pic8259 *)source;
   uint16_t command_port = pic->ports;
   outb(command_port, 0x20);
   if(pic->master)
-    pic8259_acknowledge(&pic->master->source, irq);
+    pic8259_acknowledge(&pic->master->source);
 }
 
 static void pic8259_mask(struct irqs_source *source, unsigned irq)

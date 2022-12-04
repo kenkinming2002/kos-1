@@ -161,7 +161,7 @@ void isr(uint64_t irq, uint64_t ec)
         irqs->lines[irq].handler(irqs->lines[irq].data);
 
       if(irqs->source->acknowledge)
-        irqs->source->acknowledge(irqs->source, irq);
+        irqs->source->acknowledge(irqs->source);
     }
   }
 }

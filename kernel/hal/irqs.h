@@ -13,7 +13,7 @@ struct irqs_source
 {
   void(*set_base)(struct irqs_source *source, unsigned base);
 
-  void(*acknowledge)(struct irqs_source *source, unsigned irq);
+  void(*acknowledge)(struct irqs_source *source);
   void(*unmask)(struct irqs_source *source, unsigned irq);
   void(*mask)(struct irqs_source *source, unsigned irq);
 };

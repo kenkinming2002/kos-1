@@ -3,8 +3,6 @@
 
 #include "hal.h"
 
-typedef void(*handler_t)();
-
 void pic8259s_init();
 int pic8259s_irq_register(struct module *module, unsigned irq, handler_t handler);
 int pic8259s_irq_deregister(struct module *module, unsigned irq, handler_t handler);

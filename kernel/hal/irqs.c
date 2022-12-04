@@ -13,6 +13,8 @@ struct irqs
   struct module *module;
   uint16_t begin;
   uint16_t count;
+
+  struct irqs_source *source;
 };
 
 LL_DEFINE(irqs_list);
@@ -42,6 +44,40 @@ int release_irqs(struct module *module, unsigned begin, unsigned count)
     {
       ll_delete(&irqs->node);
       kfree(irqs);
+      return 0;
+    }
+  }
+  return -1;
+}
+
+int irqs_attach_source(struct module *module, unsigned begin, unsigned count, struct irqs_source *source)
+{
+  LL_FOREACH(irqs_list, node)
+  {
+    struct irqs *irqs = (struct irqs *)node;
+    if(irqs->module == module && irqs->begin == begin && irqs->count == count)
+    {
+      if(irqs->source != NULL)
+        return -1;
+
+      irqs->source = source;
+      return 0;
+    }
+  }
+  return -1;
+}
+
+int irqs_detach_source(struct module *module, unsigned begin, unsigned count, struct irqs_source *source)
+{
+  LL_FOREACH(irqs_list, node)
+  {
+    struct irqs *irqs = (struct irqs *)node;
+    if(irqs->module == module && irqs->begin == begin && irqs->count == count)
+    {
+      if(irqs->source != source)
+        return -1;
+
+      irqs->source = NULL;
       return 0;
     }
   }

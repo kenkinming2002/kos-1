@@ -28,9 +28,12 @@ DEFINE_MODULE(pic8259);
 struct pic8259
 {
   struct irqs_source source;
+
   uint16_t ports;
   uint8_t  config;
   uint8_t  mask;
+
+  struct pic8259 *master;
 };
 
 static void pic8259_set_base(struct irqs_source *source, unsigned base)
@@ -50,6 +53,8 @@ static void pic8259_acknowledge(struct irqs_source *source, unsigned irq)
   struct pic8259 *pic = (struct pic8259 *)source;
   uint16_t command_port = pic->ports;
   outb(command_port, 0x20);
+  if(pic->master)
+    pic8259_acknowledge(&pic->master->source, irq);
 }
 
 static void pic8259_mask(struct irqs_source *source, unsigned irq)
@@ -84,6 +89,7 @@ static struct pic8259 *pic8259_create(uint16_t ports, uint8_t config, uint8_t ma
   pic->ports  = ports;
   pic->config = config;
   pic->mask   = mask;
+  pic->master = NULL;
   return pic;
 }
 
@@ -98,8 +104,12 @@ struct irqs_source *pic8259_slave;
 
 void pic8259_init()
 {
-  pic8259_master = (struct irqs_source *)pic8259_create(PIC_MASTER, 1 << 2, 0xFC);
-  pic8259_slave  = (struct irqs_source *)pic8259_create(PIC_SLAVE,  2,      0xFF);
+  struct pic8259 *master = pic8259_create(PIC_MASTER, 1 << 2, 0xFC);
+  struct pic8259 *slave  = pic8259_create(PIC_SLAVE,  2,      0xFF);
+  slave->master = master;
+
+  pic8259_master = &master->source;
+  pic8259_slave  = &slave->source;
 
   // TODO: Attach them
   acquire_irqs(THIS_MODULE, 0x20, 0x8);

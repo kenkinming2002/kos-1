@@ -1,7 +1,12 @@
 #ifndef HAL_IRQS_H
 #define HAL_IRQS_H
 
+#include "module.h"
+
 #include <core/ll.h>
+
+int acquire_irqs(struct module *module, unsigned begin, unsigned count);
+int release_irqs(struct module *module, unsigned begin, unsigned count);
 
 #define IRQ_DOMAIN_DYNAMIC_BASE (unsigned)-1
 

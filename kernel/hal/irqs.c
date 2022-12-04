@@ -116,7 +116,9 @@ int irqs_register_handler(struct irqs_source *source, struct module *module, uns
       irqs->lines[irq].handler = handler;
       irqs->lines[irq].data    = data;
 
-      irqs->source->unmask(irqs->source, irq);
+      if(irqs->source->unmask)
+        irqs->source->unmask(irqs->source, irq);
+
       return 0;
     }
   }
@@ -138,7 +140,9 @@ int irqs_deregister_handler(struct irqs_source *source, struct module *module, u
       irqs->lines[irq].handler = NULL;
       irqs->lines[irq].data    = NULL;
 
-      irqs->source->mask(irqs->source, irq);
+      if(irqs->source->mask)
+        irqs->source->mask(irqs->source, irq);
+
       return 0;
     }
   }
@@ -156,7 +160,8 @@ void isr(uint64_t irq, uint64_t ec)
       if(irqs->lines[irq].module)
         irqs->lines[irq].handler(irqs->lines[irq].data);
 
-      irqs->source->acknowledge(irqs->source, irq);
+      if(irqs->source->acknowledge)
+        irqs->source->acknowledge(irqs->source, irq);
     }
   }
 }

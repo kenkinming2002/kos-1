@@ -2,24 +2,13 @@
 
 #include "mm.h"
 
-#include <core/ll.h>
 #include <stddef.h>
 
 #define MAX_IRQ 256
 
-struct irq_domain
-{
-  struct ll_node node;
-
-  unsigned base;
-  unsigned count;
-
-  void(*handler)(unsigned, void*);
-  void *data;
-};
 LL_DEFINE(irq_domains);
 
-struct irq_domain *irq_alloc_domain(unsigned base, unsigned count, void(*handler)(unsigned, void*), void *data)
+struct irq_domain *irq_alloc_domain(unsigned base, unsigned count)
 {
   if(base == IRQ_DOMAIN_DYNAMIC_BASE)
   {
@@ -28,7 +17,7 @@ struct irq_domain *irq_alloc_domain(unsigned base, unsigned count, void(*handler
 
     for(unsigned base=0; base<MAX_IRQ-count; ++base)
     {
-      struct irq_domain *domain = irq_alloc_domain(base, count, handler, data);
+      struct irq_domain *domain = irq_alloc_domain(base, count);
       if(domain)
         return domain;
     }
@@ -44,8 +33,8 @@ struct irq_domain *irq_alloc_domain(unsigned base, unsigned count, void(*handler
   struct irq_domain *domain = kmalloc(sizeof *domain);
   domain->base    = base;
   domain->count   = count;
-  domain->handler = handler;
-  domain->data    = data;
+  domain->handler = NULL;
+  domain->data    = NULL;
   ll_append(&irq_domains, &domain->node);
   return domain;
 }
@@ -62,6 +51,7 @@ void irq_handle(unsigned irq)
   {
     struct irq_domain *domain = (struct irq_domain *)node;
     if(domain->base <= irq && irq < domain->base + domain->count)
-      return domain->handler(irq - domain->base, domain->data);
+      if(domain->handler)
+        return domain->handler(irq - domain->base, domain->data);
   }
 }

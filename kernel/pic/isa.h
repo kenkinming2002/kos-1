@@ -3,6 +3,8 @@
 
 #include "hal.h"
 
+typedef void(*handler_t)();
+
 int isa_irq_register(struct module *module, unsigned irq, handler_t handler);
 int isa_irq_deregister(struct module *module, unsigned irq, handler_t handler);
 

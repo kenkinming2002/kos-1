@@ -1,5 +1,7 @@
 #include "pic8259.h"
 
+#include "hal/irqs.h"
+
 #include <core/assert.h>
 #include <core/debug.h>
 
@@ -17,7 +19,6 @@ struct pic8259_line
 struct pic8259
 {
   uint16_t ports;
-  unsigned base;
   struct pic8259_line lines[16];
 };
 
@@ -36,6 +37,13 @@ struct pic8259
 #define ICW4_BUF_MASTER	0x0C
 #define ICW4_SFNM	0x10
 
+static void pic8259_handle_irq(unsigned irq, void *data)
+{
+  struct pic8259 *pic = data;
+  if(pic->lines[irq].handler)
+    pic->lines[irq].handler();
+}
+
 /* @params config
  *  master pic: bitmask indicating which interrupt line is cascade
  *  slave  pic: slave id, i.e. the interrupt line of the master pic for which the slave INT line is connected to */
@@ -49,24 +57,23 @@ static void pic8259_init(struct pic8259* pic, uint16_t ports, uint8_t config, ui
   uint16_t data_port    = pic->ports + 1;
 
   // FIXME: This need to be 8-byte aligned
-  pic->base = idt_alloc_range(THIS_MODULE, 8);
-  KASSERT(pic->base != IDT_INVALID_VECTOR);
+  struct irq_domain *domain = irq_alloc_domain(IRQ_DOMAIN_DYNAMIC_BASE, 8);
+  domain->handler = &pic8259_handle_irq;
+  domain->data    = pic;
 
   // Initialize
   outb(command_port, ICW1_INIT | ICW1_ICW4); io_wait();
-  outb(data_port,    pic->base);             io_wait();
+  outb(data_port,    domain->base);          io_wait();
   outb(data_port,    config);                io_wait();
   outb(data_port,    ICW4_8086);             io_wait();
   outb(data_port,    mask);                  io_wait();
 }
 
+
 static int pic8259_irq_register(struct pic8259* pic, struct module *module, unsigned irq, handler_t handler)
 {
   if(pic->lines[irq].module  != NULL ||
      pic->lines[irq].handler != NULL)
-    return -1;
-
-  if(idt_register(THIS_MODULE, pic->base + irq, handler) != 0)
     return -1;
 
   pic->lines[irq].module  = module;
@@ -78,9 +85,6 @@ static int pic8259_irq_deregister(struct pic8259* pic, struct module *module, un
 {
   if(pic->lines[irq].module  != module ||
      pic->lines[irq].handler != handler)
-    return -1;
-
-  if(idt_deregister(THIS_MODULE, pic->base + irq, handler) != 0)
     return -1;
 
   pic->lines[irq].module  = NULL;
@@ -110,7 +114,6 @@ static void pic8259_irq_unmask(struct pic8259 *pic, unsigned irq)
   mask &= ~(1 << irq);
   outb(data_port, mask);
 }
-
 
 struct pic8259 master_pic;
 struct pic8259 slave_pic;

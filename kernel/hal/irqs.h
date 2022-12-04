@@ -1,11 +1,22 @@
 #ifndef HAL_IRQS_H
 #define HAL_IRQS_H
 
+#include <core/ll.h>
+
 #define IRQ_DOMAIN_DYNAMIC_BASE (unsigned)-1
 
-struct irq_domain;
+struct irq_domain
+{
+  struct ll_node node;
 
-struct irq_domain *irq_alloc_domain(unsigned base, unsigned count, void(*handler)(unsigned, void*), void *data);
+  unsigned base;
+  unsigned count;
+
+  void(*handler)(unsigned, void*);
+  void *data;
+};
+
+struct irq_domain *irq_alloc_domain(unsigned base, unsigned count);
 void irq_free_domain(struct irq_domain *domain);
 
 void irq_handle(unsigned irq);

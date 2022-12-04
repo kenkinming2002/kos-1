@@ -8,7 +8,7 @@
 int acquire_irqs(struct module *module, unsigned begin, unsigned count);
 int release_irqs(struct module *module, unsigned begin, unsigned count);
 
-typedef void(*handler_t)(void);
+typedef void(*handler_t)(void *);
 struct irqs_source
 {
   void(*set_base)(struct irqs_source *source, unsigned base);
@@ -20,20 +20,7 @@ struct irqs_source
 int irqs_attach_source(struct module *module, unsigned begin, unsigned count, struct irqs_source *source);
 int irqs_detach_source(struct module *module, unsigned begin, unsigned count, struct irqs_source *source);
 
-#define IRQ_DOMAIN_DYNAMIC_BASE (unsigned)-1
-
-struct irq_domain
-{
-  struct ll_node node;
-
-  unsigned base;
-  unsigned count;
-
-  void(*handler)(unsigned, void*);
-  void *data;
-};
-
-struct irq_domain *irq_alloc_domain(unsigned base, unsigned count);
-void irq_free_domain(struct irq_domain *domain);
+int irqs_register_handler(struct irqs_source *source, struct module *module, unsigned irq, handler_t handler, void *data);
+int irqs_deregister_handler(struct irqs_source *source, struct module *module, unsigned irq);
 
 #endif // HAL_IRQS_H

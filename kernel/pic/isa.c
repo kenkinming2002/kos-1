@@ -2,27 +2,36 @@
 
 #include "pic8259.h"
 
-int isa_irq_register(struct module *module, unsigned irq, handler_t handler)
+#include <stdbool.h>
+#include <core/assert.h>
+
+int isa_irq_register(struct module *module, unsigned irq, handler_t handler, void *data)
 {
-  return pic8259s_irq_register(module, irq, handler);
+  struct irqs_source *pic;
+  if(irq < 8)
+    pic = pic8259_master;
+  else if(irq < 16)
+    pic = pic8259_slave;
+  else
+    KASSERT_UNREACHABLE;
+
+  irq %= 8;
+
+  return irqs_register_handler(pic, module, irq, handler, data);
 }
 
-int isa_irq_deregister(struct module *module, unsigned irq, handler_t handler)
+int isa_irq_deregister(struct module *module, unsigned irq)
 {
-  return pic8259s_irq_deregister(module, irq, handler);
+  struct irqs_source *pic;
+  if(irq < 8)
+    pic = pic8259_master;
+  else if(irq < 16)
+    pic = pic8259_slave;
+  else
+    KASSERT_UNREACHABLE;
+
+  irq %= 8;
+
+  return irqs_deregister_handler(pic, module, irq);
 }
 
-void isa_irq_acknowledge(unsigned irq)
-{
-  return pic8259s_irq_acknowledge(irq);
-}
-
-void isa_irq_mask(unsigned irq)
-{
-  return pic8259s_irq_mask(irq);
-}
-
-void isa_irq_unmask(unsigned irq)
-{
-  return pic8259s_irq_unmask(irq);
-}

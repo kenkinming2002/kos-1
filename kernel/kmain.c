@@ -40,7 +40,7 @@ void kmain(struct boot_service *service)
   pal_init();
   hal_init();
 
-  pic8259s_init();
+  pic8259_init();
   pit_init();
   pit_register_callback(THIS_MODULE, &handle_timer);
 

@@ -19,6 +19,4 @@ struct irq_domain
 struct irq_domain *irq_alloc_domain(unsigned base, unsigned count);
 void irq_free_domain(struct irq_domain *domain);
 
-void irq_handle(unsigned irq);
-
 #endif // HAL_IRQS_H

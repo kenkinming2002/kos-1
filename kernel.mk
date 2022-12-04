@@ -4,14 +4,15 @@ KERNEL_OBJS = kernel/debug.o \
        	      kernel/mm/pages.o \
        	      kernel/mm/liballoc_1_1.o \
        	      kernel/mm/liballoc_hooks.o \
-       	      kernel/hal/exceptions.o \
+       	      kernel/pal.o \
+       	      kernel/pal/gdt.o \
+       	      kernel/pal/idt.o \
+       	      kernel/pal/segs.o \
+       	      kernel/pal/isrs.o \
        	      kernel/hal.o \
-       	      kernel/hal/ports.o \
-       	      kernel/hal/gdt.o \
-       	      kernel/hal/idt.o \
-       	      kernel/hal/segs.o \
-       	      kernel/hal/isrs.o \
+       	      kernel/hal/exceptions.o \
        	      kernel/hal/irqs.o \
+       	      kernel/hal/ports.o \
        	      kernel/pic/pic8259.o \
        	      kernel/pic/isa.o \
        	      kernel/timer/pit.o

@@ -1,7 +1,7 @@
 #include "idt.h"
 
 #include "isrs.h"
-#include "irqs.h"
+#include "hal/irqs.h"
 
 #include <core/assert.h>
 #include <core/debug.h>
@@ -80,10 +80,5 @@ void idt_init()
     };
 
   asm volatile ("lidt %0" : : "m"(idt_desc));
-}
-
-void isr(uint64_t vector, uint64_t ec)
-{
-  irq_handle(vector);
 }
 

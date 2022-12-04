@@ -45,13 +45,13 @@ void irq_free_domain(struct irq_domain *domain)
   kfree(domain);
 }
 
-void irq_handle(unsigned irq)
+void isr(uint64_t vector, uint64_t ec)
 {
   LL_FOREACH(irq_domains, node)
   {
     struct irq_domain *domain = (struct irq_domain *)node;
-    if(domain->base <= irq && irq < domain->base + domain->count)
+    if(domain->base <= vector && vector < domain->base + domain->count)
       if(domain->handler)
-        return domain->handler(irq - domain->base, domain->data);
+        return domain->handler(vector - domain->base, domain->data);
   }
 }

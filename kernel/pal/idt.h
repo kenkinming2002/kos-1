@@ -1,5 +1,5 @@
-#ifndef HAL_IDT_H
-#define HAL_IDT_H
+#ifndef PAL_IDT_H
+#define PAL_IDT_H
 
 #include "module.h"
 
@@ -8,4 +8,4 @@
 
 void idt_init();
 
-#endif // HAL_IDT_H
+#endif // PAL_IDT_H

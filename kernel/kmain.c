@@ -2,6 +2,7 @@
 #include "core/debug.h"
 
 #include "debug.h"
+#include "pal.h"
 #include "hal.h"
 #include "mm.h"
 
@@ -36,6 +37,7 @@ void kmain(struct boot_service *service)
   debug_printf("hello\n");
 
   mm_init(service);
+  pal_init();
   hal_init();
 
   pic8259s_init();

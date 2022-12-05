@@ -13,6 +13,10 @@ typedef void(*timer_handler_t)(void *);
 struct timer
 {
   struct ll_node node;
+
+  void(*enable)(struct timer *timer);
+  void(*disable)(struct timer *timer);
+
   void(*configure)(struct timer *timer, enum timer_mode mode, unsigned duration, timer_handler_t handler, void *data);
 };
 

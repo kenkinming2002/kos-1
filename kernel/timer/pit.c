@@ -79,6 +79,18 @@ static uint16_t pit_reload_value_from_duration(unsigned duration)
   return reload_value;
 }
 
+static void pit_enable(struct timer *timer)
+{
+  struct pit *pit = (struct pit *)timer;
+  KASSERT(isa_irq_register(THIS_MODULE, 0, pit_handler, pit) == 0);
+}
+
+static void pit_disable(struct timer *timer)
+{
+  struct pit *pit = (struct pit *)timer;
+  KASSERT(isa_irq_deregister(THIS_MODULE, 0) == 0);
+}
+
 static void pit_configure(struct timer *timer, enum timer_mode mode, unsigned duration, timer_handler_t handler, void *data)
 {
   struct pit *pit = (struct pit *)timer;
@@ -95,16 +107,16 @@ static void pit_configure(struct timer *timer, enum timer_mode mode, unsigned du
 static struct pit *pit_create()
 {
   struct pit *pit = kmalloc(sizeof *pit);
+  pit->timer.enable    = &pit_enable;
+  pit->timer.disable   = &pit_disable;
   pit->timer.configure = &pit_configure;
   KASSERT(acquire_ports(THIS_MODULE, PIT_PORTS, PIT_PORT_COUNT) == 0);
-  KASSERT(isa_irq_register(THIS_MODULE, 0, pit_handler, pit)    == 0);
   return pit;
 }
 
 static void pit_destroy(struct pit *pit)
 {
   KASSERT(release_ports(THIS_MODULE, PIT_PORTS, PIT_PORT_COUNT) == 0);
-  KASSERT(isa_irq_deregister(THIS_MODULE, 0)                    == 0);
   kfree(pit);
 }
 

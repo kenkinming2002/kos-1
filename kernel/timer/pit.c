@@ -61,12 +61,33 @@ static void pit_handler(void *data)
   pit->handler(pit->data);
 }
 
+static uint64_t _pit_reload_value_from_duration(uint64_t duration)
+{
+  // Duration specified in ns
+  return duration * 1193192 / 1000000000;
+}
+
+static uint16_t pit_reload_value_from_duration(unsigned duration)
+{
+  uint64_t reload_value = _pit_reload_value_from_duration(duration);
+  if(reload_value >= UINT16_MAX)
+    reload_value = UINT16_MAX;
+
+  if(reload_value == 0)
+    reload_value = 1;
+
+  return reload_value;
+}
+
 static void pit_configure(struct timer *timer, enum timer_mode mode, unsigned duration, timer_handler_t handler, void *data)
 {
   struct pit *pit = (struct pit *)timer;
   outb(PIT_MODE_COMMAND_REGISTER, PIT_SELECT_CHANNEL0 | PIT_ACCESS_LOBYTE_HIBYTE | PIT_RATE_GENERATOR1);
-  outb(PIT_SELECT_CHANNEL0, 0xFF);
-  outb(PIT_SELECT_CHANNEL0, 0xFF);
+
+  uint16_t reload_value = pit_reload_value_from_duration(duration);
+  outb(PIT_SELECT_CHANNEL0, (reload_value >> 0) & 0xFF);
+  outb(PIT_SELECT_CHANNEL0, (reload_value >> 8) & 0xFF);
+
   pit->handler = handler;
   pit->data    = data;
 }

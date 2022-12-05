@@ -87,11 +87,9 @@ static void pit_destroy(struct pit *pit)
   kfree(pit);
 }
 
-struct timer *pit_timer;
 void pit_init()
 {
   struct pit *pit = pit_create();
-  pit_timer = &pit->timer;
   timer_register(&pit->timer);
 }
 

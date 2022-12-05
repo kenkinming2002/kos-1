@@ -12,6 +12,7 @@ KERNEL_OBJS = kernel/debug.o \
        	      kernel/hal.o \
        	      kernel/hal/irqs.o \
        	      kernel/hal/ports.o \
+       	      kernel/hal/timer.o \
 	      kernel/irqs.o \
        	      kernel/irqs/exceptions.o \
        	      kernel/irqs/pic8259.o \

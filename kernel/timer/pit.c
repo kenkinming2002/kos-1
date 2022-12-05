@@ -92,5 +92,6 @@ void pit_init()
 {
   struct pit *pit = pit_create();
   pit_timer = &pit->timer;
+  timer_register(&pit->timer);
 }
 

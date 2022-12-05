@@ -7,6 +7,8 @@
 #include <core/assert.h>
 #include <core/ll.h>
 
+DEFINE_MODULE(pit);
+
 #define PIT_PORTS      0x40
 #define PIT_PORT_COUNT 4
 
@@ -45,57 +47,50 @@ enum pit_operating_mode
 
 #define PIT_BCD 0b00000001;
 
-DEFINE_MODULE(pit);
-
-struct timer_record
+struct pit
 {
-  struct ll_node node;
+  struct timer timer;
 
-  struct module *module;
-  timer_callback_t callback;
+  timer_handler_t  handler;
+  void            *data;
 };
-static LL_DEFINE(timer_records);
 
-static void pit_handler(void *)
+static void pit_handler(void *data)
 {
-  LL_FOREACH(timer_records, node)
-  {
-    struct timer_record *record = (struct timer_record *)node;
-    record->callback();
-  }
+  struct pit *pit = data;
+  pit->handler(pit->data);
 }
 
-void pit_init()
+static void pit_configure(struct timer *timer, enum timer_mode mode, unsigned duration, timer_handler_t handler, void *data)
 {
-  KASSERT(acquire_ports(THIS_MODULE, PIT_PORTS, PIT_PORT_COUNT) != -1);
+  struct pit *pit = (struct pit *)timer;
   outb(PIT_MODE_COMMAND_REGISTER, PIT_SELECT_CHANNEL0 | PIT_ACCESS_LOBYTE_HIBYTE | PIT_RATE_GENERATOR1);
   outb(PIT_SELECT_CHANNEL0, 0xFF);
   outb(PIT_SELECT_CHANNEL0, 0xFF);
-
-  KASSERT(isa_irq_register(THIS_MODULE, 0, &pit_handler, NULL) != -1);
+  pit->handler = handler;
+  pit->data    = data;
 }
 
-int pit_register_callback(struct module *module, timer_callback_t callback)
+static struct pit *pit_create()
 {
-  struct timer_record *record = kmalloc(sizeof *record);
-  record->module   = module;
-  record->callback = callback;
-  ll_append(&timer_records, &record->node);
-  return 0;
+  struct pit *pit = kmalloc(sizeof *pit);
+  pit->timer.configure = &pit_configure;
+  KASSERT(acquire_ports(THIS_MODULE, PIT_PORTS, PIT_PORT_COUNT) == 0);
+  KASSERT(isa_irq_register(THIS_MODULE, 0, pit_handler, pit)    == 0);
+  return pit;
 }
 
-int pit_deregister_callback(struct module *module, timer_callback_t callback)
+static void pit_destroy(struct pit *pit)
 {
-  LL_FOREACH(timer_records, node)
-  {
-    struct timer_record *record = (struct timer_record *)node;
-    if(record->module == module && record->callback == callback)
-    {
-      ll_delete(node);
-      kfree(record);
-      return 0;
-    }
-  }
-  return -1;
+  KASSERT(release_ports(THIS_MODULE, PIT_PORTS, PIT_PORT_COUNT) == 0);
+  KASSERT(isa_irq_deregister(THIS_MODULE, 0)                    == 0);
+  kfree(pit);
+}
+
+struct timer *pit_timer;
+void pit_init()
+{
+  struct pit *pit = pit_create();
+  pit_timer = &pit->timer;
 }
 

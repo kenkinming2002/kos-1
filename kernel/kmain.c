@@ -38,9 +38,7 @@ void kmain(struct boot_service *service)
   irqs_init();
 
   pit_init();
-  pit_register_callback(THIS_MODULE, &handle_timer);
-
-  debug_printf("success\n");
+  pit_timer->configure(pit_timer, TIMER_MODE_PERIODIC, 100, &handle_timer, NULL);
 
   asm volatile ("int $0x7");
   asm volatile ("int $0x80");

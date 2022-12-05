@@ -3,10 +3,7 @@
 
 #include "module.h"
 
-typedef void(*timer_callback_t)();
-
+extern struct timer *pit_timer;
 void pit_init();
-int pit_register_callback(struct module *module, timer_callback_t callback);
-int pit_deregister_callback(struct module *module, timer_callback_t callback);
 
 #endif // TIMER_PIT_H

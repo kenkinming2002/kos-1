@@ -10,7 +10,7 @@ enum timer_mode
 typedef void(*timer_handler_t)(void *);
 struct timer
 {
-  void(*configure)(enum timer_mode mode, unsigned duration, timer_handler_t handler, void *data);
+  void(*configure)(struct timer *timer, enum timer_mode mode, unsigned duration, timer_handler_t handler, void *data);
 };
 
 #endif // HAL_TIMER_H

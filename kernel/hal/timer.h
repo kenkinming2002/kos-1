@@ -19,4 +19,7 @@ struct timer
 void timer_register(struct timer *timer);
 void timer_deregister(struct timer *timer);
 
+struct timer *timer_alloc();
+void timer_free(struct timer *timer);
+
 #endif // HAL_TIMER_H

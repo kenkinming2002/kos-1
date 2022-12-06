@@ -104,7 +104,7 @@ struct irqs_source *pic8259_slave;
 
 void pic8259_init()
 {
-  struct pic8259 *master = pic8259_create(PIC_MASTER, 1 << 2, 0xFC);
+  struct pic8259 *master = pic8259_create(PIC_MASTER, 1 << 2, 0xFB);
   struct pic8259 *slave  = pic8259_create(PIC_SLAVE,  2,      0xFF);
   slave->master = master;
 

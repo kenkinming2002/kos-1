@@ -20,6 +20,9 @@ static void mm_add(uintptr_t addr, size_t length)
 {
   uintptr_t new_addr   = ALIGN_UP(addr, PAGE_SIZE);
   size_t    new_length = length - (new_addr - addr);
+  if(addr + length < new_addr)
+    return;
+
   bm_fill(bm, new_addr / PAGE_SIZE, ALIGN_DOWN(new_length, PAGE_SIZE) / PAGE_SIZE, false);
 }
 

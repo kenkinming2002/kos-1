@@ -7,6 +7,8 @@
 #include <core/assert.h>
 #include <core/ll.h>
 
+#include <stdbool.h>
+
 DEFINE_MODULE(pit);
 
 #define PIT_PORTS      0x40
@@ -32,6 +34,23 @@ enum pit_access_mode
   PIT_ACCESS_LOBYTE_HIBYTE = 0b00110000,
 };
 
+/* Different mode of PIT can be confusing at best.
+ * Hence, the following summary.
+ *
+ * =======================================================================================
+ * |                               | Type     | Trigger                 | Output Form    |
+ * =======================================================================================
+ * |Interrupt on Terminal Count    | Oneshot  | Counter Reload          | Flip-flop like |
+ * |Hardware Retriggerable Oneshot | Oneshot  | Gate Input Rising Edge  | Flip-flop like |
+ * |Software Triggered Strobe      | Oneshot  | Counter Reload          | Pulse like     |
+ * |Hardware Triggered Strobe      | Oneshot  | Gate Input Rising Edge  | Pulse like     |
+ * |Rate Generator                 | Periodic | N.A.                    | Pulse Like     |
+ * |Square Wave Generator          | Periodic | N.A.                    | Flip-flop like |
+ * =======================================================================================
+ *
+ * Worth noting is that if the trigger of a mode is on gate input rising edge,
+ * it is really on usable for channel 2 since that is the only channel for
+ * which the gate input could be controlled by software. */
 enum pit_operating_mode
 {
   PIT_INTERRUPT_ON_TERMINAL_COUNT    = 0b00000000,
@@ -91,10 +110,22 @@ static void pit_disable(struct timer *timer)
   KASSERT(isa_irq_deregister(THIS_MODULE, 0) == 0);
 }
 
+bool once = false;
+
 static void pit_configure(struct timer *timer, enum timer_mode mode, unsigned duration, timer_handler_t handler, void *data)
 {
   struct pit *pit = (struct pit *)timer;
-  outb(PIT_MODE_COMMAND_REGISTER, PIT_SELECT_CHANNEL0 | PIT_ACCESS_LOBYTE_HIBYTE | PIT_RATE_GENERATOR1);
+  switch(mode)
+  {
+  case TIMER_MODE_ONESHOT:
+    outb(PIT_MODE_COMMAND_REGISTER, PIT_SELECT_CHANNEL0 | PIT_ACCESS_LOBYTE_HIBYTE | PIT_SOFTWARE_TRIGGERED_STROBE);
+    break;
+  case TIMER_MODE_PERIODIC:
+    outb(PIT_MODE_COMMAND_REGISTER, PIT_SELECT_CHANNEL0 | PIT_ACCESS_LOBYTE_HIBYTE | PIT_RATE_GENERATOR1);
+    break;
+  default:
+    KASSERT_UNREACHABLE;
+  }
 
   uint16_t reload_value = pit_reload_value_from_duration(duration);
   outb(PIT_SELECT_CHANNEL0, (reload_value >> 0) & 0xFF);

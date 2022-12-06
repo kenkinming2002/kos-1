@@ -3,6 +3,7 @@
 
 #include "hal/ports.h"
 #include "hal/irqs.h"
+#include "hal/timer.h"
 
 void hal_init();
 

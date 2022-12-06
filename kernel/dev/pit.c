@@ -7,8 +7,6 @@
 #include <core/assert.h>
 #include <core/ll.h>
 
-#include <stdbool.h>
-
 DEFINE_MODULE(pit);
 
 #define PIT_PORTS      0x40

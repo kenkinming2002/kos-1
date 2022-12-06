@@ -2,7 +2,6 @@
 
 #include "dev/pic8259.h"
 
-#include <stdbool.h>
 #include <core/assert.h>
 
 int isa_irq_register(struct module *module, unsigned irq, handler_t handler, void *data)

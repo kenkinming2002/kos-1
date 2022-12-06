@@ -5,9 +5,6 @@
 
 #include <core/assert.h>
 
-#include <stdbool.h>
-#include <stddef.h>
-
 DEFINE_MODULE(pic8259);
 
 #define PIC_MASTER 0x0020

@@ -5,9 +5,6 @@
 
 #include <core/assert.h>
 
-#include <stdbool.h>
-#include <stddef.h>
-
 DEFINE_MODULE(cpu_exceptions);
 
 struct cpu_exceptions

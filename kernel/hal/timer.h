@@ -17,7 +17,8 @@ struct timer
   void(*enable)(struct timer *timer);
   void(*disable)(struct timer *timer);
 
-  void(*configure)(struct timer *timer, enum timer_mode mode, unsigned duration, timer_handler_t handler, void *data);
+  void(*configure)(struct timer *timer, enum timer_mode mode, timer_handler_t handler, void *data);
+  void(*reload)(struct timer *timer, unsigned duration);
 };
 
 void timer_register(struct timer *timer);

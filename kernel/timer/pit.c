@@ -112,7 +112,7 @@ static void pit_disable(struct timer *timer)
 
 bool once = false;
 
-static void pit_configure(struct timer *timer, enum timer_mode mode, unsigned duration, timer_handler_t handler, void *data)
+static void pit_configure(struct timer *timer, enum timer_mode mode, timer_handler_t handler, void *data)
 {
   struct pit *pit = (struct pit *)timer;
   switch(mode)
@@ -126,13 +126,15 @@ static void pit_configure(struct timer *timer, enum timer_mode mode, unsigned du
   default:
     KASSERT_UNREACHABLE;
   }
+  pit->handler = handler;
+  pit->data    = data;
+}
 
+static void pit_reload(struct timer *timer, unsigned duration)
+{
   uint16_t reload_value = pit_reload_value_from_duration(duration);
   outb(PIT_SELECT_CHANNEL0, (reload_value >> 0) & 0xFF);
   outb(PIT_SELECT_CHANNEL0, (reload_value >> 8) & 0xFF);
-
-  pit->handler = handler;
-  pit->data    = data;
 }
 
 static struct pit *pit_create()
@@ -141,6 +143,7 @@ static struct pit *pit_create()
   pit->timer.enable    = &pit_enable;
   pit->timer.disable   = &pit_disable;
   pit->timer.configure = &pit_configure;
+  pit->timer.reload    = &pit_reload;
   KASSERT(acquire_ports(THIS_MODULE, PIT_PORTS, PIT_PORT_COUNT) == 0);
   return pit;
 }

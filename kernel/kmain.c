@@ -41,7 +41,8 @@ void kmain(struct boot_service *service)
 
   struct timer *timer = timer_alloc();
   KASSERT(timer);
-  timer->configure(timer, TIMER_MODE_PERIODIC, 64000000, &handle_timer, NULL);
+  timer->configure(timer, TIMER_MODE_PERIODIC, &handle_timer, NULL);
+  timer->reload(timer, 64000000);
   timer->enable(timer);
 
   asm volatile ("int $0x7");

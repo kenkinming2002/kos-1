@@ -2,7 +2,7 @@
 
 #include "mm.h"
 #include "hal.h"
-#include "irqs.h"
+#include "isa.h"
 
 #include <core/assert.h>
 #include <core/ll.h>

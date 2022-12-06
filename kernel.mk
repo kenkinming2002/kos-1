@@ -13,11 +13,11 @@ KERNEL_OBJS = kernel/debug.o \
        	      kernel/hal/irqs.o \
        	      kernel/hal/ports.o \
        	      kernel/hal/timer.o \
-	      kernel/irqs.o \
-       	      kernel/irqs/exceptions.o \
-       	      kernel/irqs/pic8259.o \
-       	      kernel/irqs/isa.o \
-       	      kernel/timer/pit.o
+       	      kernel/isa.o \
+	      kernel/dev.o \
+       	      kernel/dev/exceptions.o \
+       	      kernel/dev/pic8259.o \
+       	      kernel/dev/pit.o
 
 kernel.elf: CFLAGS  += -Ilibcore/include -Iboot/include -Ikernel
 kernel.elf: LDFLAGS += -T kernel/link.ld -pie -Wl,--no-dynamic-linker

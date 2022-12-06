@@ -1,6 +1,6 @@
 #include "isa.h"
 
-#include "pic8259.h"
+#include "dev/pic8259.h"
 
 #include <stdbool.h>
 #include <core/assert.h>

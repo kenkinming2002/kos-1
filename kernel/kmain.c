@@ -5,9 +5,7 @@
 #include "mm.h"
 #include "pal.h"
 #include "hal.h"
-#include "irqs.h"
-
-#include "timer/pit.h"
+#include "dev.h"
 
 #include <boot/service.h>
 
@@ -35,9 +33,7 @@ void kmain(struct boot_service *service)
   mm_init(service);
   pal_init();
   hal_init();
-  irqs_init();
-
-  pit_init();
+  dev_init();
 
   struct timer *timer = timer_alloc();
   KASSERT(timer);

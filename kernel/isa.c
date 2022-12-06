@@ -1,6 +1,6 @@
 #include "isa.h"
 
-#include "dev/pic8259.h"
+#include "dev/i8259.h"
 
 #include <core/assert.h>
 
@@ -8,9 +8,9 @@ int isa_irq_register(struct module *module, unsigned irq, handler_t handler, voi
 {
   struct irqs_source *pic;
   if(irq < 8)
-    pic = pic8259_master;
+    pic = i8259_master;
   else if(irq < 16)
-    pic = pic8259_slave;
+    pic = i8259_slave;
   else
     KASSERT_UNREACHABLE;
 
@@ -23,9 +23,9 @@ int isa_irq_deregister(struct module *module, unsigned irq)
 {
   struct irqs_source *pic;
   if(irq < 8)
-    pic = pic8259_master;
+    pic = i8259_master;
   else if(irq < 16)
-    pic = pic8259_slave;
+    pic = i8259_slave;
   else
     KASSERT_UNREACHABLE;
 

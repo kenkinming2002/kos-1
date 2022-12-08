@@ -101,6 +101,7 @@ static int i8259_init(struct i8259 *pic, struct i8259 *master, uint16_t ports, u
     slot_init(&pic->slots[i], &i8259_slot_ops, "i8259", pic);
     slot_connect(irqs_bus_get("root", pic->base + i), &pic->slots[i]);
   }
+  return 0;
 }
 
 static void i8259_fini(struct i8259 *pic)

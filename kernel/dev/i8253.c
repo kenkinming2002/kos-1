@@ -118,6 +118,7 @@ static int i8253_init(struct i8253 *pit)
 
   slot_init(&pit->timer.slot, NULL, "i8253", NULL);
   slot_connect(irqs_bus_get("isa", 0), &pit->timer.slot);
+  return 0;
 }
 
 static void i8253_fini(struct i8253 *i8253)

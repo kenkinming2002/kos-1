@@ -99,14 +99,14 @@ static int i8259_init(struct i8259 *pic, struct i8259 *master, uint16_t ports, u
   for(unsigned i=0; i<8; ++i)
   {
     slot_init(&pic->slots[i], &i8259_slot_ops, "i8259", pic);
-    slot_connect(&irq_slots[pic->base + i], &pic->slots[i]);
+    slot_connect(irqs_bus_get("root", pic->base + i), &pic->slots[i]);
   }
 }
 
 static void i8259_fini(struct i8259 *pic)
 {
   for(unsigned i=0; i<8; ++i)
-    slot_disconnect(&irq_slots[pic->base + i]);
+    slot_disconnect(irqs_bus_get("root", pic->base + i));
 
   KASSERT(release_irqs(THIS_MODULE, pic->base, 8) == 0);
   KASSERT(release_ports(THIS_MODULE, pic->ports, 2) == 0);
@@ -115,14 +115,16 @@ static void i8259_fini(struct i8259 *pic)
 static struct i8259 i8259_master;
 static struct i8259 i8259_slave;
 
-struct slot *i8259_master_slots;
-struct slot *i8259_slave_slots;
-
 void i8259_module_init()
 {
   i8259_init(&i8259_master, NULL,          0x20, PIC_MASTER, 1 << 2, 0xFB);
   i8259_init(&i8259_slave,  &i8259_master, 0x28, PIC_SLAVE,  2,      0xFF);
-  i8259_master_slots = i8259_master.slots;
-  i8259_slave_slots  = i8259_slave.slots;
+
+  irqs_bus_add("isa", 16);
+  for(unsigned i=0; i<8; ++i)
+  {
+    irqs_bus_set("isa", i,   &i8259_master.slots[i]);
+    irqs_bus_set("isa", i+8, &i8259_slave.slots[i]);
+  }
 }
 

@@ -2,7 +2,6 @@
 
 #include "mm.h"
 #include "hal.h"
-#include "i8259.h"
 
 #include <core/assert.h>
 #include <core/ll.h>
@@ -147,12 +146,12 @@ static int i8253_init(struct i8253 *pit)
     return -1;
 
   slot_init(&pit->slot, &i8253_slot_ops, "i8253", pit);
-  slot_connect(&i8259_master_slots[0], &pit->slot);
+  slot_connect(irqs_bus_get("isa", 0), &pit->slot);
 }
 
 static void i8253_fini(struct i8253 *i8253)
 {
-  slot_disconnect(&i8259_master_slots[0]);
+  slot_disconnect(irqs_bus_get("isa", 0));
   KASSERT(release_ports(THIS_MODULE, I8253_PORTS, I8253_PORT_COUNT) == 0);
 }
 

@@ -1,6 +1,7 @@
 #include "irqs.h"
 
 #include "mm.h"
+#include "irqs_bus.h"
 
 #include <core/assert.h>
 #include <core/string.h>
@@ -49,10 +50,16 @@ int release_irqs(struct module *module, unsigned begin, unsigned count)
   return -1;
 }
 
+static struct slot irqs_slot[256];
+void irqs_init()
+{
+  irqs_bus_add("root", 256);
+  for(unsigned i=0; i<256; ++i)
+    irqs_bus_set("root", i, &irqs_slot[i]);
+}
 
-struct slot irq_slots[256];
 void isr(uint64_t irq, uint64_t ec)
 {
-  slot_emit(&irq_slots[irq]);
+  slot_emit(&irqs_slot[irq]);
 }
 

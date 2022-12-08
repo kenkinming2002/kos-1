@@ -2,4 +2,5 @@
 
 void hal_init()
 {
+  irqs_init();
 }

@@ -3,9 +3,6 @@
 
 #include "hal.h"
 
-extern struct irqs_source *i8259_master;
-extern struct irqs_source *i8259_slave;
-
-void i8259_init();
+void i8259_module_init();
 
 #endif // DEV_I8259_H

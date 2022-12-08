@@ -4,6 +4,7 @@
 #include "mm.h"
 
 #include <core/assert.h>
+#include <core/slot.h>
 
 DEFINE_MODULE(i8259);
 
@@ -24,91 +25,106 @@ DEFINE_MODULE(i8259);
 
 struct i8259
 {
-  struct irqs_source source;
-
+  struct i8259 *master;
   uint16_t ports;
+  uint8_t  base;
   uint8_t  config;
   uint8_t  mask;
 
-  struct i8259 *master;
+  struct slot slots[8];
 };
 
-static void i8259_set_base(struct irqs_source *source, unsigned base)
+static void i8259_slot_on_connect(struct slot *slot)
 {
-  struct i8259 *pic = (struct i8259 *)source;
-  uint16_t command_port = pic->ports;
-  uint16_t data_port    = pic->ports + 1;
-  outb(command_port, ICW1_INIT | ICW1_ICW4); io_wait();
-  outb(data_port,    base);                  io_wait();
-  outb(data_port,    pic->config);           io_wait();
-  outb(data_port,    ICW4_8086);             io_wait();
-  outb(data_port,    pic->mask);             io_wait();
-}
+  struct i8259 *pic = slot->data;
+  unsigned      irq = pic->slots - slot;
 
-static void i8259_acknowledge(struct irqs_source *source)
-{
-  struct i8259 *pic = (struct i8259 *)source;
-  uint16_t command_port = pic->ports;
-  outb(command_port, 0x20);
-  if(pic->master)
-    i8259_acknowledge(&pic->master->source);
-}
-
-static void i8259_mask(struct irqs_source *source, unsigned irq)
-{
-  struct i8259 *pic = (struct i8259 *)source;
-  uint16_t data_port = pic->ports + 1;
-  uint8_t mask = inb(data_port);
-  mask |= 1 << irq;
-  outb(data_port, mask);
-
-}
-
-static void i8259_unmask(struct irqs_source *source, unsigned irq)
-{
-  struct i8259 *pic = (struct i8259 *)source;
+  // Unmask the interrupt
   uint16_t data_port = pic->ports + 1;
   uint8_t mask = inb(data_port);
   mask &= ~(1 << irq);
   outb(data_port, mask);
 }
 
-static struct i8259 *i8259_create(uint16_t ports, uint8_t config, uint8_t mask)
+static void i8259_slot_on_disconnect(struct slot *slot)
 {
-  if(acquire_ports(THIS_MODULE, ports, 2) != 0)
-    return NULL;
+  struct i8259 *pic = slot->data;
+  unsigned      irq = pic->slots - slot;
 
-  struct i8259 *pic = kmalloc(sizeof *pic);
-  pic->source.set_base    = &i8259_set_base;
-  pic->source.acknowledge = &i8259_acknowledge;
-  pic->source.unmask      = &i8259_unmask;
-  pic->source.mask        = &i8259_mask;
+  // Mask the interrupt
+  uint16_t data_port = pic->ports + 1;
+  uint8_t mask = inb(data_port);
+  mask |= 1 << irq;
+  outb(data_port, mask);
+}
+
+static void i8259_slot_on_emit(struct slot *slot)
+{
+  struct i8259 *pic = slot->data;
+
+  // Acknowledge the interrupt
+  outb(pic->ports, 0x20);
+  if(pic->master)
+    outb(pic->master->ports, 0x20);
+}
+
+struct slot_ops i8259_slot_ops = {
+  .on_connect    = &i8259_slot_on_connect,
+  .on_disconnect = &i8259_slot_on_disconnect,
+  .on_emit       = &i8259_slot_on_emit,
+};
+
+static int i8259_init(struct i8259 *pic, struct i8259 *master, uint16_t ports, uint8_t base, uint8_t config, uint8_t mask)
+{
+  pic->master = master;
+  pic->base   = base;
   pic->ports  = ports;
   pic->config = config;
   pic->mask   = mask;
-  pic->master = NULL;
-  return pic;
+
+  if(acquire_irqs(THIS_MODULE, pic->base, 8) != 0)
+    return -1;
+
+  if(acquire_ports(THIS_MODULE, pic->ports, 2) != 0)
+    return -1;
+
+  uint16_t command_port = pic->ports;
+  uint16_t data_port    = pic->ports + 1;
+  outb(command_port, ICW1_INIT | ICW1_ICW4); io_wait();
+  outb(data_port,    pic->base);             io_wait();
+  outb(data_port,    pic->config);           io_wait();
+  outb(data_port,    ICW4_8086);             io_wait();
+  outb(data_port,    pic->mask);             io_wait();
+
+  for(unsigned i=0; i<8; ++i)
+  {
+    slot_init(&pic->slots[i], &i8259_slot_ops, "i8259", pic);
+    slot_connect(irqs_bus_get("root", pic->base + i), &pic->slots[i]);
+  }
 }
 
-static void i8259_destroy(struct i8259 *pic)
+static void i8259_fini(struct i8259 *pic)
 {
+  for(unsigned i=0; i<8; ++i)
+    slot_disconnect(irqs_bus_get("root", pic->base + i));
+
+  KASSERT(release_irqs(THIS_MODULE, pic->base, 8) == 0);
   KASSERT(release_ports(THIS_MODULE, pic->ports, 2) == 0);
-  kfree(pic);
 }
 
-struct irqs_source *i8259_master;
-struct irqs_source *i8259_slave;
+static struct i8259 i8259_master;
+static struct i8259 i8259_slave;
 
-void i8259_init()
+void i8259_module_init()
 {
-  struct i8259 *master = i8259_create(PIC_MASTER, 1 << 2, 0xFB);
-  struct i8259 *slave  = i8259_create(PIC_SLAVE,  2,      0xFF);
-  slave->master = master;
+  i8259_init(&i8259_master, NULL,          0x20, PIC_MASTER, 1 << 2, 0xFB);
+  i8259_init(&i8259_slave,  &i8259_master, 0x28, PIC_SLAVE,  2,      0xFF);
 
-  i8259_master = &master->source;
-  i8259_slave  = &slave->source;
-
-  acquire_irqs(THIS_MODULE, 0x20, 0x8, i8259_master);
-  acquire_irqs(THIS_MODULE, 0x28, 0x8, i8259_slave);
+  irqs_bus_add("isa", 16);
+  for(unsigned i=0; i<8; ++i)
+  {
+    irqs_bus_set("isa", i,   &i8259_master.slots[i]);
+    irqs_bus_set("isa", i+8, &i8259_slave.slots[i]);
+  }
 }
 

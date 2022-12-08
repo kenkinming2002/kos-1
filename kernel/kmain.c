@@ -20,10 +20,13 @@ void handle_device_not_available()
   debug_printf("device not available\n");
 }
 
-void handle_timer()
+void on_tick(struct slot *slot)
 {
-  debug_printf("timer interrupt\n");
+  debug_printf("on tick\n");
 }
+
+static struct slot_ops timer_slot_ops = { .on_emit = &on_tick, };
+static struct slot     timer_slot     = { .name = "on tick", .ops = &timer_slot_ops };
 
 void kmain(struct boot_service *service)
 {
@@ -36,10 +39,10 @@ void kmain(struct boot_service *service)
   dev_init();
 
   struct timer *timer = timer_alloc();
+  slot_connect(&timer->slot, &timer_slot);
   KASSERT(timer);
-  timer->configure(timer, TIMER_MODE_PERIODIC, &handle_timer, NULL);
+  timer->configure(timer, TIMER_MODE_PERIODIC);
   timer->reload(timer, 64000000);
-  timer->enable(timer);
 
   asm volatile ("int $0x7");
   asm volatile ("int $0x80");

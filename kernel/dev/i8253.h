@@ -3,6 +3,6 @@
 
 #include "module.h"
 
-void i8253_init();
+void i8253_module_init();
 
 #endif // DEV_I8253_H

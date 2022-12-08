@@ -1,5 +1,7 @@
 #include <core/slot.h>
 
+#include <core/debug.h>
+
 #include <stddef.h>
 
 void slot_init(struct slot *slot, struct slot_ops *ops, const char *name, void *data)
@@ -12,8 +14,11 @@ void slot_init(struct slot *slot, struct slot_ops *ops, const char *name, void *
 void slot_emit(struct slot *slot)
 {
   for(; slot; slot = slot->next)
+  {
+    debug_printf("emitting on slot with name=%s\n", slot->name ? slot->name : "none");
     if(slot->ops && slot->ops->on_emit)
       slot->ops->on_emit(slot);
+  }
 }
 
 void slot_connect(struct slot *slot, struct slot *next)

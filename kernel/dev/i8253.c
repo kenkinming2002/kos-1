@@ -2,7 +2,7 @@
 
 #include "mm.h"
 #include "hal.h"
-#include "isa.h"
+#include "i8259.h"
 
 #include <core/assert.h>
 #include <core/ll.h>
@@ -70,13 +70,21 @@ struct i8253
 
   timer_handler_t  handler;
   void            *data;
+
+  struct slot slot;
 };
 
-static void i8253_handler(void *data)
+static void i8253_slot_on_emit(struct slot *slot)
 {
-  struct i8253 *i8253 = data;
-  i8253->handler(i8253->data);
+  struct i8253 *pit = slot->data;
+  pit->handler(pit->data);
 }
+
+struct slot_ops i8253_slot_ops = {
+  .on_connect    = NULL,
+  .on_disconnect = NULL,
+  .on_emit       = &i8253_slot_on_emit,
+};
 
 static uint64_t _i8253_reload_value_from_duration(uint64_t duration)
 {
@@ -98,17 +106,11 @@ static uint16_t i8253_reload_value_from_duration(unsigned duration)
 
 static void i8253_enable(struct timer *timer)
 {
-  struct i8253 *i8253 = (struct i8253 *)timer;
-  KASSERT(isa_irq_register(THIS_MODULE, 0, i8253_handler, i8253) == 0);
 }
 
 static void i8253_disable(struct timer *timer)
 {
-  struct i8253 *i8253 = (struct i8253 *)timer;
-  KASSERT(isa_irq_deregister(THIS_MODULE, 0) == 0);
 }
-
-bool once = false;
 
 static void i8253_configure(struct timer *timer, enum timer_mode mode, timer_handler_t handler, void *data)
 {
@@ -135,26 +137,29 @@ static void i8253_reload(struct timer *timer, unsigned duration)
   outb(I8253_SELECT_CHANNEL0, (reload_value >> 8) & 0xFF);
 }
 
-static struct i8253 *i8253_create()
+static int i8253_init(struct i8253 *pit)
 {
-  struct i8253 *i8253 = kmalloc(sizeof *i8253);
-  i8253->timer.enable    = &i8253_enable;
-  i8253->timer.disable   = &i8253_disable;
-  i8253->timer.configure = &i8253_configure;
-  i8253->timer.reload    = &i8253_reload;
-  KASSERT(acquire_ports(THIS_MODULE, I8253_PORTS, I8253_PORT_COUNT) == 0);
-  return i8253;
+  pit->timer.enable    = &i8253_enable;
+  pit->timer.disable   = &i8253_disable;
+  pit->timer.configure = &i8253_configure;
+  pit->timer.reload    = &i8253_reload;
+  if(acquire_ports(THIS_MODULE, I8253_PORTS, I8253_PORT_COUNT) != 0)
+    return -1;
+
+  slot_init(&pit->slot, &i8253_slot_ops, "i8253", pit);
+  slot_connect(&i8259_master_slots[0], &pit->slot);
 }
 
-static void i8253_destroy(struct i8253 *i8253)
+static void i8253_fini(struct i8253 *i8253)
 {
+  slot_disconnect(&i8259_master_slots[0]);
   KASSERT(release_ports(THIS_MODULE, I8253_PORTS, I8253_PORT_COUNT) == 0);
-  kfree(i8253);
 }
 
-void i8253_init()
+static struct i8253 i8253;
+void i8253_module_init()
 {
-  struct i8253 *i8253 = i8253_create();
-  timer_register(&i8253->timer);
+  i8253_init(&i8253);
+  timer_register(&i8253.timer);
 }
 

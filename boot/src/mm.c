@@ -85,6 +85,7 @@ uintptr_t boot_mm_lookup(size_t length, size_t alignment, enum boot_memory_type 
        entries[i].addr <= addr && addr + length <= entries[i].addr + entries[i].length)
       return addr;
   }
+  KASSERT_UNREACHABLE;
 }
 
 void boot_mm_transfer(uintptr_t addr, size_t length, enum boot_memory_type type, enum boot_memory_owner from, enum boot_memory_owner to)
@@ -106,7 +107,7 @@ void boot_mm_transfer(uintptr_t addr, size_t length, enum boot_memory_type type,
       return;
     }
   }
-  KASSERT(false && "Failed to transfer region");
+  KASSERT_UNREACHABLE;
 }
 
 // Init

@@ -2,6 +2,7 @@
 #define HAL_TIMER_H
 
 #include <core/ll.h>
+#include <core/slot.h>
 
 enum timer_mode
 {
@@ -14,11 +15,10 @@ struct timer
 {
   struct ll_node node;
 
-  void(*enable)(struct timer *timer);
-  void(*disable)(struct timer *timer);
-
-  void(*configure)(struct timer *timer, enum timer_mode mode, timer_handler_t handler, void *data);
+  void(*configure)(struct timer *timer, enum timer_mode mode);
   void(*reload)(struct timer *timer, unsigned duration);
+
+  struct slot slot;
 };
 
 void timer_register(struct timer *timer);

@@ -66,23 +66,6 @@ enum i8253_operating_mode
 struct i8253
 {
   struct timer timer;
-
-  timer_handler_t  handler;
-  void            *data;
-
-  struct slot slot;
-};
-
-static void i8253_slot_on_emit(struct slot *slot)
-{
-  struct i8253 *pit = slot->data;
-  pit->handler(pit->data);
-}
-
-struct slot_ops i8253_slot_ops = {
-  .on_connect    = NULL,
-  .on_disconnect = NULL,
-  .on_emit       = &i8253_slot_on_emit,
 };
 
 static uint64_t _i8253_reload_value_from_duration(uint64_t duration)
@@ -103,15 +86,7 @@ static uint16_t i8253_reload_value_from_duration(unsigned duration)
   return reload_value;
 }
 
-static void i8253_enable(struct timer *timer)
-{
-}
-
-static void i8253_disable(struct timer *timer)
-{
-}
-
-static void i8253_configure(struct timer *timer, enum timer_mode mode, timer_handler_t handler, void *data)
+static void i8253_configure(struct timer *timer, enum timer_mode mode)
 {
   struct i8253 *i8253 = (struct i8253 *)timer;
   switch(mode)
@@ -125,8 +100,6 @@ static void i8253_configure(struct timer *timer, enum timer_mode mode, timer_han
   default:
     KASSERT_UNREACHABLE;
   }
-  i8253->handler = handler;
-  i8253->data    = data;
 }
 
 static void i8253_reload(struct timer *timer, unsigned duration)
@@ -138,15 +111,13 @@ static void i8253_reload(struct timer *timer, unsigned duration)
 
 static int i8253_init(struct i8253 *pit)
 {
-  pit->timer.enable    = &i8253_enable;
-  pit->timer.disable   = &i8253_disable;
   pit->timer.configure = &i8253_configure;
   pit->timer.reload    = &i8253_reload;
   if(acquire_ports(THIS_MODULE, I8253_PORTS, I8253_PORT_COUNT) != 0)
     return -1;
 
-  slot_init(&pit->slot, &i8253_slot_ops, "i8253", pit);
-  slot_connect(irqs_bus_get("isa", 0), &pit->slot);
+  slot_init(&pit->timer.slot, NULL, "i8253", NULL);
+  slot_connect(irqs_bus_get("isa", 0), &pit->timer.slot);
 }
 
 static void i8253_fini(struct i8253 *i8253)

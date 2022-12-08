@@ -15,7 +15,7 @@
 
 DEFINE_MODULE(dummy);
 
-void handle_device_not_available()
+void on_device_not_available(struct slot *slot)
 {
   debug_printf("device not available\n");
 }
@@ -24,6 +24,9 @@ void on_tick(struct slot *slot)
 {
   debug_printf("on tick\n");
 }
+
+static struct slot_ops device_not_available_slot_ops = { .on_emit = &on_device_not_available, };
+static struct slot     device_not_available_slot     = { .name = "on device not available", .ops = &device_not_available_slot_ops };
 
 static struct slot_ops timer_slot_ops = { .on_emit = &on_tick, };
 static struct slot     timer_slot     = { .name = "on tick", .ops = &timer_slot_ops };
@@ -37,6 +40,8 @@ void kmain(struct boot_service *service)
   pal_init();
   hal_init();
   dev_init();
+
+  slot_connect(irqs_bus_get("exceptions", 7), &device_not_available_slot);
 
   struct timer *timer = timer_alloc();
   slot_connect(&timer->slot, &timer_slot);

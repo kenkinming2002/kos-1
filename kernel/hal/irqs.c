@@ -116,20 +116,9 @@ int irqs_deregister_handler(struct irqs_source *source, struct module *module, u
   return -1;
 }
 
+struct slot irq_slots[256];
 void isr(uint64_t irq, uint64_t ec)
 {
-  LL_FOREACH(irqs_list, node)
-  {
-    struct irqs *irqs = (struct irqs *)node;
-    if(irqs->begin <= irq && irq < irqs->begin + irqs->count)
-    {
-      irq -= irqs->begin;
-      if(irqs->lines[irq].module)
-        irqs->lines[irq].handler(irqs->lines[irq].data);
-
-      if(irqs->source->acknowledge)
-        irqs->source->acknowledge(irqs->source);
-    }
-  }
+  slot_emit(&irq_slots[irq]);
 }
 

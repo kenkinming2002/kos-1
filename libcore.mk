@@ -1,6 +1,7 @@
 CORE_OBJS = libcore/src/assert.o \
             libcore/src/bitmap.o \
             libcore/src/debug.o \
+            libcore/src/slot.o \
             libcore/src/string.o \
             libcore/src/ll.o
 

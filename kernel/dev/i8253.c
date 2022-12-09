@@ -121,9 +121,9 @@ static int i8253_init(struct i8253 *pit)
   return 0;
 }
 
-static void i8253_fini(struct i8253 *i8253)
+static void i8253_fini(struct i8253 *pit)
 {
-  slot_disconnect(irqs_bus_get("isa", 0));
+  slot_disconnect(irqs_bus_get("isa", 0), &pit->timer.slot);
   KASSERT(release_ports(THIS_MODULE, I8253_PORTS, I8253_PORT_COUNT) == 0);
 }
 

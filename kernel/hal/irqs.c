@@ -60,6 +60,6 @@ void irqs_init()
 
 void isr(uint64_t irq, uint64_t ec)
 {
-  slot_emit(&irqs_slot[irq]);
+  slot_emit_forward(&irqs_slot[irq]);
 }
 

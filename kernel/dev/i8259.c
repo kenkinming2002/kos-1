@@ -69,9 +69,11 @@ static void i8259_slot_on_emit(struct slot *slot)
 }
 
 struct slot_ops i8259_slot_ops = {
-  .on_connect    = &i8259_slot_on_connect,
-  .on_disconnect = &i8259_slot_on_disconnect,
-  .on_emit       = &i8259_slot_on_emit,
+  .on_connect_prev    = NULL,
+  .on_disconnect_prev = NULL,
+  .on_connect_next    = &i8259_slot_on_connect,
+  .on_disconnect_next = &i8259_slot_on_disconnect,
+  .on_emit            = &i8259_slot_on_emit,
 };
 
 static int i8259_init(struct i8259 *pic, struct i8259 *master, uint16_t ports, uint8_t base, uint8_t config, uint8_t mask)
@@ -107,7 +109,7 @@ static int i8259_init(struct i8259 *pic, struct i8259 *master, uint16_t ports, u
 static void i8259_fini(struct i8259 *pic)
 {
   for(unsigned i=0; i<8; ++i)
-    slot_disconnect(irqs_bus_get("root", pic->base + i));
+    slot_disconnect(irqs_bus_get("root", pic->base + i), &pic->slots[i]);
 
   KASSERT(release_irqs(THIS_MODULE, pic->base, 8) == 0);
   KASSERT(release_ports(THIS_MODULE, pic->ports, 2) == 0);

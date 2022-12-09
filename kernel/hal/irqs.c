@@ -55,7 +55,7 @@ void irqs_init()
 {
   irqs_bus_add("root", 256);
   for(unsigned i=0; i<256; ++i)
-    irqs_bus_set("root", i, &irqs_slot[i]);
+    irqs_bus_set_input("root", i, &irqs_slot[i]);
 }
 
 void isr(uint64_t irq, uint64_t ec)

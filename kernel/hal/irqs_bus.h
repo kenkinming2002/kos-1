@@ -6,7 +6,10 @@
 void irqs_bus_add(const char *name, unsigned size);
 void irqs_bus_del(const char *name);
 
-void irqs_bus_set(const char *name, unsigned n, struct slot *slot);
-struct slot *irqs_bus_get(const char *name, unsigned n);
+void irqs_bus_set_input(const char *name, unsigned n, struct slot *slot);
+void irqs_bus_set_output(const char *name, unsigned n, struct slot *slot);
+
+void irqs_bus_unset_input(const char *name, unsigned n);
+void irqs_bus_unset_output(const char *name, unsigned n);
 
 #endif // HAL_IRQS_BUS_H

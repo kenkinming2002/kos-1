@@ -108,3 +108,10 @@ void irqs_bus_unset_output(const char *name, unsigned n)
   conn->output = NULL;
 }
 
+void irqs_bus_init()
+{
+  irqs_bus_add("root",        256);
+  irqs_bus_add("isa",         16);
+  irqs_bus_add("exceptions",  32);
+}
+

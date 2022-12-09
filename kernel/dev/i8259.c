@@ -123,7 +123,6 @@ void i8259_module_init()
   i8259_init(&i8259_master, NULL,          0x20, PIC_MASTER, 1 << 2, 0xFB);
   i8259_init(&i8259_slave,  &i8259_master, 0x28, PIC_SLAVE,  2,      0xFF);
 
-  irqs_bus_add("isa", 16);
   for(unsigned i=0; i<8; ++i)
   {
     irqs_bus_set_input("isa", i,   &i8259_master.slots[i]);

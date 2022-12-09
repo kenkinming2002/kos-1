@@ -53,7 +53,6 @@ int release_irqs(struct module *module, unsigned begin, unsigned count)
 static struct slot irqs_slot[256];
 void irqs_init()
 {
-  irqs_bus_add("root", 256);
   for(unsigned i=0; i<256; ++i)
     irqs_bus_set_input("root", i, &irqs_slot[i]);
 }

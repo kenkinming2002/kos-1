@@ -12,4 +12,6 @@ void irqs_bus_set_output(const char *name, unsigned n, struct slot *slot);
 void irqs_bus_unset_input(const char *name, unsigned n);
 void irqs_bus_unset_output(const char *name, unsigned n);
 
+void irqs_bus_init();
+
 #endif // HAL_IRQS_BUS_H

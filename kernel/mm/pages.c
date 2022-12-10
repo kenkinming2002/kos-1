@@ -46,9 +46,6 @@ static void iterate_init(struct boot_mmap_entry *entry)
     mm_add(entry->addr, entry->length);
 }
 
-extern char kernel_begin[];
-extern char kernel_end[];
-
 void mm_init_pages(struct boot_service *boot_service)
 {
   boot_service->mm_iterate(&iterate_get_max_addr);
@@ -59,7 +56,6 @@ void mm_init_pages(struct boot_service *boot_service)
 
   mm_clear();
   boot_service->mm_iterate(&iterate_init);
-  mm_del((uintptr_t)kernel_begin, kernel_end - kernel_begin);
 }
 
 void *alloc_pages(unsigned count)

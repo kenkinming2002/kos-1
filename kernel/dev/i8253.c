@@ -117,13 +117,13 @@ static int i8253_init(struct i8253 *pit)
     return -1;
 
   slot_init(&pit->timer.slot, NULL, "i8253", NULL);
-  irqs_bus_set_output("isa", 0, &pit->timer.slot);
+  irq_bus_set_output("isa", 0, &pit->timer.slot);
   return 0;
 }
 
 static void i8253_fini(struct i8253 *pit)
 {
-  irqs_bus_unset_output("isa", 0);
+  irq_bus_unset_output("isa", 0);
   KASSERT(release_ports(THIS_MODULE, I8253_PORTS, I8253_PORT_COUNT) == 0);
 }
 

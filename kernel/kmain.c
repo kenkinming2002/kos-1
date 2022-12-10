@@ -41,7 +41,7 @@ void kmain(struct boot_service *service)
   hal_init();
   dev_init();
 
-  irqs_bus_set_output("exceptions", 7, &device_not_available_slot);
+  irq_bus_set_output("exceptions", 7, &device_not_available_slot);
 
   struct timer *timer = timer_alloc();
   slot_connect(&timer->slot, &timer_slot);

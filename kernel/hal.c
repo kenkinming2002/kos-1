@@ -2,6 +2,6 @@
 
 void hal_init()
 {
-  irqs_bus_init();
+  irq_bus_init();
   irqs_init();
 }

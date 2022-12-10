@@ -1,7 +1,7 @@
 #include "irqs.h"
 
 #include "mm.h"
-#include "irqs_bus.h"
+#include "irq/bus.h"
 
 #include <core/assert.h>
 #include <core/string.h>
@@ -54,7 +54,7 @@ static struct slot irqs_slot[256];
 void irqs_init()
 {
   for(unsigned i=0; i<256; ++i)
-    irqs_bus_set_input("root", i, &irqs_slot[i]);
+    irq_bus_set_input("root", i, &irqs_slot[i]);
 }
 
 void isr(uint64_t irq, uint64_t ec)

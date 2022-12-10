@@ -22,12 +22,12 @@ static void iterate_init(struct boot_mmap_entry *entry)
 {
   if(entry->type == BOOT_MEMORY_CONVENTIONAL && entry->owner == BOOT_MEMORY_UNOWNED)
   {
-    uintptr_t addr   = ALIGN_UP(entry->addr, PAGE_SIZE);
-    size_t    length = entry->length - (addr - entry->addr);
-    if(addr + length < addr)
+    size_t begin_index = ALIGN_UP  (entry->addr,                 PAGE_SIZE) / PAGE_SIZE;
+    size_t end_index   = ALIGN_DOWN(entry->addr + entry->length, PAGE_SIZE) / PAGE_SIZE;
+    if(begin_index > end_index)
       return;
 
-    bm_fill(bm, addr / PAGE_SIZE, ALIGN_DOWN(length, PAGE_SIZE) / PAGE_SIZE, false);
+    bm_fill(bm, begin_index, end_index - begin_index, false);
   }
 }
 

@@ -99,7 +99,7 @@ static int i8259_init(struct i8259 *pic, struct i8259 *master, uint16_t ports, u
 
   for(unsigned i=0; i<8; ++i)
   {
-    irq_slot_init(&pic->slots[i], &i8259_slot_ops, "i8259", pic);
+    pic->slots[i] = IRQ_SLOT_INIT("i8259", &i8259_slot_ops, pic);
     irq_bus_set_output(IRQ_BUS_ROOT, pic->base + i, &pic->slots[i]);
   }
   return 0;

@@ -5,13 +5,6 @@
 
 #include <stddef.h>
 
-void irq_slot_init(struct irq_slot *slot, struct irq_slot_ops *ops, const char *name, void *data)
-{
-  slot->ops  = ops;
-  slot->name = name;
-  slot->data = data;
-}
-
 void irq_slot_emit_backward(struct irq_slot *slot)
 {
   for(; slot; slot = slot->prev)

@@ -15,13 +15,14 @@ struct irq_slot_ops
 
 struct irq_slot
 {
-  struct irq_slot_ops *ops;
   struct irq_slot *prev, *next;
+
   const char *name;
+  struct irq_slot_ops *ops;
   void *data;
 };
 
-void irq_slot_init(struct irq_slot *slot, struct irq_slot_ops *ops, const char *name, void *data);
+#define IRQ_SLOT_INIT(_name, _ops, _data) (struct irq_slot){ .prev = NULL, .next = NULL, .name = _name, .ops = _ops, .data = _data, }
 
 void irq_slot_emit_backward(struct irq_slot *slot);
 void irq_slot_emit_forward(struct irq_slot *slot);

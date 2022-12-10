@@ -11,28 +11,6 @@ static struct bitmap bm;
 #define ALIGN_UP(value, align)   ((value + align - 1) / align * align)
 #define ALIGN_DOWN(value, align) (value / align * align)
 
-static void mm_clear()
-{
-  bm_fill(bm, 0, bm.size, true);
-}
-
-static void mm_add(uintptr_t addr, size_t length)
-{
-  uintptr_t new_addr   = ALIGN_UP(addr, PAGE_SIZE);
-  size_t    new_length = length - (new_addr - addr);
-  if(addr + length < new_addr)
-    return;
-
-  bm_fill(bm, new_addr / PAGE_SIZE, ALIGN_DOWN(new_length, PAGE_SIZE) / PAGE_SIZE, false);
-}
-
-static void mm_del(uintptr_t addr, size_t length)
-{
-  uintptr_t new_addr   = ALIGN_DOWN(addr, PAGE_SIZE);
-  size_t    new_length = length + (addr - new_addr);
-  bm_fill(bm, new_addr / PAGE_SIZE, ALIGN_UP(new_length, PAGE_SIZE) / PAGE_SIZE, true);
-}
-
 static uintptr_t max_addr = 0;
 static void iterate_get_max_addr(struct boot_mmap_entry *entry)
 {
@@ -43,7 +21,14 @@ static void iterate_get_max_addr(struct boot_mmap_entry *entry)
 static void iterate_init(struct boot_mmap_entry *entry)
 {
   if(entry->type == BOOT_MEMORY_CONVENTIONAL && entry->owner == BOOT_MEMORY_UNOWNED)
-    mm_add(entry->addr, entry->length);
+  {
+    uintptr_t addr   = ALIGN_UP(entry->addr, PAGE_SIZE);
+    size_t    length = entry->length - (addr - entry->addr);
+    if(addr + length < addr)
+      return;
+
+    bm_fill(bm, addr / PAGE_SIZE, ALIGN_DOWN(length, PAGE_SIZE) / PAGE_SIZE, false);
+  }
 }
 
 void mm_init_pages(struct boot_service *boot_service)
@@ -53,8 +38,8 @@ void mm_init_pages(struct boot_service *boot_service)
   size_t page_count = (max_addr + PAGE_SIZE - 1) / PAGE_SIZE;
   bm.size = page_count;
   bm.bits = boot_service->mm_alloc(page_count / CHAR_BIT, alignof(unsigned));
+  bm_fill(bm, 0, bm.size, true);
 
-  mm_clear();
   boot_service->mm_iterate(&iterate_init);
 }
 

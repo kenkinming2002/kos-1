@@ -10,6 +10,7 @@ KERNEL_OBJS = kernel/debug.o \
        	      kernel/pal/segs.o \
        	      kernel/pal/isrs.o \
        	      kernel/hal.o \
+       	      kernel/hal/locks.o \
        	      kernel/hal/irqs.o \
        	      kernel/hal/irq/slot.o \
        	      kernel/hal/irq/bus.o \

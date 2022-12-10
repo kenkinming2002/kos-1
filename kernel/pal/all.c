@@ -1,4 +1,4 @@
-#include "pal.h"
+#include "all.h"
 
 void pal_init()
 {

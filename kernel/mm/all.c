@@ -1,4 +1,4 @@
-#include "mm.h"
+#include "all.h"
 
 void mm_init(struct boot_service *service)
 {

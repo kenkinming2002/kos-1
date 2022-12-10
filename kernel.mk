@@ -1,22 +1,22 @@
 KERNEL_OBJS = kernel/debug.o \
        	      kernel/kmain.o \
-       	      kernel/mm.o \
+       	      kernel/mm/all.o \
        	      kernel/mm/pages.o \
        	      kernel/mm/liballoc_1_1.o \
        	      kernel/mm/liballoc_hooks.o \
-       	      kernel/pal.o \
+       	      kernel/pal/all.o \
        	      kernel/pal/gdt.o \
        	      kernel/pal/idt.o \
        	      kernel/pal/segs.o \
        	      kernel/pal/isrs.o \
-       	      kernel/hal.o \
+       	      kernel/hal/all.o \
        	      kernel/hal/locks.o \
        	      kernel/hal/irqs.o \
        	      kernel/hal/irq/slot.o \
        	      kernel/hal/irq/bus.o \
        	      kernel/hal/ports.o \
        	      kernel/hal/timer.o \
-	      kernel/dev.o \
+	      kernel/dev/all.o \
        	      kernel/dev/exceptions.o \
        	      kernel/dev/i8253.o \
        	      kernel/dev/i8259.o

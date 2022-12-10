@@ -1,4 +1,4 @@
-#include "dev.h"
+#include "all.h"
 
 void dev_init()
 {

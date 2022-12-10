@@ -1,4 +1,4 @@
-#include "hal.h"
+#include "all.h"
 
 void hal_init()
 {

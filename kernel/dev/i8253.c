@@ -1,7 +1,7 @@
 #include "i8253.h"
 
-#include "mm.h"
-#include "hal.h"
+#include "mm/all.h"
+#include "hal/all.h"
 
 #include <core/assert.h>
 #include <core/ll.h>

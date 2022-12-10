@@ -1,6 +1,6 @@
 #include "irqs.h"
 
-#include "mm.h"
+#include "mm/all.h"
 #include "irq/bus.h"
 
 #include <core/assert.h>

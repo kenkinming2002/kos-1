@@ -2,10 +2,10 @@
 #include "core/debug.h"
 
 #include "debug.h"
-#include "mm.h"
-#include "pal.h"
-#include "hal.h"
-#include "dev.h"
+#include "mm/all.h"
+#include "pal/all.h"
+#include "hal/all.h"
+#include "dev/all.h"
 
 #include <boot/service.h>
 

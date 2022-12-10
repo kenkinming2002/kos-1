@@ -1,6 +1,6 @@
 #include "bus.h"
 
-#include "mm.h"
+#include "mm/all.h"
 
 #include <core/assert.h>
 #include <core/ll.h>

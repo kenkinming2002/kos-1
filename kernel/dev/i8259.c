@@ -100,7 +100,7 @@ static int i8259_init(struct i8259 *pic, struct i8259 *master, uint16_t ports, u
   for(unsigned i=0; i<8; ++i)
   {
     irq_slot_init(&pic->slots[i], &i8259_slot_ops, "i8259", pic);
-    irq_bus_set_output("root", pic->base + i, &pic->slots[i]);
+    irq_bus_set_output(IRQ_BUS_ROOT, pic->base + i, &pic->slots[i]);
   }
   return 0;
 }
@@ -108,7 +108,7 @@ static int i8259_init(struct i8259 *pic, struct i8259 *master, uint16_t ports, u
 static void i8259_fini(struct i8259 *pic)
 {
   for(unsigned i=0; i<8; ++i)
-    irq_bus_unset_output("root", pic->base + i);
+    irq_bus_unset_output(IRQ_BUS_ROOT, pic->base + i);
 
   KASSERT(release_irqs(THIS_MODULE, pic->base, 8) == 0);
   KASSERT(release_ports(THIS_MODULE, pic->ports, 2) == 0);
@@ -124,8 +124,8 @@ void i8259_module_init()
 
   for(unsigned i=0; i<8; ++i)
   {
-    irq_bus_set_input("isa", i,   &i8259_master.slots[i]);
-    irq_bus_set_input("isa", i+8, &i8259_slave.slots[i]);
+    irq_bus_set_input(IRQ_BUS_ISA, i,   &i8259_master.slots[i]);
+    irq_bus_set_input(IRQ_BUS_ISA, i+8, &i8259_slave.slots[i]);
   }
 }
 

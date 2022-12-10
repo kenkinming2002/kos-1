@@ -14,94 +14,69 @@ struct irq_bus_connection
 
 struct irq_bus
 {
-  struct ll_node node;
-
-  const char                 *name;
-  unsigned                    size;
-  struct irq_bus_connection *connections;
+  unsigned                   size;
+  struct irq_bus_connection *conns;
 };
-LL_DEFINE(irq_bus_list);
 
-static struct irq_bus *irq_bus_lookup(const char *name)
+#define DEFINE_IRQ_BUS(name, size) \
+  struct irq_bus_connection name##_irq_bus_connections[size]; \
+  struct irq_bus name##_irq_bus = { size, name##_irq_bus_connections };
+
+DEFINE_IRQ_BUS(root,       256)
+DEFINE_IRQ_BUS(exceptions, 32)
+DEFINE_IRQ_BUS(isa,        16)
+DEFINE_IRQ_BUS(gsi,        0)
+
+static struct irq_bus *irq_bus_get(enum irq_bus_tag tag)
 {
-  LL_FOREACH(irq_bus_list, node)
+  switch(tag)
   {
-    struct irq_bus *bus = (struct irq_bus *)node;
-    if(strcmp(name, bus->name) != 0)
-      continue;
-
-    return bus;
+  case IRQ_BUS_ROOT:       return &root_irq_bus;
+  case IRQ_BUS_EXCEPTIONS: return &exceptions_irq_bus;
+  case IRQ_BUS_ISA:        return &isa_irq_bus;
+  case IRQ_BUS_GSI:        return &gsi_irq_bus;
+  default:
+    KASSERT_UNREACHABLE;
   }
-  return NULL;
 }
 
-void irq_bus_add(const char *name, unsigned size)
+static struct irq_bus_connection *irq_bus_connection_get(enum irq_bus_tag tag, unsigned n)
 {
-  struct irq_bus *bus = irq_bus_lookup(name);
-  KASSERT(!bus);
-  bus = kmalloc(sizeof *bus);
-  bus->name = name;
-  bus->size = size;
-  bus->connections = kmalloc(sizeof *bus->connections * size);
-  ll_append(&irq_bus_list, &bus->node);
+  struct irq_bus *bus = irq_bus_get(tag);
+  KASSERT(n < bus->size);
+  return &bus->conns[n];
 }
 
-void irq_bus_del(const char *name)
+void irq_bus_set_input(enum irq_bus_tag tag, unsigned n, struct irq_slot *slot)
 {
-  struct irq_bus *bus = irq_bus_lookup(name);
-  KASSERT(bus);
-  ll_delete(&bus->node);
-  kfree(bus->connections);
-  kfree(bus);
-  return;
-}
-
-void irq_bus_set_input(const char *name, unsigned n, struct irq_slot *slot)
-{
-  struct irq_bus *bus = irq_bus_lookup(name);
-  KASSERT(bus);
-  KASSERT(n<bus->size);
-
-  struct irq_bus_connection *conn = &bus->connections[n];
+  struct irq_bus_connection *conn = irq_bus_connection_get(tag, n);
   KASSERT(!conn->input);
   conn->input = slot;
   if(conn->output)
     irq_slot_connect(conn->input, conn->output);
 }
 
-void irq_bus_set_output(const char *name, unsigned n, struct irq_slot *slot)
+void irq_bus_set_output(enum irq_bus_tag tag, unsigned n, struct irq_slot *slot)
 {
-  struct irq_bus *bus = irq_bus_lookup(name);
-  KASSERT(bus);
-  KASSERT(n<bus->size);
-
-  struct irq_bus_connection *conn = &bus->connections[n];
+  struct irq_bus_connection *conn = irq_bus_connection_get(tag, n);
   KASSERT(!conn->output);
   conn->output = slot;
   if(conn->input)
     irq_slot_connect(conn->input, conn->output);
 }
 
-void irq_bus_unset_input(const char *name, unsigned n)
+void irq_bus_unset_input(enum irq_bus_tag tag, unsigned n)
 {
-  struct irq_bus *bus = irq_bus_lookup(name);
-  KASSERT(bus);
-  KASSERT(n<bus->size);
-
-  struct irq_bus_connection *conn = &bus->connections[n];
+  struct irq_bus_connection *conn = irq_bus_connection_get(tag, n);
   KASSERT(conn->input);
   if(conn->output)
     irq_slot_disconnect(conn->input, conn->output);
   conn->input = NULL;
 }
 
-void irq_bus_unset_output(const char *name, unsigned n)
+void irq_bus_unset_output(enum irq_bus_tag tag, unsigned n)
 {
-  struct irq_bus *bus = irq_bus_lookup(name);
-  KASSERT(bus);
-  KASSERT(n<bus->size);
-
-  struct irq_bus_connection *conn = &bus->connections[n];
+  struct irq_bus_connection *conn = irq_bus_connection_get(tag, n);
   KASSERT(conn->output);
   if(conn->input)
     irq_slot_disconnect(conn->input, conn->output);
@@ -110,8 +85,7 @@ void irq_bus_unset_output(const char *name, unsigned n)
 
 void irq_bus_init()
 {
-  irq_bus_add("root",        256);
-  irq_bus_add("isa",         16);
-  irq_bus_add("exceptions",  32);
+  // This may be needed in the future since the GSI bus would likely be
+  // dynamically sized, so keep it for now.
 }
 

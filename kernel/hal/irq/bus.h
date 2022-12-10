@@ -3,14 +3,19 @@
 
 #include "slot.h"
 
-void irq_bus_add(const char *name, unsigned size);
-void irq_bus_del(const char *name);
+enum irq_bus_tag
+{
+  IRQ_BUS_ROOT,
+  IRQ_BUS_EXCEPTIONS,
+  IRQ_BUS_ISA,
+  IRQ_BUS_GSI,
+};
 
-void irq_bus_set_input(const char *name, unsigned n, struct irq_slot *slot);
-void irq_bus_set_output(const char *name, unsigned n, struct irq_slot *slot);
+void irq_bus_set_input(enum irq_bus_tag tag, unsigned n, struct irq_slot *slot);
+void irq_bus_set_output(enum irq_bus_tag tag, unsigned n, struct irq_slot *slot);
 
-void irq_bus_unset_input(const char *name, unsigned n);
-void irq_bus_unset_output(const char *name, unsigned n);
+void irq_bus_unset_input(enum irq_bus_tag tag, unsigned n);
+void irq_bus_unset_output(enum irq_bus_tag tag, unsigned n);
 
 void irq_bus_init();
 

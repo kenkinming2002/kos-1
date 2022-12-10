@@ -116,7 +116,7 @@ static int i8253_init(struct i8253 *pit)
   if(acquire_ports(THIS_MODULE, I8253_PORTS, I8253_PORT_COUNT) != 0)
     return -1;
 
-  slot_init(&pit->timer.slot, NULL, "i8253", NULL);
+  irq_slot_init(&pit->timer.slot, NULL, "i8253", NULL);
   irq_bus_set_output("isa", 0, &pit->timer.slot);
   return 0;
 }

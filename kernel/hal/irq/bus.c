@@ -8,8 +8,8 @@
 
 struct irq_bus_connection
 {
-  struct slot *input;
-  struct slot *output;
+  struct irq_slot *input;
+  struct irq_slot *output;
 };
 
 struct irq_bus
@@ -56,7 +56,7 @@ void irq_bus_del(const char *name)
   return;
 }
 
-void irq_bus_set_input(const char *name, unsigned n, struct slot *slot)
+void irq_bus_set_input(const char *name, unsigned n, struct irq_slot *slot)
 {
   struct irq_bus *bus = irq_bus_lookup(name);
   KASSERT(bus);
@@ -66,10 +66,10 @@ void irq_bus_set_input(const char *name, unsigned n, struct slot *slot)
   KASSERT(!conn->input);
   conn->input = slot;
   if(conn->output)
-    slot_connect(conn->input, conn->output);
+    irq_slot_connect(conn->input, conn->output);
 }
 
-void irq_bus_set_output(const char *name, unsigned n, struct slot *slot)
+void irq_bus_set_output(const char *name, unsigned n, struct irq_slot *slot)
 {
   struct irq_bus *bus = irq_bus_lookup(name);
   KASSERT(bus);
@@ -79,7 +79,7 @@ void irq_bus_set_output(const char *name, unsigned n, struct slot *slot)
   KASSERT(!conn->output);
   conn->output = slot;
   if(conn->input)
-    slot_connect(conn->input, conn->output);
+    irq_slot_connect(conn->input, conn->output);
 }
 
 void irq_bus_unset_input(const char *name, unsigned n)
@@ -91,7 +91,7 @@ void irq_bus_unset_input(const char *name, unsigned n)
   struct irq_bus_connection *conn = &bus->connections[n];
   KASSERT(conn->input);
   if(conn->output)
-    slot_disconnect(conn->input, conn->output);
+    irq_slot_disconnect(conn->input, conn->output);
   conn->input = NULL;
 }
 
@@ -104,7 +104,7 @@ void irq_bus_unset_output(const char *name, unsigned n)
   struct irq_bus_connection *conn = &bus->connections[n];
   KASSERT(conn->output);
   if(conn->input)
-    slot_disconnect(conn->input, conn->output);
+    irq_slot_disconnect(conn->input, conn->output);
   conn->output = NULL;
 }
 

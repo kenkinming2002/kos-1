@@ -1,10 +1,9 @@
 #include "i8259.h"
 
-#include "hal/irqs.h"
+#include "hal.h"
 #include "mm.h"
 
 #include <core/assert.h>
-#include <core/slot.h>
 
 DEFINE_MODULE(i8259);
 
@@ -31,10 +30,10 @@ struct i8259
   uint8_t  config;
   uint8_t  mask;
 
-  struct slot slots[8];
+  struct irq_slot slots[8];
 };
 
-static void i8259_slot_on_connect(struct slot *slot)
+static void i8259_slot_on_connect(struct irq_slot *slot)
 {
   struct i8259 *pic = slot->data;
   unsigned      irq = pic->slots - slot;
@@ -46,7 +45,7 @@ static void i8259_slot_on_connect(struct slot *slot)
   outb(data_port, mask);
 }
 
-static void i8259_slot_on_disconnect(struct slot *slot)
+static void i8259_slot_on_disconnect(struct irq_slot *slot)
 {
   struct i8259 *pic = slot->data;
   unsigned      irq = pic->slots - slot;
@@ -58,7 +57,7 @@ static void i8259_slot_on_disconnect(struct slot *slot)
   outb(data_port, mask);
 }
 
-static void i8259_slot_on_emit(struct slot *slot)
+static void i8259_slot_on_emit(struct irq_slot *slot)
 {
   struct i8259 *pic = slot->data;
 
@@ -68,7 +67,7 @@ static void i8259_slot_on_emit(struct slot *slot)
     outb(pic->master->ports, 0x20);
 }
 
-struct slot_ops i8259_slot_ops = {
+struct irq_slot_ops i8259_slot_ops = {
   .on_connect_prev    = NULL,
   .on_disconnect_prev = NULL,
   .on_connect_next    = &i8259_slot_on_connect,
@@ -100,7 +99,7 @@ static int i8259_init(struct i8259 *pic, struct i8259 *master, uint16_t ports, u
 
   for(unsigned i=0; i<8; ++i)
   {
-    slot_init(&pic->slots[i], &i8259_slot_ops, "i8259", pic);
+    irq_slot_init(&pic->slots[i], &i8259_slot_ops, "i8259", pic);
     irq_bus_set_output("root", pic->base + i, &pic->slots[i]);
   }
   return 0;

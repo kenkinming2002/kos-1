@@ -7,7 +7,7 @@
 
 DEFINE_MODULE(exceptions);
 
-static struct slot exceptions_slot[32];
+static struct irq_slot exceptions_slot[32];
 void exceptions_module_init()
 {
   KASSERT(acquire_irqs(THIS_MODULE, 0, 32) == 0);

@@ -15,21 +15,21 @@
 
 DEFINE_MODULE(dummy);
 
-void on_device_not_available(struct slot *slot)
+void on_device_not_available(struct irq_slot *slot)
 {
   debug_printf("device not available\n");
 }
 
-void on_tick(struct slot *slot)
+void on_tick(struct irq_slot *slot)
 {
   debug_printf("on tick\n");
 }
 
-static struct slot_ops device_not_available_slot_ops = { .on_emit = &on_device_not_available, };
-static struct slot     device_not_available_slot     = { .name = "on device not available", .ops = &device_not_available_slot_ops };
+static struct irq_slot_ops device_not_available_slot_ops = { .on_emit = &on_device_not_available, };
+static struct irq_slot     device_not_available_slot     = { .name = "on device not available", .ops = &device_not_available_slot_ops };
 
-static struct slot_ops timer_slot_ops = { .on_emit = &on_tick, };
-static struct slot     timer_slot     = { .name = "on tick", .ops = &timer_slot_ops };
+static struct irq_slot_ops timer_slot_ops = { .on_emit = &on_tick, };
+static struct irq_slot     timer_slot     = { .name = "on tick", .ops = &timer_slot_ops };
 
 void kmain(struct boot_service *service)
 {
@@ -44,7 +44,7 @@ void kmain(struct boot_service *service)
   irq_bus_set_output("exceptions", 7, &device_not_available_slot);
 
   struct timer *timer = timer_alloc();
-  slot_connect(&timer->slot, &timer_slot);
+  irq_slot_connect(&timer->slot, &timer_slot);
   KASSERT(timer);
   timer->configure(timer, TIMER_MODE_PERIODIC);
   timer->reload(timer, 64000000);

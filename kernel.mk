@@ -11,6 +11,7 @@ KERNEL_OBJS = kernel/debug.o \
        	      kernel/pal/isrs.o \
        	      kernel/hal.o \
        	      kernel/hal/irqs.o \
+       	      kernel/hal/irq/slot.o \
        	      kernel/hal/irq/bus.o \
        	      kernel/hal/ports.o \
        	      kernel/hal/timer.o \

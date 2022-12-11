@@ -2,7 +2,7 @@
 
 #include <stddef.h>
 
-LL_DEFINE(timer_list);
+struct ll timer_list = LL_INIT(timer_list);
 
 void timer_register(struct timer *timer)
 {

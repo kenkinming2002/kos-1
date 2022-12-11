@@ -18,7 +18,7 @@ struct irqs
   uint16_t count;
 };
 
-LL_DEFINE(irqs_list);
+struct ll irqs_list = LL_INIT(irqs_list);
 int acquire_irqs(struct module *module, unsigned begin, unsigned count)
 {
   LL_FOREACH(irqs_list, node)

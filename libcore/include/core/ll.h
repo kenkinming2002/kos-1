@@ -15,7 +15,7 @@ struct ll
   struct ll_node sentinel;
 };
 
-#define LL_DEFINE(name) struct ll name = { .sentinel = { .prev = &name.sentinel, .next = &name.sentinel } }
+#define LL_INIT(name) (struct ll){ .sentinel = { .prev = &name.sentinel, .next = &name.sentinel } }
 #define LL_FOREACH(name, node) for(struct ll_node *node = name.sentinel.next; node != &name.sentinel; node = node->next)
 
 void ll_prepend(struct ll *ll, struct ll_node *node);

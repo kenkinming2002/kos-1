@@ -13,7 +13,7 @@ struct ports
   uint16_t count;
 };
 
-LL_DEFINE(ports_list);
+struct ll ports_list = LL_INIT(ports_list);
 int acquire_ports(struct module *module, uint16_t begin, uint16_t count)
 {
   LL_FOREACH(ports_list, node)

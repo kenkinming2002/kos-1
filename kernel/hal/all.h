@@ -1,6 +1,7 @@
 #ifndef HAL_ALL_H
 #define HAL_ALL_H
 
+#include "access.h"
 #include "ports.h"
 #include "irqs.h"
 #include "irq/bus.h"

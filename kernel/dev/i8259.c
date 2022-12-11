@@ -119,8 +119,8 @@ static struct i8259 i8259_slave;
 
 void i8259_module_init()
 {
-  i8259_init(&i8259_master, NULL,          0x20, PIC_MASTER, 1 << 2, 0xFB);
-  i8259_init(&i8259_slave,  &i8259_master, 0x28, PIC_SLAVE,  2,      0xFF);
+  i8259_init(&i8259_master, NULL,          PIC_MASTER, 0x20, 1 << 2, 0xFB);
+  i8259_init(&i8259_slave,  &i8259_master, PIC_SLAVE,  0x28, 2,      0xFF);
 
   for(unsigned i=0; i<8; ++i)
   {

@@ -3,8 +3,7 @@
 
 #include "access.h"
 #include "res.h"
-#include "irqs.h"
-#include "irq/bus.h"
+#include "irq/all.h"
 #include "timer.h"
 
 void hal_init();

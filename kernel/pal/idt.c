@@ -1,7 +1,6 @@
 #include "idt.h"
 
 #include "isrs.h"
-#include "hal/irqs.h"
 
 #include <core/assert.h>
 #include <core/debug.h>

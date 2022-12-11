@@ -10,12 +10,12 @@ KERNEL_OBJS = kernel/debug.o \
        	      kernel/pal/segs.o \
        	      kernel/pal/isrs.o \
        	      kernel/hal/all.o \
-       	      kernel/hal/locks.o \
-       	      kernel/hal/irqs.o \
-       	      kernel/hal/irq/slot.o \
-       	      kernel/hal/irq/bus.o \
        	      kernel/hal/access.o \
        	      kernel/hal/res.o \
+       	      kernel/hal/locks.o \
+       	      kernel/hal/irq/all.o \
+       	      kernel/hal/irq/slot.o \
+       	      kernel/hal/irq/bus.o \
        	      kernel/hal/timer.o \
 	      kernel/dev/all.o \
        	      kernel/dev/exceptions.o \

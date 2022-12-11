@@ -16,7 +16,6 @@ KERNEL_OBJS = kernel/debug.o \
        	      kernel/hal/irq/bus.o \
        	      kernel/hal/access.o \
        	      kernel/hal/res.o \
-       	      kernel/hal/ports.o \
        	      kernel/hal/timer.o \
 	      kernel/dev/all.o \
        	      kernel/dev/exceptions.o \

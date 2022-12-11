@@ -3,9 +3,6 @@
 
 #include "module.h"
 
-int acquire_irqs(struct module *module, unsigned begin, unsigned count);
-int release_irqs(struct module *module, unsigned begin, unsigned count);
-
 void irqs_init();
 
 #endif // HAL_IRQS_H

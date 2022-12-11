@@ -10,7 +10,7 @@ DEFINE_MODULE(exceptions);
 static struct irq_slot exceptions_slot[32];
 void exceptions_module_init()
 {
-  KASSERT(acquire_irqs(THIS_MODULE, 0, 32) == 0);
+  KASSERT(res_acquire(RES_IRQ_VECTOR, THIS_MODULE, 0, 32) == 0);
   for(unsigned i=0; i<32; ++i)
   {
     irq_bus_set_output(IRQ_BUS_ROOT,       i, &exceptions_slot[i]);

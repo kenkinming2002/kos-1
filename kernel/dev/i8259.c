@@ -83,10 +83,10 @@ static int i8259_init(struct i8259 *pic, struct i8259 *master, uint16_t ports, u
   pic->config = config;
   pic->mask   = mask;
 
-  if(acquire_irqs(THIS_MODULE, pic->base, 8) != 0)
+  if(res_acquire(RES_IRQ_VECTOR, THIS_MODULE, pic->base, 8) != 0)
     return -1;
 
-  if(acquire_ports(THIS_MODULE, pic->ports, 2) != 0)
+  if(res_acquire(RES_IOPORT, THIS_MODULE, pic->ports, 2) != 0)
     return -1;
 
   uint16_t command_port = pic->ports;
@@ -110,8 +110,8 @@ static void i8259_fini(struct i8259 *pic)
   for(unsigned i=0; i<8; ++i)
     irq_bus_unset_output(IRQ_BUS_ROOT, pic->base + i);
 
-  KASSERT(release_irqs(THIS_MODULE, pic->base, 8) == 0);
-  KASSERT(release_ports(THIS_MODULE, pic->ports, 2) == 0);
+  KASSERT(res_release(RES_IRQ_VECTOR, THIS_MODULE, pic->base, 8) == 0);
+  KASSERT(res_release(RES_IOPORT, THIS_MODULE, pic->ports, 2) == 0);
 }
 
 static struct i8259 i8259_master;

@@ -1,55 +1,10 @@
 #include "irqs.h"
 
-#include "mm/all.h"
 #include "irq/bus.h"
-
-#include <core/assert.h>
-#include <core/ll.h>
-#include <core/string.h>
+#include "irq/slot.h"
 
 #include <stddef.h>
-
-struct irqs
-{
-  struct ll_node node;
-
-  struct module *module;
-  uint16_t begin;
-  uint16_t count;
-};
-
-struct ll irqs_list = LL_INIT(irqs_list);
-int acquire_irqs(struct module *module, unsigned begin, unsigned count)
-{
-  LL_FOREACH(irqs_list, node)
-  {
-    struct irqs *irqs = (struct irqs *)node;
-    if(irqs->begin + irqs->count > begin && begin + count > irqs->begin)
-      return -1; // Overlap
-  }
-
-  struct irqs *irqs = kmalloc(sizeof *irqs);
-  irqs->module  = module;
-  irqs->begin   = begin;
-  irqs->count   = count;
-  ll_append(&irqs_list, &irqs->node);
-  return 0;
-}
-
-int release_irqs(struct module *module, unsigned begin, unsigned count)
-{
-  LL_FOREACH(irqs_list, node)
-  {
-    struct irqs *irqs = (struct irqs *)node;
-    if(irqs->module == module && irqs->begin == begin && irqs->count == count)
-    {
-      ll_delete(&irqs->node);
-      kfree(irqs);
-      return 0;
-    }
-  }
-  return -1;
-}
+#include <stdint.h>
 
 static struct irq_slot irqs_slot[256];
 void irqs_init()

@@ -113,7 +113,7 @@ static int i8253_init(struct i8253 *pit)
 {
   pit->timer.configure = &i8253_configure;
   pit->timer.reload    = &i8253_reload;
-  if(acquire_ports(THIS_MODULE, I8253_PORTS, I8253_PORT_COUNT) != 0)
+  if(res_acquire(RES_IOPORT, THIS_MODULE, I8253_PORTS, I8253_PORT_COUNT) != 0)
     return -1;
 
   pit->timer.slot = IRQ_SLOT_INIT("i8253", NULL, NULL);
@@ -124,7 +124,7 @@ static int i8253_init(struct i8253 *pit)
 static void i8253_fini(struct i8253 *pit)
 {
   irq_bus_unset_output(IRQ_BUS_ISA, 0);
-  KASSERT(release_ports(THIS_MODULE, I8253_PORTS, I8253_PORT_COUNT) == 0);
+  KASSERT(res_release(RES_IOPORT, THIS_MODULE, I8253_PORTS, I8253_PORT_COUNT) == 0);
 }
 
 static struct i8253 i8253;

@@ -2,7 +2,7 @@
 #define HAL_ALL_H
 
 #include "access.h"
-#include "ports.h"
+#include "res.h"
 #include "irqs.h"
 #include "irq/bus.h"
 #include "timer.h"

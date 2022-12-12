@@ -83,6 +83,8 @@ static int i8259_init(struct i8259 *pic, struct i8259 *master, uint16_t ports, u
   pic->ports  = ports;
   pic->config = config;
   pic->mask   = mask;
+  for(unsigned i=0; i<8; ++i)
+    pic->slots[i] = IRQ_SLOT_INIT("i8259", &i8259_slot_ops, pic);
 
   if(res_acquire(RES_IRQ_VECTOR, THIS_MODULE, pic->base, 8) != 0)
     return -1;
@@ -91,10 +93,8 @@ static int i8259_init(struct i8259 *pic, struct i8259 *master, uint16_t ports, u
     return -1;
 
   for(unsigned i=0; i<8; ++i)
-  {
-    pic->slots[i] = IRQ_SLOT_INIT("i8259", &i8259_slot_ops, pic);
-    irq_bus_set_output(IRQ_BUS_ROOT, pic->base + i, &pic->slots[i]);
-  }
+    if(irq_bus_set_output(IRQ_BUS_ROOT, pic->base + i, &pic->slots[i]) != 0)
+      return -1;
 
   uint16_t command_port = pic->ports;
   uint16_t data_port    = pic->ports + 1;

@@ -26,7 +26,8 @@ struct i8259
 {
   struct i8259 *master;
   uint16_t ports;
-  uint8_t  base;
+  uint8_t  base_root;
+  uint8_t  base_isa;
   uint8_t  config;
   uint8_t  mask;
 
@@ -76,30 +77,36 @@ struct irq_slot_ops i8259_slot_ops = {
   .on_emit   = &i8259_slot_on_emit,
 };
 
-static int i8259_init(struct i8259 *pic, struct i8259 *master, uint16_t ports, uint8_t base, uint8_t config, uint8_t mask)
+static int i8259_init(struct i8259 *pic, struct i8259 *master, uint16_t ports, uint8_t base_root, uint8_t base_isa, uint8_t config, uint8_t mask)
 {
-  pic->master = master;
-  pic->base   = base;
-  pic->ports  = ports;
-  pic->config = config;
-  pic->mask   = mask;
+  pic->master    = master;
+  pic->base_root = base_root;
+  pic->base_isa  = base_isa;
+  pic->ports     = ports;
+  pic->config    = config;
+  pic->mask      = mask;
   for(unsigned i=0; i<8; ++i)
     pic->slots[i] = IRQ_SLOT_INIT("i8259", &i8259_slot_ops, pic);
 
-  if(res_acquire(RES_IRQ_VECTOR, THIS_MODULE, pic->base, 8) != 0)
+  if(res_acquire(RES_IRQ_VECTOR, THIS_MODULE, pic->base_root, 8) != 0)
     return -1;
 
   if(res_acquire(RES_IOPORT, THIS_MODULE, pic->ports, 2) != 0)
     return -1;
 
   for(unsigned i=0; i<8; ++i)
-    if(irq_bus_set_output(IRQ_BUS_ROOT, pic->base + i, &pic->slots[i]) != 0)
+    if(irq_bus_set_output(IRQ_BUS_ROOT, pic->base_root + i, &pic->slots[i]) != 0)
       return -1;
+
+  for(unsigned i=0; i<8; ++i)
+    if(irq_bus_set_input(IRQ_BUS_ISA, pic->base_isa + i, &pic->slots[i]) != 0)
+      return -1;
+
 
   uint16_t command_port = pic->ports;
   uint16_t data_port    = pic->ports + 1;
   outb(command_port, ICW1_INIT | ICW1_ICW4); io_wait();
-  outb(data_port,    pic->base);             io_wait();
+  outb(data_port,    pic->base_root);        io_wait();
   outb(data_port,    pic->config);           io_wait();
   outb(data_port,    ICW4_8086);             io_wait();
   outb(data_port,    pic->mask);             io_wait();
@@ -111,13 +118,7 @@ static struct i8259 i8259_slave;
 
 void i8259_module_init()
 {
-  i8259_init(&i8259_master, NULL,          PIC_MASTER, 0x20, 1 << 2, 0xFB);
-  i8259_init(&i8259_slave,  &i8259_master, PIC_SLAVE,  0x28, 2,      0xFF);
-
-  for(unsigned i=0; i<8; ++i)
-  {
-    irq_bus_set_input(IRQ_BUS_ISA, i,   &i8259_master.slots[i]);
-    irq_bus_set_input(IRQ_BUS_ISA, i+8, &i8259_slave.slots[i]);
-  }
+  i8259_init(&i8259_master, NULL,          PIC_MASTER, 0x20, 0x0, 1 << 2, 0xFB);
+  i8259_init(&i8259_slave,  &i8259_master, PIC_SLAVE,  0x28, 0x8, 2,      0xFF);
 }
 

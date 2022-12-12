@@ -11,7 +11,7 @@ void irq_init()
     irq_bus_set_input(IRQ_BUS_ROOT, i, &irqs_slot[i]);
 }
 
-void isr(uint64_t irq, uint64_t ec)
+void isr(uint64_t irq, uint64_t /*ec*/)
 {
   irq_slot_emit(&irqs_slot[irq]);
 }

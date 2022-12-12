@@ -13,15 +13,13 @@
 
 #define TEST_COUNT 10
 
-DEFINE_MODULE(dummy);
-
-bool on_device_not_available(struct irq_slot *slot)
+bool on_device_not_available(struct irq_slot *)
 {
   debug_printf("device not available\n");
   return false;
 }
 
-bool on_tick(struct irq_slot *slot)
+bool on_tick(struct irq_slot *)
 {
   debug_printf("on tick\n");
   return false;

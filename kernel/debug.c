@@ -17,11 +17,6 @@ static uint8_t inb(uint16_t port)
   return byte;
 }
 
-static void io_wait()
-{
-  outb(0x80, 0);
-}
-
 static const uint16_t SERIAL_COM1_BASE          = 0x3F8;     /* COM1 base port */
 
 static const uint16_t SERIAL_DATA_PORT          = SERIAL_COM1_BASE;

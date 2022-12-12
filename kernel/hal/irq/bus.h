@@ -11,8 +11,8 @@ enum irq_bus_tag
   IRQ_BUS_GSI,
 };
 
-void irq_bus_set_input(enum irq_bus_tag tag, unsigned n, struct irq_slot *slot);
-void irq_bus_set_output(enum irq_bus_tag tag, unsigned n, struct irq_slot *slot);
+int irq_bus_set_input(enum irq_bus_tag tag, unsigned n, struct irq_slot *slot);
+int irq_bus_set_output(enum irq_bus_tag tag, unsigned n, struct irq_slot *slot);
 
 void irq_bus_unset_input(enum irq_bus_tag tag, unsigned n);
 void irq_bus_unset_output(enum irq_bus_tag tag, unsigned n);

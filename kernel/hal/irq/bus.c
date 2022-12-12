@@ -47,22 +47,30 @@ static struct irq_bus_connection *irq_bus_connection_get(enum irq_bus_tag tag, u
   return &bus->conns[n];
 }
 
-void irq_bus_set_input(enum irq_bus_tag tag, unsigned n, struct irq_slot *slot)
+int irq_bus_set_input(enum irq_bus_tag tag, unsigned n, struct irq_slot *slot)
 {
   struct irq_bus_connection *conn = irq_bus_connection_get(tag, n);
-  KASSERT(!conn->input);
+  if(conn->input)
+    return -1;
+
   conn->input = slot;
   if(conn->output)
     irq_slot_connect(conn->input, conn->output);
+
+  return 0;
 }
 
-void irq_bus_set_output(enum irq_bus_tag tag, unsigned n, struct irq_slot *slot)
+int irq_bus_set_output(enum irq_bus_tag tag, unsigned n, struct irq_slot *slot)
 {
   struct irq_bus_connection *conn = irq_bus_connection_get(tag, n);
-  KASSERT(!conn->output);
+  if(conn->output)
+    return -1;
+
   conn->output = slot;
   if(conn->input)
     irq_slot_connect(conn->input, conn->output);
+
+  return 0;
 }
 
 void irq_bus_unset_input(enum irq_bus_tag tag, unsigned n)

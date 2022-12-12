@@ -6,6 +6,7 @@
 local_lock:
   pushfq
   pop 0(%rdi)
+  cli
   ret
 
 local_unlock:
@@ -17,6 +18,7 @@ spin_lock:
 0:
   pushfq
   pop 0(%rdi)
+  cli
   lock btsq $0, 8(%rdi)
   jc 0b
   ret

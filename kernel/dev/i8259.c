@@ -90,6 +90,12 @@ static int i8259_init(struct i8259 *pic, struct i8259 *master, uint16_t ports, u
   if(res_acquire(RES_IOPORT, THIS_MODULE, pic->ports, 2) != 0)
     return -1;
 
+  for(unsigned i=0; i<8; ++i)
+  {
+    pic->slots[i] = IRQ_SLOT_INIT("i8259", &i8259_slot_ops, pic);
+    irq_bus_set_output(IRQ_BUS_ROOT, pic->base + i, &pic->slots[i]);
+  }
+
   uint16_t command_port = pic->ports;
   uint16_t data_port    = pic->ports + 1;
   outb(command_port, ICW1_INIT | ICW1_ICW4); io_wait();
@@ -97,22 +103,7 @@ static int i8259_init(struct i8259 *pic, struct i8259 *master, uint16_t ports, u
   outb(data_port,    pic->config);           io_wait();
   outb(data_port,    ICW4_8086);             io_wait();
   outb(data_port,    pic->mask);             io_wait();
-
-  for(unsigned i=0; i<8; ++i)
-  {
-    pic->slots[i] = IRQ_SLOT_INIT("i8259", &i8259_slot_ops, pic);
-    irq_bus_set_output(IRQ_BUS_ROOT, pic->base + i, &pic->slots[i]);
-  }
   return 0;
-}
-
-static void i8259_fini(struct i8259 *pic)
-{
-  for(unsigned i=0; i<8; ++i)
-    irq_bus_unset_output(IRQ_BUS_ROOT, pic->base + i);
-
-  KASSERT(res_release(RES_IRQ_VECTOR, THIS_MODULE, pic->base, 8) == 0);
-  KASSERT(res_release(RES_IOPORT, THIS_MODULE, pic->ports, 2) == 0);
 }
 
 static struct i8259 i8259_master;

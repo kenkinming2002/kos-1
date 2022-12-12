@@ -86,9 +86,8 @@ static uint16_t i8253_reload_value_from_duration(unsigned duration)
   return reload_value;
 }
 
-static void i8253_configure(struct timer *timer, enum timer_mode mode)
+static void i8253_configure(struct timer *, enum timer_mode mode)
 {
-  struct i8253 *i8253 = (struct i8253 *)timer;
   switch(mode)
   {
   case TIMER_MODE_ONESHOT:
@@ -102,7 +101,7 @@ static void i8253_configure(struct timer *timer, enum timer_mode mode)
   }
 }
 
-static void i8253_reload(struct timer *timer, unsigned duration)
+static void i8253_reload(struct timer *, unsigned duration)
 {
   uint16_t reload_value = i8253_reload_value_from_duration(duration);
   outb(I8253_SELECT_CHANNEL0, (reload_value >> 0) & 0xFF);
@@ -119,12 +118,6 @@ static int i8253_init(struct i8253 *pit)
   pit->timer.slot = IRQ_SLOT_INIT("i8253", NULL, NULL);
   irq_bus_set_output(IRQ_BUS_ISA, 0, &pit->timer.slot);
   return 0;
-}
-
-static void i8253_fini(struct i8253 *pit)
-{
-  irq_bus_unset_output(IRQ_BUS_ISA, 0);
-  KASSERT(res_release(RES_IOPORT, THIS_MODULE, I8253_PORTS, I8253_PORT_COUNT) == 0);
 }
 
 static struct i8253 i8253;

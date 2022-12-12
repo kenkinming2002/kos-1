@@ -33,7 +33,7 @@ struct i8259
   struct irq_slot slots[8];
 };
 
-static void i8259_slot_on_connect(struct irq_slot *slot)
+static void i8259_slot_on_unmask(struct irq_slot *slot)
 {
   struct i8259 *pic = slot->data;
   unsigned      irq = pic->slots - slot;
@@ -45,7 +45,7 @@ static void i8259_slot_on_connect(struct irq_slot *slot)
   outb(data_port, mask);
 }
 
-static void i8259_slot_on_disconnect(struct irq_slot *slot)
+static void i8259_slot_on_mask(struct irq_slot *slot)
 {
   struct i8259 *pic = slot->data;
   unsigned      irq = pic->slots - slot;
@@ -57,7 +57,7 @@ static void i8259_slot_on_disconnect(struct irq_slot *slot)
   outb(data_port, mask);
 }
 
-static void i8259_slot_on_emit(struct irq_slot *slot)
+static bool i8259_slot_on_emit(struct irq_slot *slot)
 {
   struct i8259 *pic = slot->data;
 
@@ -65,14 +65,15 @@ static void i8259_slot_on_emit(struct irq_slot *slot)
   outb(pic->ports, 0x20);
   if(pic->master)
     outb(pic->master->ports, 0x20);
+
+  // TODO: detect spurious interrupt
+  return true;
 }
 
 struct irq_slot_ops i8259_slot_ops = {
-  .on_connect_prev    = NULL,
-  .on_disconnect_prev = NULL,
-  .on_connect_next    = &i8259_slot_on_connect,
-  .on_disconnect_next = &i8259_slot_on_disconnect,
-  .on_emit            = &i8259_slot_on_emit,
+  .on_unmask = &i8259_slot_on_unmask,
+  .on_mask   = &i8259_slot_on_mask,
+  .on_emit   = &i8259_slot_on_emit,
 };
 
 static int i8259_init(struct i8259 *pic, struct i8259 *master, uint16_t ports, uint8_t base, uint8_t config, uint8_t mask)

@@ -15,14 +15,16 @@
 
 DEFINE_MODULE(dummy);
 
-void on_device_not_available(struct irq_slot *slot)
+bool on_device_not_available(struct irq_slot *slot)
 {
   debug_printf("device not available\n");
+  return false;
 }
 
-void on_tick(struct irq_slot *slot)
+bool on_tick(struct irq_slot *slot)
 {
   debug_printf("on tick\n");
+  return false;
 }
 
 static struct irq_slot_ops device_not_available_slot_ops = { .on_emit = &on_device_not_available, };
@@ -45,6 +47,7 @@ void kmain(struct boot_service *service)
 
   struct timer *timer = timer_alloc();
   irq_slot_connect(&timer->slot, &on_tick_slot);
+  irq_slot_unmask(&on_tick_slot);
   KASSERT(timer);
   timer->configure(timer, TIMER_MODE_PERIODIC);
   timer->reload(timer, 64000000);

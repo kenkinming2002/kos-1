@@ -13,7 +13,7 @@ void irq_init()
 
 void isr(uint64_t irq, uint64_t ec)
 {
-  irq_slot_emit_forward(&irqs_slot[irq]);
+  irq_slot_emit(&irqs_slot[irq]);
 }
 
 

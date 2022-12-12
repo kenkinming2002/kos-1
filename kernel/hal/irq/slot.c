@@ -5,34 +5,12 @@
 
 #include <stddef.h>
 
-void irq_slot_emit_backward(struct irq_slot *slot)
-{
-  for(; slot; slot = slot->prev)
-  {
-    debug_printf("emitting backward on slot with name=%s\n", slot->name ? slot->name : "none");
-    if(slot->ops && slot->ops->on_emit)
-      slot->ops->on_emit(slot);
-  }
-}
-
-void irq_slot_emit_forward(struct irq_slot *slot)
-{
-  for(; slot; slot = slot->next)
-  {
-    debug_printf("emitting forward on slot with name=%s\n", slot->name ? slot->name : "none");
-    if(slot->ops && slot->ops->on_emit)
-      slot->ops->on_emit(slot);
-  }
-}
-
 void irq_slot_connect(struct irq_slot *prev, struct irq_slot *next)
 {
   KASSERT(prev->next == NULL);
   KASSERT(next->prev == NULL);
   prev->next = next;
   next->prev = prev;
-  if(prev->ops && prev->ops->on_connect_next) prev->ops->on_connect_next(prev);
-  if(next->ops && next->ops->on_connect_prev) next->ops->on_connect_prev(next);
 }
 
 void irq_slot_disconnect(struct irq_slot *prev, struct irq_slot *next)
@@ -41,7 +19,35 @@ void irq_slot_disconnect(struct irq_slot *prev, struct irq_slot *next)
   KASSERT(next->prev == prev);
   prev->next = NULL;
   next->prev = NULL;
-  if(prev->ops && prev->ops->on_disconnect_next) prev->ops->on_disconnect_next(prev);
-  if(next->ops && next->ops->on_disconnect_prev) next->ops->on_disconnect_prev(next);
 }
 
+void irq_slot_emit(struct irq_slot *slot)
+{
+  for(; slot; slot = slot->next)
+  {
+    debug_printf("emitting on slot with name=%s\n", slot->name ? slot->name : "none");
+    if(slot->ops && slot->ops->on_emit)
+      if(!slot->ops->on_emit(slot))
+        break;
+  }
+}
+
+void irq_slot_unmask(struct irq_slot *slot)
+{
+  for(; slot; slot = slot->prev)
+  {
+    debug_printf("unmasking on slot with name=%s\n", slot->name ? slot->name : "none");
+    if(slot->ops && slot->ops->on_unmask)
+      slot->ops->on_unmask(slot);
+  }
+}
+
+void irq_slot_mask(struct irq_slot *slot)
+{
+  for(; slot; slot = slot->prev)
+  {
+    debug_printf("masking on slot with name=%s\n", slot->name ? slot->name : "none");
+    if(slot->ops && slot->ops->on_mask)
+      slot->ops->on_mask(slot);
+  }
+}

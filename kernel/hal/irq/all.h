@@ -3,6 +3,7 @@
 
 #include "bus.h"
 #include "slot.h"
+#include "root.h"
 
 void irq_init();
 

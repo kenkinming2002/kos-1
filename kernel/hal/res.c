@@ -71,7 +71,7 @@ static int _res_acquire(enum res_type type, struct module *module, size_t base, 
   return 0;
 }
 
-static int _res_release(enum res_type type, struct module *module, size_t base, size_t limit)
+static void _res_release(enum res_type type, struct module *module, size_t base, size_t limit)
 {
   struct res_pool *pool = res_pool_get(type);
   LL_FOREACH(pool->res_list, node)
@@ -81,10 +81,10 @@ static int _res_release(enum res_type type, struct module *module, size_t base, 
     {
       ll_delete(&res->node);
       kfree(res);
-      return 0;
+      return;
     }
   }
-  return -1;
+  KASSERT_UNREACHABLE;
 }
 
 int res_acquire(enum res_type type, struct module *module, size_t index, size_t count)
@@ -93,8 +93,8 @@ int res_acquire(enum res_type type, struct module *module, size_t index, size_t 
   return _res_acquire(type, module, index, count - 1);
 }
 
-int res_release(enum res_type type, struct module *module, size_t index, size_t count)
+void res_release(enum res_type type, struct module *module, size_t index, size_t count)
 {
   KASSERT(count != 0);
-  return _res_release(type, module, index, count - 1);
+  _res_release(type, module, index, count - 1);
 }

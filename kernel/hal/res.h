@@ -20,7 +20,7 @@ enum res_type
   RES_MMIO,
 };
 
-int res_acquire(enum res_type type, struct module *module, size_t index, size_t count);
+__attribute__((warn_unused_result)) int res_acquire(enum res_type type, struct module *module, size_t index, size_t count);
 void res_release(enum res_type type, struct module *module, size_t index, size_t count);
 
 #endif // HAL_RES_H

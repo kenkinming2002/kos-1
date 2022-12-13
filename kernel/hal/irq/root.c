@@ -11,7 +11,7 @@ void irq_root_init()
 {
   KASSERT(res_acquire(RES_IRQ_BUS_ROOT_INPUT, THIS_MODULE, 0, 256) == 0);
   for(unsigned i=0; i<256; ++i)
-    irq_bus_set_input(IRQ_BUS_ROOT, i, &irq_root_slots[i]);
+    KASSERT(irq_bus_set_input(IRQ_BUS_ROOT, i, &irq_root_slots[i]) == 0);
 }
 
 void isr(uint64_t irq, uint64_t /*ec*/)

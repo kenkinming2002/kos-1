@@ -10,9 +10,10 @@
 #include <stdbool.h>
 
 #include "fs.h"
-#include "mm.h"
 
-#define PAGE_SIZE 0x1000
+#include "config.h"
+
+__attribute__((section(".kernel"))) static char kernel_area[KERNEL_MAX];
 
 #define INT_ADD_OVERFLOW_P(a, b) __builtin_add_overflow_p (a, b, (__typeof__ ((a) + (b))) 0)
 #define INT_MUL_OVERFLOW_P(a, b) __builtin_mul_overflow_p (a, b, (__typeof__ ((a) + (b))) 0)
@@ -123,10 +124,10 @@ void load_kernel()
   KASSERT(elf64_file.ehdr->e_type    == ET_DYN);
   KASSERT(elf64_file.ehdr->e_machine == EM_X86_64);
   KASSERT(elf64_file.ehdr->e_version == EV_CURRENT);
+  data   = elf64_file.data;
+  memory = kernel_area;
 
-  data = elf64_file.data;
   elf64_iterate_phdr(elf64_file, &kernel_iterate_phdr1);
-  memory = boot_mm_alloc(max_end, PAGE_SIZE);
   elf64_iterate_phdr(elf64_file, &kernel_iterate_phdr2);
   elf64_iterate_phdr(elf64_file, &kernel_iterate_phdr3);
 

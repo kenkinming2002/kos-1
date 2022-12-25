@@ -11,5 +11,8 @@ SECTIONS {
   .rodata : { *(.rodata .rodata.* ) }
   .data   : { *(.data   .data.*   ) }
   .bss    : { *(.bss    .bss.*    ) }
+
+  .kernel (NOLOAD) : { *(.kernel) }
+
   boot_end = .;
 }

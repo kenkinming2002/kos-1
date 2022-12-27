@@ -1,8 +1,7 @@
 #include "pages.h"
 
+#include <core/assert.h>
 #include <core/bitmap.h>
-
-#include <stdalign.h>
 
 #define PAGE_SIZE 0x1000
 
@@ -11,36 +10,44 @@ static struct bitmap bm;
 #define ALIGN_UP(value, align)   ((value + align - 1) / align * align)
 #define ALIGN_DOWN(value, align) (value / align * align)
 
-static uintptr_t max_addr = 0;
-static void iterate_get_max_addr(struct boot_mmap_entry *entry)
+static void *mm_alloc_initial(struct kboot_info *boot_info, size_t size)
 {
-  if(max_addr < entry->addr)
-    max_addr = entry->addr;
+  for(size_t i=0; i<boot_info->mmap->count; ++i)
+    if(boot_info->mmap->entries[i].type == KBOOT_CONVENTIONAL_MEMORY)
+      if(boot_info->mmap->entries[i].end - boot_info->mmap->entries[i].begin >= size)
+        return (void*)boot_info->mmap->entries[i].begin;
+
+  KASSERT_UNREACHABLE;
 }
 
-static void iterate_init(struct boot_mmap_entry *entry)
+void mm_init_pages(struct kboot_info *boot_info)
 {
-  if(entry->type == BOOT_MEMORY_CONVENTIONAL && entry->owner == BOOT_MEMORY_UNOWNED)
-  {
-    size_t begin_index = ALIGN_UP  (entry->addr,                 PAGE_SIZE) / PAGE_SIZE;
-    size_t end_index   = ALIGN_DOWN(entry->addr + entry->length, PAGE_SIZE) / PAGE_SIZE;
-    if(begin_index > end_index)
-      return;
+  uint64_t max_addr = 0;
+  for(size_t i=0; i<boot_info->mmap->count; ++i)
+    if(boot_info->mmap->entries[i].type == KBOOT_CONVENTIONAL_MEMORY)
+      if(max_addr < boot_info->mmap->entries[i].end)
+        max_addr = boot_info->mmap->entries[i].end;
 
-    bm_fill(bm, begin_index, end_index - begin_index, false);
-  }
-}
-
-void mm_init_pages(struct boot_service *boot_service)
-{
-  boot_service->mm_iterate(&iterate_get_max_addr);
-
-  size_t page_count = (max_addr + PAGE_SIZE - 1) / PAGE_SIZE;
+  size_t page_count  = (max_addr   + PAGE_SIZE - 1) / PAGE_SIZE;
+  size_t bitmap_size = (page_count + UINT_BIT  - 1) / UINT_BIT;
   bm.size = page_count;
-  bm.bits = boot_service->mm_alloc(page_count / CHAR_BIT, alignof(unsigned));
-  bm_fill(bm, 0, bm.size, true);
+  bm.bits = mm_alloc_initial(boot_info, bitmap_size * sizeof *bm.bits);
 
-  boot_service->mm_iterate(&iterate_init);
+  bm_fill(bm, 0, bm.size, true);
+  for(size_t i=0; i<boot_info->mmap->count; ++i)
+    if(boot_info->mmap->entries[i].type == KBOOT_CONVENTIONAL_MEMORY)
+    {
+      size_t begin_index = ALIGN_UP  (boot_info->mmap->entries[i].begin, PAGE_SIZE) / PAGE_SIZE;
+      size_t end_index   = ALIGN_DOWN(boot_info->mmap->entries[i].end,   PAGE_SIZE) / PAGE_SIZE;
+      if(begin_index > end_index)
+        continue;
+
+      bm_fill(bm, begin_index, end_index - begin_index, false);
+    }
+
+  size_t begin_index = ALIGN_DOWN((uintptr_t)(bm.bits),               PAGE_SIZE) / PAGE_SIZE;
+  size_t end_index   = ALIGN_UP  ((uintptr_t)(bm.bits + bitmap_size), PAGE_SIZE) / PAGE_SIZE;
+  bm_fill(bm, begin_index, end_index - begin_index, true);
 }
 
 void *alloc_pages(unsigned count)

@@ -2,9 +2,11 @@
 
 #include <boot/service.h>
 
-#include "core/assert.h"
-#include "core/debug.h"
-#include "core/string.h"
+#include "kboot/all.h"
+
+#include <core/assert.h>
+#include <core/debug.h>
+#include <core/string.h>
 
 #include <elf.h>
 #include <stdbool.h>
@@ -112,8 +114,7 @@ static void kernel_iterate_phdr3(Elf64_Phdr *phdr)
     }
 }
 
-extern struct boot_service boot_service;
-typedef void(*entry_t)(struct boot_service *);
+typedef void(*entry_t)(struct kboot_info *);
 
 void load_kernel()
 {
@@ -149,6 +150,6 @@ void load_kernel()
   debug_printf("max_end = 0x%lx\n", max_end);
   KASSERT(elf64_file.ehdr->e_entry <= max_end);
   entry_t entry = (entry_t)(memory + elf64_file.ehdr->e_entry);
-  entry(&boot_service);
+  entry(info);
   KASSERT(false && "Unreachable");
 }

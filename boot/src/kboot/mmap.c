@@ -116,6 +116,8 @@ static void mmap_sanitize()
 
 static void mmap_populate(struct multiboot_boot_information *mbi)
 {
+  extern char system_structures_begin[];
+  extern char system_structures_end[];
   extern char kernel_begin[];
   extern char kernel_end[];
   extern char kboot_begin[];
@@ -144,6 +146,11 @@ static void mmap_populate(struct multiboot_boot_information *mbi)
         mmap_append(new_entry);
       }
     }
+
+  new_entry.type  = KBOOT_SYSTEM_STRUCTURES;
+  new_entry.begin = (uintptr_t)system_structures_begin;
+  new_entry.end   = (uintptr_t)system_structures_end;
+  mmap_append(new_entry);
 
   new_entry.type  = KBOOT_KERNEL;
   new_entry.begin = (uintptr_t)kernel_begin;

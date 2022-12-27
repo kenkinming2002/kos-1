@@ -12,6 +12,10 @@ SECTIONS {
   .data   : { *(.data   .data.*   ) }
   .bss    : { *(.bss    .bss.*    ) }
 
+  system_structures_begin = .;
+  .system_structures (NOLOAD) : { *(.system_structures) }
+  system_structures_end = .;
+
   kernel_begin = .;
   .kernel (NOLOAD) : { *(.kernel) }
   kernel_end = .;

@@ -3,6 +3,6 @@
 
 #define KERNEL_MAX 0x10000 // 64KiB
 #define INITRD_MAX 0x10000 // 64KiB
-#define INFO_MAX   0x1000  // 4KiB
+#define KBOOT_MAX  0x1000  // 4KiB
 
 #endif // CONFIG_H

@@ -12,7 +12,13 @@ SECTIONS {
   .data   : { *(.data   .data.*   ) }
   .bss    : { *(.bss    .bss.*    ) }
 
+  kernel_begin = .;
   .kernel (NOLOAD) : { *(.kernel) }
+  kernel_end = .;
+
+  kboot_begin = .;
+  .kboot   (NOLOAD) : { *(.kboot) }
+  kboot_end = .;
 
   boot_end = .;
 }

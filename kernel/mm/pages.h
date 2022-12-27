@@ -1,7 +1,6 @@
 #ifndef PAGES_H
 #define PAGES_H
 
-#include <boot/service.h>
 #include <boot/kboot.h>
 
 #define ALLOC_FAILED (void*)(-1);

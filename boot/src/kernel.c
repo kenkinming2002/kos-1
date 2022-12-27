@@ -1,7 +1,5 @@
 #include "kernel.h"
 
-#include <boot/service.h>
-
 #include "kboot/all.h"
 
 #include <core/assert.h>
@@ -10,8 +8,6 @@
 
 #include <elf.h>
 #include <stdbool.h>
-
-#include "fs.h"
 
 #include "config.h"
 
@@ -28,10 +24,10 @@ struct elf64_file
   Elf64_Ehdr *ehdr;
 };
 
-static struct elf64_file as_elf64_file(struct boot_file file)
+static struct elf64_file as_elf64_file(char *data, size_t length)
 {
-  KASSERT(sizeof(Elf64_Ehdr) <= file.length);
-  Elf64_Ehdr *ehdr = (Elf64_Ehdr *)file.data;
+  KASSERT(sizeof(Elf64_Ehdr) <= length);
+  Elf64_Ehdr *ehdr = (Elf64_Ehdr *)data;
   KASSERT(ehdr->e_ident[EI_MAG0] == ELFMAG0);
   KASSERT(ehdr->e_ident[EI_MAG1] == ELFMAG1);
   KASSERT(ehdr->e_ident[EI_MAG2] == ELFMAG2);
@@ -41,11 +37,11 @@ static struct elf64_file as_elf64_file(struct boot_file file)
 
   KASSERT(!INT_MUL_OVERFLOW_P(ehdr->e_shnum, ehdr->e_shentsize));
   KASSERT(!INT_ADD_OVERFLOW_P(ehdr->e_shoff, ehdr->e_shnum * ehdr->e_shentsize));
-  KASSERT(ehdr->e_shoff + ehdr->e_shnum * ehdr->e_shentsize <= file.length);
+  KASSERT(ehdr->e_shoff + ehdr->e_shnum * ehdr->e_shentsize <= length);
 
   struct elf64_file elf64_file;
-  elf64_file.data   = file.data;
-  elf64_file.length = file.length;
+  elf64_file.data   = data;
+  elf64_file.length = length;
   elf64_file.ehdr   = ehdr;
   return elf64_file;
 }
@@ -116,12 +112,31 @@ static void kernel_iterate_phdr3(Elf64_Phdr *phdr)
 
 typedef void(*entry_t)(struct kboot_info *);
 
-void load_kernel()
+char  *kernel_data;
+size_t kernel_length;
+static void kernel_lookup(struct multiboot_boot_information *mbi)
 {
-  struct boot_file *file = boot_fs_lookup("kernel");
-  KASSERT(file && "No kernel file loaded");
+  MULTIBOOT_FOREACH_TAG(mbi, tag)
+  {
+    if(tag->type == MULTIBOOT_TAG_TYPE_MODULE)
+    {
+      struct multiboot_tag_module *module_tag = (struct multiboot_tag_module *)tag;
+      if(strcmp(module_tag->cmdline, "kernel") == 0)
+      {
+        kernel_data   = (char*)(uintptr_t)module_tag->mod_start;
+        kernel_length = module_tag->mod_end - module_tag->mod_start;
+        return;
+      }
+    }
+  }
+  KASSERT_UNREACHABLE;
+}
 
-  struct elf64_file elf64_file = as_elf64_file(*file);
+void load_kernel(struct multiboot_boot_information *mbi)
+{
+  kernel_lookup(mbi);
+
+  struct elf64_file elf64_file = as_elf64_file(kernel_data, kernel_length);
   KASSERT(elf64_file.ehdr->e_type    == ET_DYN);
   KASSERT(elf64_file.ehdr->e_machine == EM_X86_64);
   KASSERT(elf64_file.ehdr->e_version == EV_CURRENT);

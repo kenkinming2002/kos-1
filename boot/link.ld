@@ -6,7 +6,6 @@ SECTIONS {
 
   . = 0x00100000; /* Skip over low memory */
 
-  boot_begin = .;
   .text   : { *(.text   .text.*   ) }
   .rodata : { *(.rodata .rodata.* ) }
   .data   : { *(.data   .data.*   ) }
@@ -27,6 +26,4 @@ SECTIONS {
   kboot_begin = .;
   .kboot   (NOLOAD) : { *(.kboot) }
   kboot_end = .;
-
-  boot_end = .;
 }

@@ -16,6 +16,10 @@ SECTIONS {
   .system_structures (NOLOAD) : { *(.system_structures) }
   system_structures_end = .;
 
+  initrd_begin = .;
+  .initrd (NOLOAD) : { *(.initrd) }
+  initrd_end = .;
+
   kernel_begin = .;
   .kernel (NOLOAD) : { *(.kernel) }
   kernel_end = .;

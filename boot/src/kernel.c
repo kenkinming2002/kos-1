@@ -144,6 +144,7 @@ void load_kernel(struct multiboot_boot_information *mbi)
   memory = kernel_area;
 
   elf64_iterate_phdr(elf64_file, &kernel_iterate_phdr1);
+  KASSERT(max_end <= KERNEL_MAX);
   elf64_iterate_phdr(elf64_file, &kernel_iterate_phdr2);
   elf64_iterate_phdr(elf64_file, &kernel_iterate_phdr3);
 

@@ -2,15 +2,14 @@
 
 #include <core/debug.h>
 
-struct kboot_info *info;
-void kboot_init(struct multiboot_boot_information *mbi)
+void kboot_init(struct multiboot_boot_information *mbi, kboot_info_t *kboot_info)
 {
-  info = info_init(mbi);
-  for(size_t i=0; i<info->mmap->count; ++i)
+  *kboot_info = info_init(mbi);
+  for(size_t i=0; i<(*kboot_info)->mmap->count; ++i)
     debug_printf("info => mmap => entries[%lu] => { type = %lu, begin = 0x%lx, end = 0x%lx }\n",
         i,
-        info->mmap->entries[i].type,
-        info->mmap->entries[i].begin,
-        info->mmap->entries[i].end);
+        (*kboot_info)->mmap->entries[i].type,
+        (*kboot_info)->mmap->entries[i].begin,
+        (*kboot_info)->mmap->entries[i].end);
 }
 

@@ -2,7 +2,9 @@
 #define BOOT_KERNEL_H
 
 #include "multiboot2_extra.h"
+#include "kboot/all.h"
 
-void load_kernel(struct multiboot_boot_information *mbi);
+typedef void(*entry_t)(kboot_info_t);
+void load_kernel(struct multiboot_boot_information *mbi, entry_t *entry);
 
 #endif // BOOT_KERNEL_H

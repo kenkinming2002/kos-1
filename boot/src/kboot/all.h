@@ -6,7 +6,7 @@
 #include "mmap.h"
 #include "multiboot2_extra.h"
 
-extern struct kboot_info *info;
-void kboot_init(struct multiboot_boot_information *mbi);
+typedef struct kboot_info *kboot_info_t;
+void kboot_init(struct multiboot_boot_information *mbi, kboot_info_t *kboot_info);
 
 #endif // INFO_ALL_H

@@ -1,13 +1,10 @@
 #include "kernel.h"
 
-#include "kboot/all.h"
-
 #include <core/assert.h>
 #include <core/debug.h>
 #include <core/string.h>
 
 #include <elf.h>
-#include <stdbool.h>
 
 #include "config.h"
 
@@ -94,8 +91,7 @@ static void kernel_lookup(struct multiboot_boot_information *mbi, char **data, s
   KASSERT_UNREACHABLE;
 }
 
-typedef void(*entry_t)(struct kboot_info *);
-void load_kernel(struct multiboot_boot_information *mbi)
+void load_kernel(struct multiboot_boot_information *mbi, entry_t *entry)
 {
   char  *kernel_data;
   size_t kernel_length;
@@ -152,8 +148,6 @@ void load_kernel(struct multiboot_boot_information *mbi)
     fwrite(kernel_area, sizeof kernel_area, rela.r_offset, (char*)&value, sizeof value);
   }
 
-  debug_printf("entry = 0x%lx\n", ehdr.e_entry);
-  entry_t entry = (entry_t)&kernel_area[ehdr.e_entry];
-  entry(info);
-  KASSERT(false && "Unreachable");
+  // 5: Entry point
+  *entry = (entry_t)&kernel_area[ehdr.e_entry];
 }

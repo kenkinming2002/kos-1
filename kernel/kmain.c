@@ -7,8 +7,6 @@
 #include "hal/all.h"
 #include "dev/all.h"
 
-#include <boot/service.h>
-
 #include <stdint.h>
 
 #define TEST_COUNT 10
@@ -31,12 +29,12 @@ static struct irq_slot     device_not_available_slot     = IRQ_SLOT_INIT("main:o
 static struct irq_slot_ops on_tick_slot_ops = { .on_emit = &on_tick, };
 static struct irq_slot     on_tick_slot     = IRQ_SLOT_INIT("main:on tick", &on_tick_slot_ops, NULL);
 
-void kmain(struct boot_service *service)
+void kmain(struct kboot_info *boot_info)
 {
   debug_init();
   debug_printf("hello\n");
 
-  mm_init(service);
+  mm_init(boot_info);
   pal_init();
   hal_init();
   dev_init();

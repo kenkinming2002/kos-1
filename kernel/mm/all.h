@@ -4,6 +4,6 @@
 #include "pages.h"
 #include "malloc.h"
 
-void mm_init(struct boot_service *service);
+void mm_init(struct kboot_info *boot_info);
 
 #endif // MM_H

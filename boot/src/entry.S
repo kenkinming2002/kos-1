@@ -10,10 +10,11 @@
 #define PML3_SIZE (1 << 30)
 #define PML4_SIZE (1 << 39)
 
-.section .bss
+.section .system_structures, "wa", @nobits
+  .align 0x1000
   stack: .fill STACK_SIZE, 1, 0
 
-.section .bss
+.section .system_structures, "wa", @nobits
   .align 0x1000
   bootstrap_pml4: .fill 512,       8, 0
   bootstrap_pml3: .fill 512 * 512, 8, 0

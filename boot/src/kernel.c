@@ -1,153 +1,153 @@
 #include "kernel.h"
 
-#include <boot/service.h>
-
-#include "core/assert.h"
-#include "core/debug.h"
-#include "core/string.h"
+#include <core/assert.h>
+#include <core/debug.h>
+#include <core/string.h>
 
 #include <elf.h>
-#include <stdbool.h>
 
-#include "fs.h"
-#include "mm.h"
+#include "config.h"
 
-#define PAGE_SIZE 0x1000
+__attribute__((section(".kernel"))) static char kernel_area[KERNEL_MAX];
 
 #define INT_ADD_OVERFLOW_P(a, b) __builtin_add_overflow_p (a, b, (__typeof__ ((a) + (b))) 0)
-#define INT_MUL_OVERFLOW_P(a, b) __builtin_mul_overflow_p (a, b, (__typeof__ ((a) + (b))) 0)
 
-struct elf64_file
+static void fcpy(char       *out_data, size_t out_length, size_t out_offset,
+                 const char *in_data,  size_t in_length,  size_t in_offset,
+                 size_t n)
 {
-  char   *data;
-  size_t  length;
+  KASSERT(!INT_ADD_OVERFLOW_P(out_offset, n));
+  KASSERT(!INT_ADD_OVERFLOW_P(in_offset,  n));
+  KASSERT(out_offset + n < out_length);
+  KASSERT(in_offset  + n < in_length);
+  memcpy(&out_data[out_offset], &in_data[in_offset], n);
+}
 
-  Elf64_Ehdr *ehdr;
-};
-
-static struct elf64_file as_elf64_file(struct boot_file file)
+static void fset(char *data, size_t length, size_t offset, int c, size_t n)
 {
-  KASSERT(sizeof(Elf64_Ehdr) <= file.length);
-  Elf64_Ehdr *ehdr = (Elf64_Ehdr *)file.data;
+  KASSERT(!INT_ADD_OVERFLOW_P(offset, n));
+  KASSERT(offset + n < length);
+  memset(&data[offset], c, n);
+}
+
+static void fread(const char *data, size_t length, size_t offset, char *buf, size_t n)
+{
+  KASSERT(!INT_ADD_OVERFLOW_P(offset, n));
+  KASSERT(offset + n <= length);
+  memcpy(buf, &data[offset], n);
+}
+
+static void fwrite(char *data, size_t length, size_t offset, const char *buf, size_t n)
+{
+  KASSERT(!INT_ADD_OVERFLOW_P(offset, n));
+  KASSERT(offset + n <= length);
+  memcpy(&data[offset], buf, n);
+}
+
+static void ehdr_read(const char *data, size_t length, Elf64_Ehdr *ehdr)
+{
+  fread(data, length, 0, (char*)ehdr, sizeof *ehdr);
+}
+
+static size_t phdr_read_count(const char *data, size_t length)
+{
+  Elf64_Ehdr ehdr;
+  ehdr_read(data, length, &ehdr);
+  return ehdr.e_phnum;
+}
+
+static void phdr_read(const char *data, size_t length, size_t i, Elf64_Phdr *phdr)
+{
+  Elf64_Ehdr ehdr;
+  ehdr_read(data, length, &ehdr);
+  fread(data, length, ehdr.e_phoff + i * ehdr.e_phentsize, (char*)phdr, sizeof *phdr);
+}
+
+static void ehdr_check(const Elf64_Ehdr *ehdr)
+{
   KASSERT(ehdr->e_ident[EI_MAG0] == ELFMAG0);
   KASSERT(ehdr->e_ident[EI_MAG1] == ELFMAG1);
   KASSERT(ehdr->e_ident[EI_MAG2] == ELFMAG2);
   KASSERT(ehdr->e_ident[EI_MAG3] == ELFMAG3);
   KASSERT(ehdr->e_ident[EI_CLASS] == ELFCLASS64);
   KASSERT(ehdr->e_ident[EI_DATA]  == ELFDATA2LSB);
-
-  KASSERT(!INT_MUL_OVERFLOW_P(ehdr->e_shnum, ehdr->e_shentsize));
-  KASSERT(!INT_ADD_OVERFLOW_P(ehdr->e_shoff, ehdr->e_shnum * ehdr->e_shentsize));
-  KASSERT(ehdr->e_shoff + ehdr->e_shnum * ehdr->e_shentsize <= file.length);
-
-  struct elf64_file elf64_file;
-  elf64_file.data   = file.data;
-  elf64_file.length = file.length;
-  elf64_file.ehdr   = ehdr;
-  return elf64_file;
 }
 
-static void elf64_iterate_phdr(struct elf64_file file, void(*iterate)(Elf64_Phdr *))
+static void kernel_lookup(struct multiboot_boot_information *mbi, char **data, size_t *length)
 {
-  KASSERT(!INT_MUL_OVERFLOW_P(file.ehdr->e_phnum, file.ehdr->e_phentsize));
-  KASSERT(!INT_ADD_OVERFLOW_P(file.ehdr->e_phoff, file.ehdr->e_phnum * file.ehdr->e_phentsize));
-  KASSERT(file.ehdr->e_phoff + file.ehdr->e_phnum * file.ehdr->e_phentsize <= file.length);
-  for(Elf64_Half i = 0; i < file.ehdr->e_phnum; ++i)
+  MULTIBOOT_FOREACH_TAG(mbi, tag)
   {
-    Elf64_Phdr *phdr = (Elf64_Phdr *)(file.data + file.ehdr->e_phoff + i * file.ehdr->e_phentsize);
-    KASSERT(!INT_ADD_OVERFLOW_P(phdr->p_offset, phdr->p_filesz));
-    KASSERT(phdr->p_offset + phdr->p_filesz <= file.length);
-    iterate(phdr); // Check that phdr is sane
-  }
-}
-
-Elf64_Addr max_end = 0;
-
-void      *data;
-void      *memory;
-
-Elf64_Addr  dt_rela;
-Elf64_Xword dt_relasz;    /* total size */
-Elf64_Xword dt_relaent;   /* entry size */
-
-static void kernel_iterate_phdr1(Elf64_Phdr *phdr)
-{
-  if(phdr->p_type != PT_LOAD)
-    return;
-
-  KASSERT(phdr->p_paddr == phdr->p_vaddr);
-  Elf64_Addr  addr = phdr->p_paddr;
-  Elf64_Xword sz   = phdr->p_filesz > phdr->p_memsz ? phdr->p_filesz : phdr->p_memsz;
-  if(max_end < addr + sz)
-    max_end = addr + sz;
-}
-
-static void kernel_iterate_phdr2(Elf64_Phdr *phdr)
-{
-  if(phdr->p_type != PT_LOAD)
-    return;
-
-  KASSERT(phdr->p_paddr == phdr->p_vaddr);
-  Elf64_Addr addr = phdr->p_paddr;
-  memset(memory + addr, 0,                     phdr->p_memsz);
-  memcpy(memory + addr, data + phdr->p_offset, phdr->p_filesz);
-}
-
-static void kernel_iterate_phdr3(Elf64_Phdr *phdr)
-{
-  if(phdr->p_type != PT_DYNAMIC)
-    return;
-
-  KASSERT(phdr->p_paddr == phdr->p_vaddr);
-  Elf64_Addr addr = phdr->p_paddr;
-
-  Elf64_Dyn *dyns = (Elf64_Dyn *)(memory + addr);
-  for(Elf64_Dyn *dyn = dyns; dyn->d_tag != DT_NULL; ++dyn)
-    switch(dyn->d_tag)
+    if(tag->type == MULTIBOOT_TAG_TYPE_MODULE)
     {
-    case DT_RELA:      dt_rela      = dyn->d_un.d_ptr; break;
-    case DT_RELASZ:    dt_relasz    = dyn->d_un.d_val; break;
-    case DT_RELAENT:   dt_relaent   = dyn->d_un.d_val; break;
+      struct multiboot_tag_module *module_tag = (struct multiboot_tag_module *)tag;
+      if(strcmp(module_tag->cmdline, "kernel") == 0)
+      {
+        *data   = (char*)(uintptr_t)module_tag->mod_start;
+        *length = module_tag->mod_end - module_tag->mod_start;
+        return;
+      }
     }
+  }
+  KASSERT_UNREACHABLE;
 }
 
-extern struct boot_service boot_service;
-typedef void(*entry_t)(struct boot_service *);
-
-void load_kernel()
+void load_kernel(struct multiboot_boot_information *mbi, entry_t *entry)
 {
-  struct boot_file *file = boot_fs_lookup("kernel");
-  KASSERT(file && "No kernel file loaded");
+  char  *kernel_data;
+  size_t kernel_length;
 
-  struct elf64_file elf64_file = as_elf64_file(*file);
-  KASSERT(elf64_file.ehdr->e_type    == ET_DYN);
-  KASSERT(elf64_file.ehdr->e_machine == EM_X86_64);
-  KASSERT(elf64_file.ehdr->e_version == EV_CURRENT);
+  Elf64_Ehdr ehdr;
+  Elf64_Phdr phdr;
 
-  data = elf64_file.data;
-  elf64_iterate_phdr(elf64_file, &kernel_iterate_phdr1);
-  memory = boot_mm_alloc(max_end, PAGE_SIZE);
-  elf64_iterate_phdr(elf64_file, &kernel_iterate_phdr2);
-  elf64_iterate_phdr(elf64_file, &kernel_iterate_phdr3);
+  Elf64_Dyn dyn;
 
-  // Perform relocations
-  KASSERT(!INT_ADD_OVERFLOW_P(dt_rela, dt_relasz));
-  for(uintptr_t addr = dt_rela; addr < dt_rela + dt_relasz; addr += dt_relaent)
+  Elf64_Addr  dt_rela    = 0;
+  Elf64_Xword dt_relasz  = 0;
+  Elf64_Xword dt_relaent = 0;
+
+  Elf64_Rela rela;
+
+  // 1: Lookup the kernel which is a multiboot2 module
+  kernel_lookup(mbi, &kernel_data, &kernel_length);
+
+  // 2: Read and check the elf header
+  ehdr_read(kernel_data, kernel_length, &ehdr);
+  ehdr_check(&ehdr);
+
+  // 3: Read and process the program header
+  size_t phdr_count = phdr_read_count(kernel_data, kernel_length);
+  for(size_t i=0; i<phdr_count; ++i)
   {
-    Elf64_Rela *rela = (Elf64_Rela *)(memory + addr);
-
-    KASSERT(ELF64_R_SYM(rela->r_info)  == 0);
-    KASSERT(ELF64_R_TYPE(rela->r_info) == R_X86_64_RELATIVE);
-    KASSERT(rela->r_offset <= max_end);
-    *(uint64_t *)(memory + rela->r_offset) = (uint64_t)(memory + rela->r_addend);
-
-    KASSERT(!INT_ADD_OVERFLOW_P(addr, dt_relaent));
+    phdr_read(kernel_data, kernel_length, i, &phdr);
+    switch(phdr.p_type)
+    {
+    case PT_DYNAMIC:
+      for(size_t addr = phdr.p_offset; fread(kernel_data, kernel_length, addr, (char*)&dyn, sizeof dyn), dyn.d_tag != DT_NULL; addr += sizeof dyn)
+        switch(dyn.d_tag)
+        {
+        case DT_RELA:    dt_rela    = dyn.d_un.d_ptr; break;
+        case DT_RELASZ:  dt_relasz  = dyn.d_un.d_val; break;
+        case DT_RELAENT: dt_relaent = dyn.d_un.d_val; break;
+        }
+      break;
+    case PT_LOAD:
+      fset(kernel_area, sizeof kernel_area, phdr.p_vaddr, 0, phdr.p_memsz);
+      fcpy(kernel_area, sizeof kernel_area, phdr.p_vaddr, kernel_data, kernel_length, phdr.p_offset, phdr.p_filesz);
+      break;
+    }
   }
 
-  debug_printf("entry = 0x%lx\n", elf64_file.ehdr->e_entry);
-  debug_printf("max_end = 0x%lx\n", max_end);
-  KASSERT(elf64_file.ehdr->e_entry <= max_end);
-  entry_t entry = (entry_t)(memory + elf64_file.ehdr->e_entry);
-  entry(&boot_service);
-  KASSERT(false && "Unreachable");
+  // 4: Process relocation
+  for(size_t offset = dt_rela; offset < dt_rela + dt_relasz; offset += dt_relaent)
+  {
+    fread(kernel_area, sizeof kernel_area, offset, (char*)&rela, sizeof rela);
+    KASSERT(ELF64_R_SYM(rela.r_info)  == 0);
+    KASSERT(ELF64_R_TYPE(rela.r_info) == R_X86_64_RELATIVE);
+
+    uint64_t value = (uint64_t)&kernel_area + rela.r_addend;
+    fwrite(kernel_area, sizeof kernel_area, rela.r_offset, (char*)&value, sizeof value);
+  }
+
+  // 5: Entry point
+  *entry = (entry_t)&kernel_area[ehdr.e_entry];
 }

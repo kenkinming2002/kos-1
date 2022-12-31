@@ -1,5 +1,7 @@
 #include "pages.h"
 
+#include <stddef.h>
+
 int liballoc_lock()   { return 0; }
 int liballoc_unlock() { return 0; }
 

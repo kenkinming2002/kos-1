@@ -6,10 +6,24 @@ SECTIONS {
 
   . = 0x00100000; /* Skip over low memory */
 
-  boot_begin = .;
   .text   : { *(.text   .text.*   ) }
   .rodata : { *(.rodata .rodata.* ) }
   .data   : { *(.data   .data.*   ) }
   .bss    : { *(.bss    .bss.*    ) }
-  boot_end = .;
+
+  system_structures_begin = .;
+  .system_structures (NOLOAD) : { *(.system_structures) }
+  system_structures_end = .;
+
+  initrd_begin = .;
+  .initrd (NOLOAD) : { *(.initrd) }
+  initrd_end = .;
+
+  kernel_begin = .;
+  .kernel (NOLOAD) : { *(.kernel) }
+  kernel_end = .;
+
+  kboot_begin = .;
+  .kboot   (NOLOAD) : { *(.kboot) }
+  kboot_end = .;
 }

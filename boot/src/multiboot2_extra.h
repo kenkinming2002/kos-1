@@ -1,6 +1,8 @@
 #ifndef BOOT_MULTIBOOT2_EXTRA_H
 #define BOOT_MULTIBOOT2_EXTRA_H
 
+#include <stdint.h>
+
 #include "multiboot2.h"
 
 /* Multiboot2 */

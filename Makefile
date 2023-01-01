@@ -22,11 +22,11 @@ all: os.iso
 %.elf:
 	$(CC) $(LDFLAGS) -o $@ $(filter %.o, $^) $(LIBS)
 
-include libcore.mk
-include boot.mk
-include kernel.mk
+include kcore.mk
+include kboot.mk
+include kos.mk
 
-os.iso: grub.cfg boot.elf kernel.elf
+os.iso: grub.cfg kboot.elf kos.elf
 	./bin/mkiso
 
 # PHONY rule

@@ -6,8 +6,11 @@ SECTIONS {
 
   . = 0x00100000; /* Skip over low memory */
 
+  . = ALIGN(0x1000);
   .text   : { *(.text   .text.*   ) }
   .rodata : { *(.rodata .rodata.* ) }
+
+  . = ALIGN(0x1000);
   .data   : { *(.data   .data.*   ) }
   .bss    : { *(.bss    .bss.*    ) }
 

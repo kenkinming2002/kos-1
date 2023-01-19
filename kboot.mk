@@ -6,6 +6,7 @@ BOOT_OBJS = kboot/src/entry.o \
 	    kboot/src/kboot/alloc.o \
 	    kboot/src/kboot/info.o \
 	    kboot/src/kboot/mmap.o \
+	    kboot/src/file.o \
 	    kboot/src/kernel.o
 
 kboot.elf: CFLAGS  += -Ikcore/include -Ikboot/include -Ikboot/src

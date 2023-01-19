@@ -9,15 +9,15 @@ void fcpy(char *out_data, size_t out_length, size_t out_offset, const char *in_d
 {
   KASSERT(!INT_ADD_OVERFLOW_P(out_offset, n));
   KASSERT(!INT_ADD_OVERFLOW_P(in_offset,  n));
-  KASSERT(out_offset + n < out_length);
-  KASSERT(in_offset  + n < in_length);
+  KASSERT(out_offset + n <= out_length);
+  KASSERT(in_offset  + n <= in_length);
   memcpy(&out_data[out_offset], &in_data[in_offset], n);
 }
 
 void fset(char *data, size_t length, size_t offset, int c, size_t n)
 {
   KASSERT(!INT_ADD_OVERFLOW_P(offset, n));
-  KASSERT(offset + n < length);
+  KASSERT(offset + n <= length);
   memset(&data[offset], c, n);
 }
 

@@ -3,8 +3,9 @@
 tmp=$(mktemp -d)
 
 mkdir -p $tmp/boot/grub
-cp kboot.elf $tmp/boot
-cp kos.elf   $tmp/boot
-cp grub.cfg  $tmp/boot/grub
+cp kboot.elf  $tmp/boot
+cp kos.elf    $tmp/boot
+cp initrd.tar $tmp/boot
+cp grub.cfg   $tmp/boot/grub
 grub-mkrescue -o os.iso $tmp
 rm -r $tmp

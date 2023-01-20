@@ -22,11 +22,15 @@ all: os.iso
 %.elf:
 	$(CC) $(LDFLAGS) -o $@ $(filter %.o, $^) $(LIBS)
 
+%.tar:
+	tar cvf $@ $^
+
 include kcore.mk
 include kboot.mk
 include kos.mk
 
-os.iso: grub.cfg kboot.elf kos.elf
+initrd.tar: initrd/empty
+os.iso: grub.cfg kboot.elf kos.elf initrd.tar
 	./bin/mkiso
 
 # PHONY rule

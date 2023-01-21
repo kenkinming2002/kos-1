@@ -25,13 +25,16 @@ all: os.iso
 %.tar:
 	tar cvf $@ $^
 
+%.iso:
+	grub-mkrescue -o $@ $^
+
 include kcore.mk
 include kboot.mk
 include kos.mk
 
-initrd.tar: initrd/empty
-os.iso: grub.cfg kboot.elf kos.elf initrd.tar
-	./bin/mkiso
+iso/boot/initrd.tar: initrd/empty
+os.iso: iso/boot/grub/grub.cfg iso/boot/kboot.elf iso/boot/kos.elf iso/boot/initrd.tar
+	grub-mkrescue -o $@ iso
 
 # PHONY rule
 .PHONY: clean
@@ -39,4 +42,4 @@ clean:
 	- rm -f $(ALL_OBJS)
 	- rm -f $(ALL_ARS)
 	- rm -f $(ALL_ELFS)
-	- rm -f os.iso
+	- rm -f iso/boot/initrd.tar os.iso

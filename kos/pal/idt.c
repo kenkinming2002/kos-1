@@ -2,10 +2,6 @@
 
 #include "isrs.h"
 
-#include <kcore/assert.h>
-#include <kcore/debug.h>
-
-#include <stddef.h>
 #include <stdint.h>
 
 struct __attribute__((packed)) idt_entry

@@ -1,10 +1,10 @@
-#include <kcore/assert.h>
-#include <kcore/debug.h>
-
+#include "multiboot2_extra.h"
 #include "debug.h"
-#include "kboot/all.h"
-#include "kernel.h"
 #include "initrd.h"
+#include "kernel.h"
+#include "kboot/all.h"
+
+#include <kcore/assert.h>
 
 void bmain(uint64_t /*magic*/, struct multiboot_boot_information *boot_info)
 {

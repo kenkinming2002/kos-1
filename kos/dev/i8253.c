@@ -1,10 +1,9 @@
 #include "i8253.h"
 
-#include "mm/all.h"
+#include "module.h"
 #include "hal/all.h"
 
 #include <kcore/assert.h>
-#include <kcore/ll.h>
 
 DEFINE_MODULE(i8253);
 

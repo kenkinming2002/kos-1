@@ -1,5 +1,4 @@
 #include <kcore/string.h>
-#include <kcore/debug.h>
 
 static char *_memcpy(char *restrict dst, const char *restrict src, size_t n)
 {

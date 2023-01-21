@@ -1,13 +1,12 @@
 #include "kernel.h"
 
+#include "config.h"
+#include "file.h"
+
 #include <kcore/assert.h>
-#include <kcore/debug.h>
 #include <kcore/string.h>
 
 #include <elf.h>
-
-#include "config.h"
-#include "file.h"
 
 __attribute__((section(".kernel"))) static char kernel_area[KERNEL_MAX];
 

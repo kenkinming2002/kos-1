@@ -1,15 +1,15 @@
 #ifndef BOOT_MULTIBOOT2_EXTRA_H
 #define BOOT_MULTIBOOT2_EXTRA_H
 
-#include <stdint.h>
-
 #include "multiboot2.h"
+
+#include <stdint.h>
 
 /* Multiboot2 */
 struct multiboot_boot_information
 {
-  uint32_t size;
-  uint32_t reserved;
+  multiboot_uint32_t size;
+  multiboot_uint32_t reserved;
   struct multiboot_tag tags[];
 };
 

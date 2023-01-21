@@ -1,10 +1,8 @@
 #include "bus.h"
 
-#include "mm/all.h"
-
 #include <kcore/assert.h>
-#include <kcore/ll.h>
-#include <kcore/string.h>
+
+#include <stddef.h>
 
 struct irq_bus_connection
 {

@@ -1,7 +1,5 @@
-#ifndef SPINLOCK_H
-#define SPINLOCK_H
-
-#include <stdatomic.h>
+#ifndef HAL_LOCKS_H
+#define HAL_LOCKS_H
 
 struct local_lock
 {
@@ -24,4 +22,4 @@ void spin_unlock(struct spin_lock *lock);
 
 #define SPIN_LOCK_INIT (struct spin_lock){0, 0}
 
-#endif // LOCK_SPINLOCK_H
+#endif // HAL_LOCKS_H

@@ -1,7 +1,7 @@
 #ifndef HAL_TIMER_H
 #define HAL_TIMER_H
 
-#include "hal/all.h"
+#include "irq/slot.h"
 
 #include <kcore/ll.h>
 

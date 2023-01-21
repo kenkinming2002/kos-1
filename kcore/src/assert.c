@@ -1,4 +1,5 @@
 #include <kcore/assert.h>
+
 #include <kcore/debug.h>
 
 void kassert(const char *file, int line)

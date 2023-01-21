@@ -1,7 +1,5 @@
 #include "debug.h"
 
-#include <kcore/debug.h>
-
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -27,7 +25,7 @@ static const uint16_t SERIAL_MODEM_COMMAND_PORT = SERIAL_COM1_BASE + 4;
 
 static const uint16_t SERIAL_LINE_STATUS_PORT   = SERIAL_COM1_BASE + 5;
 
-void serial_init()
+void debug_init()
 {
   uint16_t divisor = 1;
 
@@ -40,29 +38,14 @@ void serial_init()
   outb(SERIAL_MODEM_COMMAND_PORT, 0x03);
 }
 
-void debug_init()
-{
-  serial_init();
-}
-
-bool serial_is_transmitter_empty()
+static bool is_transmitter_empty()
 {
   return inb(SERIAL_LINE_STATUS_PORT) & 0x20;
 }
 
-void serial_put(char c)
+void debug_put(char c)
 {
-  while(!serial_is_transmitter_empty());
+  while(!is_transmitter_empty());
   outb(SERIAL_DATA_PORT, c);
 }
 
-void debug_put(char c)
-{
-  serial_put(c);
-}
-
-void debug_write(const char *str)
-{
-  for(const char *p = str; *p != '\0'; ++p)
-    debug_put(*p);
-}

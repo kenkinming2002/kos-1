@@ -1,8 +1,12 @@
 #include "root.h"
 
-#include "hal/all.h"
+#include "../res.h"
+#include "slot.h"
+#include "bus.h"
 
 #include <kcore/assert.h>
+
+#include <stdint.h>
 
 DEFINE_MODULE(irq_root);
 

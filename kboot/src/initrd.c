@@ -1,10 +1,10 @@
 #include "initrd.h"
 
-#include <kcore/assert.h>
-#include <kcore/string.h>
-
 #include "config.h"
 #include "file.h"
+
+#include <kcore/assert.h>
+#include <kcore/string.h>
 
 __attribute__((section(".initrd"))) static char initrd_area[INITRD_MAX];
 

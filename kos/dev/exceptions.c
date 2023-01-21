@@ -1,7 +1,7 @@
 #include "exceptions.h"
 
+#include "module.h"
 #include "hal/all.h"
-#include "mm/all.h"
 
 #include <kcore/assert.h>
 

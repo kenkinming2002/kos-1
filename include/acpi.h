@@ -32,6 +32,18 @@ struct SDT
   uint32_t creator_revision;
 };
 
+struct RSDT
+{
+  struct SDT sdt;
+  uint32_t ptrs[];
+};
+
+struct XSDT
+{
+  struct SDT sdt;
+  uint64_t ptrs[];
+};
+
 struct MADT
 {
   struct SDT sdt;

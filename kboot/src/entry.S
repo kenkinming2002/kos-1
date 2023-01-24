@@ -1,5 +1,5 @@
 .global entry32
-.extern bmain
+.extern bsp_main
 
 #define STACK_SIZE 0x1000
 
@@ -96,7 +96,7 @@ entry64:
 
   mov %ebx, %edi
   mov %eax, %esi
-  call bmain
+  call bsp_main
 
 0:
   hlt

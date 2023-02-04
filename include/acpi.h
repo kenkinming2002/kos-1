@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#define ACPI_PACKED __attribute__((packed))
+
 struct RSDP
 {
   // Version 1.0
@@ -53,88 +55,71 @@ struct MADT
 
 #define PCAT_COMPACT 0x1
 
-struct MADT_Entry
+struct ACPI_PACKED MADTEntry
 {
   uint8_t type;
   uint8_t length;
+  union {
+    struct ACPI_PACKED {
+      uint8_t  processor_uid;
+      uint8_t  id;
+      uint32_t flags;
+    } lapic;
+
+    struct ACPI_PACKED {
+      uint8_t  ioapic_id;
+      uint8_t  reserved;
+      uint32_t address;
+      uint32_t gsi_base;
+    } ioapic;
+
+    struct ACPI_PACKED {
+      uint8_t  bus;
+      uint8_t  source;
+      uint32_t gsi;
+      uint16_t flags;
+    } interrupt_source_override;
+
+    struct ACPI_PACKED {
+      uint16_t flags;
+      uint32_t gsi;
+    } nmi_source;
+
+    struct ACPI_PACKED {
+      uint8_t  processor_uid;
+      uint16_t flags;
+      uint8_t  lint;
+    } lapic_nmi;
+
+    struct ACPI_PACKED {
+      uint16_t reserved;
+      uint64_t address;
+    } lapic_address_override;
+
+    struct ACPI_PACKED {
+      uint16_t reserved;
+      uint32_t id;
+      uint32_t flags;
+      uint32_t processor_uid;
+    } lx2apic;
+
+    struct ACPI_PACKED {
+      uint16_t flags;
+      uint32_t processor_uid;
+      uint8_t  lint;
+      uint8_t  reserved[3];
+    } lx2apic_nmi;
+  };
 };
 
-#define LAPIC                      0x0
-#define IOAPIC                     0x1
-#define INTERRUPT_SOURCE_OVERRIDE  0x2
-#define NMI_SOURCE                 0x3
-#define LAPIC_NMI                  0x4
-#define LAPIC_ADDRESS_OVERRIDE     0x5
-#define LX2APIC                    0x9
-#define LX2APIC_NMI                0xA
-
-/* Local xAPIC and Local x2APIC description */
-struct LAPICEntry
-{
-  struct MADT_Entry entry;
-  uint8_t  processor_uid;
-  uint8_t  id;
-  uint32_t flags;
-};
-
-struct IOAPICEntry
-{
-  struct MADT_Entry entry;
-  uint8_t  ioapic_id;
-  uint8_t  reserved;
-  uint32_t ioapic_address;
-  uint32_t gsi_base;
-};
-
-struct InterruptSourceOverrideEntry
-{
-  struct MADT_Entry entry;
-  uint8_t  bus;
-  uint8_t  source;
-  uint32_t gsi;
-  uint16_t flags;
-};
-
-struct NMISourceEntry
-{
-  struct MADT_Entry entry;
-  uint16_t flags;
-  uint32_t gsi;
-};
-
-struct LAPICNMIEntry
-{
-  struct MADT_Entry entry;
-  uint8_t  processor_uid;
-  uint16_t flags;
-  uint8_t  lint;
-};
-
-struct LAPICAddressOverrideEntry
-{
-  struct MADT_Entry entry;
-  uint16_t reserved;
-  uint64_t lapic_address;
-};
-
-struct LX2APICEntry
-{
-  struct MADT_Entry entry;
-  uint16_t reserved;
-  uint32_t id;
-  uint32_t flags;
-  uint32_t processor_uid;
-};
-
-/* Local APIC and Local x2 APIC NMI description */
-struct LX2APICNMIEntry
-{
-  struct MADT_Entry entry;
-  uint16_t flags;
-  uint32_t processor_uid;
-  uint8_t  lint;
-  uint8_t  reserved[3];
-};
+#define MADT_LAPIC                      0x0
+#define MADT_IOAPIC                     0x1
+#define MADT_INTERRUPT_SOURCE_OVERRIDE  0x2
+#define MADT_NMI_SOURCE                 0x3
+#define MADT_LAPIC_NMI                  0x4
+#define MADT_LAPIC_ADDRESS_OVERRIDE     0x5
+#define MADT_LX2APIC                    0x9
+#define MADT_LX2APIC_NMI                0xA
 
 #define LAPIC_ENABLED        0x1
 #define LAPIC_ONLINE_CAPABLE 0x2

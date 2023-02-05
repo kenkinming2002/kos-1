@@ -103,8 +103,8 @@ static void i8253_configure(struct timer *, enum timer_mode mode)
 static void i8253_reload(struct timer *, unsigned duration)
 {
   uint16_t reload_value = i8253_reload_value_from_duration(duration);
-  outb(I8253_SELECT_CHANNEL0, (reload_value >> 0) & 0xFF);
-  outb(I8253_SELECT_CHANNEL0, (reload_value >> 8) & 0xFF);
+  outb(I8253_CHANNEL0, (reload_value >> 0) & 0xFF);
+  outb(I8253_CHANNEL0, (reload_value >> 8) & 0xFF);
 }
 
 static int i8253_init(struct i8253 *pit)

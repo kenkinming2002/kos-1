@@ -11,13 +11,16 @@
     .long MULTIBOOT2_HEADER_LENGTH
     .long MULTIBOOT2_CHECKSUM
 
-    .short 1
-    .short 0
-    .long  12
-    .long  6
-    .long  0
+    .align 8
+      .short 1
+      .short 0
+      .long  24
+      .long  6
+      .long  14
+      .long  15
 
-    .short 0
-    .short 0
-    .long  8
+    .align 8
+      .short 0
+      .short 0
+      .long  8
   multiboot2_header_end:

@@ -6,24 +6,22 @@
 
 #include <kcore/assert.h>
 
-entry_t      entry;
-const char  *initrd_data;
-size_t       initrd_length;
-kboot_info_t kboot_info;
-
-void ap_main()
+void bmain(struct multiboot_boot_information *boot_info)
 {
-  entry(kboot_info);
-  KASSERT_UNREACHABLE;
-}
+  if(!boot_info)
+    for(;;)
+      asm volatile("hlt");
 
-void bsp_main(uint64_t /*magic*/, struct multiboot_boot_information *boot_info)
-{
+  entry_t      entry;
+  const char  *initrd_data;
+  size_t       initrd_length;
+  kboot_info_t kboot_info;
+
   debug_init();
   load_kernel(boot_info, &entry);
   load_initrd(boot_info, &initrd_data, &initrd_length);
   kboot_init(boot_info, &kboot_info);
 
-  ap_main();
+  entry(kboot_info);
 }
 

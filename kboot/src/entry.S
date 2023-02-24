@@ -1,5 +1,7 @@
 .global bsp_entry
 .global ap_entry
+
+.extern boot_info
 .extern bmain
 
 #define STACK_SIZE  0x1000
@@ -36,6 +38,10 @@
 stack_ptr:
   .long stack_end
 
+.section .bss
+boot_info:
+  .long 0x0
+
 /*******************
  * Entry point *
  *******************/
@@ -44,6 +50,8 @@ bsp_entry:
 .code32
   cmp $0x36d76289, %eax
   jne 0f
+
+  mov %ebx, boot_info
   jmp entry
 
 // Error: We are not boot by a multiboot2 compliant bootloader
@@ -53,7 +61,7 @@ bsp_entry:
 
 ap_entry:
 .code32
-  xor %ebx, %ebx
+  mov boot_info, %ebx
   jmp entry
 
 0:

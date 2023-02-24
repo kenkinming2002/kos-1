@@ -1,5 +1,5 @@
-#ifndef HAL_LOCKS_H
-#define HAL_LOCKS_H
+#ifndef ARCH_LOCKS_H
+#define ARCH_LOCKS_H
 
 struct local_lock
 {
@@ -22,4 +22,4 @@ void spin_unlock(struct spin_lock *lock);
 
 #define SPIN_LOCK_INIT (struct spin_lock){0, 0}
 
-#endif // HAL_LOCKS_H
+#endif // ARCH_LOCKS_H

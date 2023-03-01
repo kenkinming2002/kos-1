@@ -1,8 +1,8 @@
 #ifndef ARCH_ALL_H
 #define ARCH_ALL_H
 
-#include "gdt.h"
-#include "idt.h"
+#include "segmentation.h"
+#include "interrupt.h"
 
 void arch_init();
 

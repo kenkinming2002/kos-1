@@ -1,25 +1,25 @@
-KERNEL_OBJS = kos/debug.o \
-       	      kos/kmain.o \
-       	      kos/mm/all.o \
-       	      kos/mm/pages.o \
-       	      kos/mm/liballoc_1_1.o \
-       	      kos/mm/liballoc_hooks.o \
-       	      kos/arch/all.o \
-       	      kos/arch/gdt.o \
-       	      kos/arch/idt.o \
-       	      kos/arch/segs.o \
-       	      kos/arch/isrs.o \
-       	      kos/hal/all.o \
-       	      kos/hal/res.o \
-       	      kos/hal/irq/all.o \
-       	      kos/hal/irq/slot.o \
-       	      kos/hal/irq/bus.o \
-       	      kos/hal/irq/root.o \
-       	      kos/hal/timer.o \
-	      kos/dev/all.o \
-       	      kos/dev/exceptions.o \
-       	      kos/dev/i8253.o \
-       	      kos/dev/i8259.o
+KERNEL_OBJS = kos/debug.c.o \
+       	      kos/kmain.c.o \
+       	      kos/mm/all.c.o \
+       	      kos/mm/pages.c.o \
+       	      kos/mm/liballoc_1_1.c.o \
+       	      kos/mm/liballoc_hooks.c.o \
+       	      kos/arch/all.c.o \
+       	      kos/arch/segmentation.c.o \
+       	      kos/arch/segmentation.S.o \
+       	      kos/arch/interrupt.c.o \
+       	      kos/arch/interrupt.S.o \
+       	      kos/hal/all.c.o \
+       	      kos/hal/res.c.o \
+       	      kos/hal/irq/all.c.o \
+       	      kos/hal/irq/slot.c.o \
+       	      kos/hal/irq/bus.c.o \
+       	      kos/hal/irq/root.c.o \
+       	      kos/hal/timer.c.o \
+	      kos/dev/all.c.o \
+       	      kos/dev/exceptions.c.o \
+       	      kos/dev/i8253.c.o \
+       	      kos/dev/i8259.c.o
 
 iso/boot/kos.elf: CFLAGS  += -Iinclude -Ilibarch/include -Ilibcore/include -Ikboot/include -Ikos
 iso/boot/kos.elf: LDFLAGS += -Tkos/link.ld -pie -Wl,--no-dynamic-linker

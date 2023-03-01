@@ -1,8 +1,8 @@
-CORE_OBJS = libcore/src/assert.o \
-            libcore/src/bitmap.o \
-            libcore/src/debug.o \
-            libcore/src/string.o \
-            libcore/src/ll.o
+CORE_OBJS = libcore/src/assert.c.o \
+            libcore/src/bitmap.c.o \
+            libcore/src/debug.c.o \
+            libcore/src/string.c.o \
+            libcore/src/ll.c.o
 
 libcore.a: CFLAGS+=-Ilibcore/include
 libcore.a: $(CORE_OBJS)

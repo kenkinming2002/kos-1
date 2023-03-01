@@ -1,3 +1,5 @@
+.global interrupt_load
+.extern idt_desc
 .extern isr
 
 isr_common:
@@ -304,3 +306,7 @@ isr_no_error_code 253
 isr_no_error_code 254
 isr_no_error_code 255
 
+.section .text
+interrupt_load:
+  lidt idt_desc(%rip)
+  ret

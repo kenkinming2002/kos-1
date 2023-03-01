@@ -1,4 +1,5 @@
-.global reload_segs
+.global segmentation_load
+.extern gdt_desc
 
 .section .data
 target:
@@ -6,7 +7,8 @@ target:
   .word 0x8
 
 .section .text
-reload_segs:
+segmentation_load:
+  lgdt gdt_desc(%rip)
   mov $0x10, %eax
   mov %eax, %ss
   mov %eax, %ds

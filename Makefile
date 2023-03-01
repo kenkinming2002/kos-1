@@ -10,10 +10,10 @@ LIBS    += -L. -lgcc
 all: os.iso
 
 # Generic rules
-%.o: %.c
+%.c.o: %.c
 	$(CC) -c $(CFLAGS) -o $@ $^
 
-%.o: %.S
+%.S.o: %.S
 	$(CC) -c $(ASFLAGS) -o $@ $^
 
 %.a:

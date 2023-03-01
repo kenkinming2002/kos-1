@@ -1,15 +1,15 @@
-BOOT_OBJS = kboot/src/entry.o \
-	    kboot/src/trampoline.o \
-	    kboot/src/multiboot2.o \
-	    kboot/src/debug.o \
-	    kboot/src/bmain.o \
-	    kboot/src/kboot/all.o \
-	    kboot/src/kboot/alloc.o \
-	    kboot/src/kboot/info.o \
-	    kboot/src/kboot/mmap.o \
-	    kboot/src/file.o \
-	    kboot/src/kernel.o \
-	    kboot/src/initrd.o
+BOOT_OBJS = kboot/src/entry.S.o \
+	    kboot/src/trampoline.S.o \
+	    kboot/src/multiboot2.S.o \
+	    kboot/src/debug.c.o \
+	    kboot/src/bmain.c.o \
+	    kboot/src/kboot/all.c.o \
+	    kboot/src/kboot/alloc.c.o \
+	    kboot/src/kboot/info.c.o \
+	    kboot/src/kboot/mmap.c.o \
+	    kboot/src/file.c.o \
+	    kboot/src/kernel.c.o \
+	    kboot/src/initrd.c.o
 
 iso/boot/kboot.elf: CFLAGS  += -Iinclude -Ilibarch/include -Ilibcore/include -Ikboot/include -Ikboot/src
 iso/boot/kboot.elf: LDFLAGS += -Tkboot/link.ld

@@ -1,6 +1,6 @@
-ARCH_OBJS = libarch/src/access.o \
-            libarch/src/locks.o \
-            libarch/src/once.o
+ARCH_OBJS = libarch/src/access.c.o \
+            libarch/src/locks.S.o \
+            libarch/src/once.c.o
 
 libarch.a: CFLAGS+=-Ilibarch/include
 libarch.a: $(ARCH_OBJS)

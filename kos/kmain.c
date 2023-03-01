@@ -1,3 +1,4 @@
+#include "arch/once.h"
 #include "debug.h"
 #include "mm/all.h"
 #include "pal/all.h"
@@ -32,9 +33,12 @@ static struct irq_slot     on_tick_slot     = IRQ_SLOT_INIT("main:on tick", &on_
 static int once;
 static int ready;
 
+struct once once1;
+struct once once2;
+
 void kmain(struct kboot_info *boot_info)
 {
-  if(!__atomic_exchange_n(&once, 1, __ATOMIC_SEQ_CST))
+  if(once_begin(&once1, ONCE_SYNC))
   {
     // Initialize
     debug_init();
@@ -42,18 +46,13 @@ void kmain(struct kboot_info *boot_info)
 
     mm_init(boot_info);
     pal_init();
-    pal_load();
-  }
-  else
-  {
-    // Wait
-    while(!__atomic_load_n(&ready, __ATOMIC_ACQUIRE))
-      asm volatile("pause");
 
-    pal_load();
-    for(;;) asm volatile ("hlt");
+    once_end(&once1, ONCE_SYNC);
   }
 
+  if(!once_begin(&once2, 0));
+
+  pal_load();
   hal_init();
   dev_init();
 

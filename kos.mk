@@ -2,6 +2,7 @@ KERNEL_OBJS = kos/debug.o \
        	      kos/kmain.o \
        	      kos/arch/access.o \
        	      kos/arch/locks.o \
+       	      kos/arch/once.o \
        	      kos/mm/all.o \
        	      kos/mm/pages.o \
        	      kos/mm/liballoc_1_1.o \

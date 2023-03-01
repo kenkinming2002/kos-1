@@ -1,6 +1,6 @@
 #include "debug.h"
 #include "mm/all.h"
-#include "pal/all.h"
+#include "arch/all.h"
 #include "hal/all.h"
 #include "dev/all.h"
 
@@ -45,14 +45,14 @@ void kmain(struct kboot_info *boot_info)
     debug_printf("hello\n");
 
     mm_init(boot_info);
-    pal_init();
+    arch_init();
 
     once_end(&once1, ONCE_SYNC);
   }
 
   if(!once_begin(&once2, 0));
 
-  pal_load();
+  arch_load();
   hal_init();
   dev_init();
 

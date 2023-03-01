@@ -4,11 +4,11 @@ KERNEL_OBJS = kos/debug.o \
        	      kos/mm/pages.o \
        	      kos/mm/liballoc_1_1.o \
        	      kos/mm/liballoc_hooks.o \
-       	      kos/pal/all.o \
-       	      kos/pal/gdt.o \
-       	      kos/pal/idt.o \
-       	      kos/pal/segs.o \
-       	      kos/pal/isrs.o \
+       	      kos/arch/all.o \
+       	      kos/arch/gdt.o \
+       	      kos/arch/idt.o \
+       	      kos/arch/segs.o \
+       	      kos/arch/isrs.o \
        	      kos/hal/all.o \
        	      kos/hal/res.o \
        	      kos/hal/irq/all.o \

@@ -1,5 +1,5 @@
-#ifndef PAL_ISRS_H
-#define PAL_ISRS_H
+#ifndef ARCH_ISRS_H
+#define ARCH_ISRS_H
 
 extern void isr0();
 extern void isr1();
@@ -258,4 +258,4 @@ extern void isr253();
 extern void isr254();
 extern void isr255();
 
-#endif // PAL_ISRS_H
+#endif // ARCH_ISRS_H

@@ -1,7 +1,7 @@
 #include "i8259.h"
 
 #include "hal/all.h"
-#include "module.h"
+#include "hal/module.h"
 
 #include <arch/access.h>
 #include <core/assert.h>

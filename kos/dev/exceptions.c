@@ -1,6 +1,6 @@
 #include "exceptions.h"
 
-#include "module.h"
+#include "hal/module.h"
 #include "hal/all.h"
 
 #include <core/assert.h>

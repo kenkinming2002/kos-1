@@ -1,8 +1,5 @@
 KERNEL_OBJS = kos/debug.o \
        	      kos/kmain.o \
-       	      kos/arch/access.o \
-       	      kos/arch/locks.o \
-       	      kos/arch/once.o \
        	      kos/mm/all.o \
        	      kos/mm/pages.o \
        	      kos/mm/liballoc_1_1.o \
@@ -24,10 +21,10 @@ KERNEL_OBJS = kos/debug.o \
        	      kos/dev/i8253.o \
        	      kos/dev/i8259.o
 
-iso/boot/kos.elf: CFLAGS  += -Iinclude -Ilibcore/include -Ikboot/include -Ikos
+iso/boot/kos.elf: CFLAGS  += -Iinclude -Ilibarch/include -Ilibcore/include -Ikboot/include -Ikos
 iso/boot/kos.elf: LDFLAGS += -Tkos/link.ld -pie -Wl,--no-dynamic-linker
-iso/boot/kos.elf: LIBS    += -lcore
-iso/boot/kos.elf: kos/link.ld libkcore.a $(KERNEL_OBJS)
+iso/boot/kos.elf: LIBS    += -larch -lcore
+iso/boot/kos.elf: kos/link.ld libarch.a libcore.a $(KERNEL_OBJS)
 
 ALL_OBJS += $(KERNEL_OBJS)
 ALL_ELFS += iso/boot/kos.elf

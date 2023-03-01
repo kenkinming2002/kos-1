@@ -28,6 +28,7 @@ all: os.iso
 %.iso:
 	grub-mkrescue -o $@ $^
 
+include libarch.mk
 include libcore.mk
 include kboot.mk
 include kos.mk

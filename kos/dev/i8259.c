@@ -1,9 +1,9 @@
 #include "i8259.h"
 
-#include "arch/access.h"
 #include "hal/all.h"
 #include "module.h"
 
+#include <arch/access.h>
 #include <core/assert.h>
 
 DEFINE_MODULE(i8259);

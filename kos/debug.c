@@ -1,19 +1,9 @@
 #include "debug.h"
 
+#include <arch/access.h>
+
 #include <stdbool.h>
 #include <stdint.h>
-
-static void outb(uint16_t port, uint8_t data)
-{
-  asm volatile ("out %[data], %[port]" : : [port]"d"(port), [data]"a"(data));
-}
-
-static uint8_t inb(uint16_t port)
-{
-  uint8_t byte;
-  asm volatile ("in %[port], %[byte] " : [byte]"=a"(byte) : [port]"d"(port));
-  return byte;
-}
 
 static const uint16_t SERIAL_COM1_BASE          = 0x3F8;     /* COM1 base port */
 

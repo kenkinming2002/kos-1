@@ -11,10 +11,10 @@ BOOT_OBJS = kboot/src/entry.o \
 	    kboot/src/kernel.o \
 	    kboot/src/initrd.o
 
-iso/boot/kboot.elf: CFLAGS  += -Iinclude -Ilibcore/include -Ikboot/include -Ikboot/src
+iso/boot/kboot.elf: CFLAGS  += -Iinclude -Ilibarch/include -Ilibcore/include -Ikboot/include -Ikboot/src
 iso/boot/kboot.elf: LDFLAGS += -Tkboot/link.ld
-iso/boot/kboot.elf: LIBS    += -lcore
-iso/boot/kboot.elf: kboot/link.ld libcore.a $(BOOT_OBJS)
+iso/boot/kboot.elf: LIBS    += -larch -lcore
+iso/boot/kboot.elf: kboot/link.ld libarch.a libcore.a $(BOOT_OBJS)
 
 ALL_OBJS += $(BOOT_OBJS)
 ALL_ELFS += iso/boot/kboot.elf

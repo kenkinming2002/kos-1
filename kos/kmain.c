@@ -1,10 +1,10 @@
-#include "arch/once.h"
 #include "debug.h"
 #include "mm/all.h"
 #include "pal/all.h"
 #include "hal/all.h"
 #include "dev/all.h"
 
+#include <arch/once.h>
 #include <core/assert.h>
 #include <core/debug.h>
 

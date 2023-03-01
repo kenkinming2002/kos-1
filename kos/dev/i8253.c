@@ -6,7 +6,7 @@
 #include <arch/access.h>
 #include <core/assert.h>
 
-DEFINE_MODULE(i8253);
+DEFINE_MODULE(i8253)
 
 #define I8253_PORTS      0x40
 #define I8253_PORT_COUNT 4
@@ -124,9 +124,15 @@ static int i8253_init(struct i8253 *pit)
 }
 
 static struct i8253 i8253;
-void i8253_module_init()
+int i8253_module_init()
 {
   i8253_init(&i8253);
   timer_register(&i8253.timer);
+  return 0;
+}
+
+int i8253_module_fini()
+{
+  return -1;
 }
 

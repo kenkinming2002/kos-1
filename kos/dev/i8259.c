@@ -6,7 +6,7 @@
 #include <arch/access.h>
 #include <core/assert.h>
 
-DEFINE_MODULE(i8259);
+DEFINE_MODULE(i8259)
 
 #define PIC_MASTER 0x0020
 #define PIC_SLAVE  0x00A0
@@ -115,9 +115,14 @@ static int i8259_init(struct i8259 *pic, struct i8259 *master, uint16_t ports, u
 static struct i8259 i8259_master;
 static struct i8259 i8259_slave;
 
-void i8259_module_init()
+int i8259_module_init()
 {
   i8259_init(&i8259_master, NULL,          PIC_MASTER, 0x20, 0x0, 1 << 2, 0xFB);
   i8259_init(&i8259_slave,  &i8259_master, PIC_SLAVE,  0x28, 0x8, 2,      0xFF);
+}
+
+int i8259_module_fini()
+{
+  return -1;
 }
 

@@ -5,5 +5,6 @@
 #include "idt.h"
 
 void pal_init();
+void pal_load();
 
 #endif // PAL_ALL_H

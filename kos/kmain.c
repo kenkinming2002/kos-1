@@ -29,19 +29,31 @@ static struct irq_slot     device_not_available_slot     = IRQ_SLOT_INIT("main:o
 static struct irq_slot_ops on_tick_slot_ops = { .on_emit = &on_tick, };
 static struct irq_slot     on_tick_slot     = IRQ_SLOT_INIT("main:on tick", &on_tick_slot_ops, NULL);
 
+static int once;
+static int ready;
 
 void kmain(struct kboot_info *boot_info)
 {
-  static int reach;
-  if(__atomic_exchange_n(&reach, 1, __ATOMIC_SEQ_CST))
-    for(;;)
-      asm volatile("hlt");
+  if(!__atomic_exchange_n(&once, 1, __ATOMIC_SEQ_CST))
+  {
+    // Initialize
+    debug_init();
+    debug_printf("hello\n");
 
-  debug_init();
-  debug_printf("hello\n");
+    mm_init(boot_info);
+    pal_init();
+    pal_load();
+  }
+  else
+  {
+    // Wait
+    while(!__atomic_load_n(&ready, __ATOMIC_ACQUIRE))
+      asm volatile("pause");
 
-  mm_init(boot_info);
-  pal_init();
+    pal_load();
+    for(;;) asm volatile ("hlt");
+  }
+
   hal_init();
   dev_init();
 

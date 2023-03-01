@@ -185,7 +185,11 @@ void gdt_init()
     .base     = ((uint64_t)&tss >> 32) & 0xFFFF,
     .reserved = 0,
   };
+}
 
+void gdt_load()
+{
   asm volatile ("lgdt %0" : : "m"(gdt_desc));
   reload_segs();
 }
+

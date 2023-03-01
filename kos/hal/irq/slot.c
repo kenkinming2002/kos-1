@@ -1,7 +1,7 @@
 #include "slot.h"
 
-#include <kcore/assert.h>
-#include <kcore/debug.h>
+#include <core/assert.h>
+#include <core/debug.h>
 
 #include <stddef.h>
 

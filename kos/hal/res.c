@@ -2,8 +2,8 @@
 
 #include "mm/all.h"
 
-#include <kcore/assert.h>
-#include <kcore/ll.h>
+#include <core/assert.h>
+#include <core/ll.h>
 
 #include <stdint.h>
 

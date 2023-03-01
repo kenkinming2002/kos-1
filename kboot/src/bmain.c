@@ -4,7 +4,7 @@
 #include "kernel.h"
 #include "kboot/all.h"
 
-#include <kcore/assert.h>
+#include <core/assert.h>
 
 void bmain(struct multiboot_boot_information *boot_info)
 {

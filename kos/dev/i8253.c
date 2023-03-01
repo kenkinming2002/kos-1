@@ -4,7 +4,7 @@
 #include "hal/all.h"
 #include "module.h"
 
-#include <kcore/assert.h>
+#include <core/assert.h>
 
 DEFINE_MODULE(i8253);
 

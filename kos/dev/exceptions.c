@@ -3,7 +3,7 @@
 #include "module.h"
 #include "hal/all.h"
 
-#include <kcore/assert.h>
+#include <core/assert.h>
 
 DEFINE_MODULE(exceptions);
 

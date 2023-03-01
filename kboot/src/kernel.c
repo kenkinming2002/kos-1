@@ -3,8 +3,8 @@
 #include "config.h"
 #include "file.h"
 
-#include <kcore/assert.h>
-#include <kcore/string.h>
+#include <core/assert.h>
+#include <core/string.h>
 
 #include <elf.h>
 

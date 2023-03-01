@@ -4,7 +4,7 @@
 #include "slot.h"
 #include "bus.h"
 
-#include <kcore/assert.h>
+#include <core/assert.h>
 
 #include <stdint.h>
 

@@ -3,7 +3,7 @@
 
 #include "irq/slot.h"
 
-#include <kcore/ll.h>
+#include <core/ll.h>
 
 enum timer_mode
 {

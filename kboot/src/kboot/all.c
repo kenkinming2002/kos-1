@@ -1,6 +1,6 @@
 #include "all.h"
 
-#include <kcore/debug.h>
+#include <core/debug.h>
 
 void kboot_init(struct multiboot_boot_information *mbi, kboot_info_t *kboot_info)
 {

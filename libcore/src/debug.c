@@ -1,4 +1,4 @@
-#include <kcore/debug.h>
+#include <core/debug.h>
 
 #include <stdarg.h>
 #include <stdbool.h>

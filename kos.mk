@@ -24,9 +24,9 @@ KERNEL_OBJS = kos/debug.o \
        	      kos/dev/i8253.o \
        	      kos/dev/i8259.o
 
-iso/boot/kos.elf: CFLAGS  += -Iinclude -Ikcore/include -Ikboot/include -Ikos
+iso/boot/kos.elf: CFLAGS  += -Iinclude -Ilibcore/include -Ikboot/include -Ikos
 iso/boot/kos.elf: LDFLAGS += -Tkos/link.ld -pie -Wl,--no-dynamic-linker
-iso/boot/kos.elf: LIBS    += -lkcore
+iso/boot/kos.elf: LIBS    += -lcore
 iso/boot/kos.elf: kos/link.ld libkcore.a $(KERNEL_OBJS)
 
 ALL_OBJS += $(KERNEL_OBJS)

@@ -12,6 +12,20 @@
 
 #define TEST_COUNT 10
 
+static void early_init(struct kboot_info *boot_info)
+{
+  static struct once once;
+  if(once_begin(&once, ONCE_SYNC))
+  {
+    // Initialize
+    debug_init();
+    mm_init(boot_info);
+    hal_init();
+
+    once_end(&once, ONCE_SYNC);
+  }
+}
+
 bool on_device_not_available(struct irq_slot *)
 {
   debug_printf("device not available\n");
@@ -30,30 +44,9 @@ static struct irq_slot     device_not_available_slot     = IRQ_SLOT_INIT("main:o
 static struct irq_slot_ops on_tick_slot_ops = { .on_emit = &on_tick, };
 static struct irq_slot     on_tick_slot     = IRQ_SLOT_INIT("main:on tick", &on_tick_slot_ops, NULL);
 
-static int once;
-static int ready;
-
-struct once once1;
-struct once once2;
-
-void kmain(struct kboot_info *boot_info)
+// TODO: postpone these initialization task to the first schedulable process kinit
+static void kinit()
 {
-  if(once_begin(&once1, ONCE_SYNC))
-  {
-    // Initialize
-    debug_init();
-    debug_printf("hello\n");
-
-    mm_init(boot_info);
-    arch_init();
-
-    once_end(&once1, ONCE_SYNC);
-  }
-
-  if(!once_begin(&once2, 0));
-
-  arch_load();
-  hal_init();
   dev_init();
 
   KASSERT(irq_bus_set_output(IRQ_BUS_EXCEPTIONS, 7, &device_not_available_slot) == 0);
@@ -70,5 +63,20 @@ void kmain(struct kboot_info *boot_info)
   asm volatile ("sti");
 
   for(;;) asm volatile("hlt");
+}
+
+void kmain(struct kboot_info *boot_info)
+{
+  early_init(boot_info);
+  arch_init();
+
+  // Hacky way to restrict to a single core until until we have a proper
+  // scheduler implementation
+  static struct once once;
+  if(!once_begin(&once, 0))
+    for(;;)
+      asm volatile ("hlt");
+
+  kinit();
 }
 

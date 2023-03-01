@@ -1,4 +1,5 @@
 BOOT_OBJS = kboot/src/entry.o \
+	    kboot/src/trampoline.o \
 	    kboot/src/multiboot2.o \
 	    kboot/src/debug.o \
 	    kboot/src/bmain.o \

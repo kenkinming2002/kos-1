@@ -73,7 +73,10 @@ void idt_init()
       .reserved2 = 0,
       .reserved3 = 0,
     };
+}
 
+void idt_load()
+{
   asm volatile ("lidt %0" : : "m"(idt_desc));
 }
 

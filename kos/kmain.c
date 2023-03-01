@@ -1,3 +1,4 @@
+#include "arch/once.h"
 #include "debug.h"
 #include "mm/all.h"
 #include "pal/all.h"
@@ -29,13 +30,29 @@ static struct irq_slot     device_not_available_slot     = IRQ_SLOT_INIT("main:o
 static struct irq_slot_ops on_tick_slot_ops = { .on_emit = &on_tick, };
 static struct irq_slot     on_tick_slot     = IRQ_SLOT_INIT("main:on tick", &on_tick_slot_ops, NULL);
 
+static int once;
+static int ready;
+
+struct once once1;
+struct once once2;
+
 void kmain(struct kboot_info *boot_info)
 {
-  debug_init();
-  debug_printf("hello\n");
+  if(once_begin(&once1, ONCE_SYNC))
+  {
+    // Initialize
+    debug_init();
+    debug_printf("hello\n");
 
-  mm_init(boot_info);
-  pal_init();
+    mm_init(boot_info);
+    pal_init();
+
+    once_end(&once1, ONCE_SYNC);
+  }
+
+  if(!once_begin(&once2, 0));
+
+  pal_load();
   hal_init();
   dev_init();
 

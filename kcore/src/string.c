@@ -58,6 +58,19 @@ void *memset(void *dst, int c, size_t n)
   return _memset(dst, c, n);
 }
 
+int _memcmp(const char *s1, const char *s2, size_t n)
+{
+  for(size_t i=0; i<n; ++i)
+    if(s1[i] != s2[i])
+      return s1[i] - s2[i];
+  return 0;
+}
+
+int memcmp(const void *s1, const void *s2, size_t n)
+{
+  return _memcmp(s1, s2, n);
+}
+
 char *strcpy(char *restrict dst, const char *restrict src)
 {
   char *res = dst;

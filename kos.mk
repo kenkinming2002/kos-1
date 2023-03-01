@@ -1,5 +1,8 @@
 KERNEL_OBJS = kos/debug.o \
        	      kos/kmain.o \
+       	      kos/arch/access.o \
+       	      kos/arch/locks.o \
+       	      kos/arch/once.o \
        	      kos/mm/all.o \
        	      kos/mm/pages.o \
        	      kos/mm/liballoc_1_1.o \
@@ -10,9 +13,7 @@ KERNEL_OBJS = kos/debug.o \
        	      kos/pal/segs.o \
        	      kos/pal/isrs.o \
        	      kos/hal/all.o \
-       	      kos/hal/access.o \
        	      kos/hal/res.o \
-       	      kos/hal/locks.o \
        	      kos/hal/irq/all.o \
        	      kos/hal/irq/slot.o \
        	      kos/hal/irq/bus.o \

@@ -5,5 +5,6 @@
 #define IDT_INVALID_VECTOR ((unsigned)-1)
 
 void idt_init();
+void idt_load();
 
 #endif // PAL_IDT_H

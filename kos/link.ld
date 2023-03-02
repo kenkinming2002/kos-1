@@ -6,6 +6,8 @@ SECTIONS {
   .rodata : { *(.rodata .rodata.* ) }
 
   . = ALIGN(0x1000);
+  module_begin = .; .module : SUBALIGN(0) { *(.module) } module_end = .;
+
   .data   : { *(.data   .data.*   ) }
   .bss    : { *(.bss    .bss.*    ) }
 }

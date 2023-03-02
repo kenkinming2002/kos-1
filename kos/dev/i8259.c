@@ -1,7 +1,8 @@
 #include "i8259.h"
 
-#include "hal/all.h"
+#include "hal/irq/bus.h"
 #include "hal/module.h"
+#include "hal/res.h"
 
 #include <arch/access.h>
 #include <core/assert.h>

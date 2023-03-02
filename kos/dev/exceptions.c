@@ -1,7 +1,8 @@
 #include "exceptions.h"
 
+#include "hal/irq/bus.h"
 #include "hal/module.h"
-#include "hal/all.h"
+#include "hal/res.h"
 
 #include <core/assert.h>
 

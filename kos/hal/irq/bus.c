@@ -89,9 +89,3 @@ void irq_bus_unset_output(enum irq_bus_tag tag, unsigned n)
   conn->output = NULL;
 }
 
-void irq_bus_init()
-{
-  // This may be needed in the future since the GSI bus would likely be
-  // dynamically sized, so keep it for now.
-}
-

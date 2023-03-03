@@ -18,7 +18,7 @@ struct module
 #define DEFINE_MODULE(_name)                                           \
   int _name##_module_init();                                           \
   int _name##_module_fini();                                           \
-  __attribute__((section(".module"))) struct module _name##_module = { \
+  __attribute__((section(".module"), used)) struct module _name##_module = { \
     .name = #_name,                                                    \
     .init = _name##_module_init,                                       \
     .fini = _name##_module_fini,                                       \

@@ -50,14 +50,7 @@ static struct irq_slot     on_tick_slot     = IRQ_SLOT_INIT("main:on tick", &on_
 // TODO: postpone these initialization task to the first schedulable process kinit
 static void kinit()
 {
-  extern struct module *module_begin[];
-  extern struct module *module_end[];
-
-  for(struct module **module = module_begin; module != module_end; ++module)
-    if(*module)
-      module_register(*module);
-
-  module_update();
+  module_init();
 
   KASSERT(irq_bus_set_output(IRQ_BUS_EXCEPTIONS, 7, &device_not_available_slot) == 0);
 

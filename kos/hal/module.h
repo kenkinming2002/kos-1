@@ -32,6 +32,7 @@ struct module
 void module_register(struct module *module);
 void module_deregister(struct module *module);
 
+void module_init();
 void module_update();
 
 #endif // MODULE_H

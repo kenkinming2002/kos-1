@@ -9,9 +9,8 @@ KERNEL_OBJS = kos/debug.c.o \
        	      kos/arch/segmentation.S.o \
        	      kos/arch/interrupt.c.o \
        	      kos/arch/interrupt.S.o \
-       	      kos/hal/all.c.o \
+       	      kos/hal/module.c.o \
        	      kos/hal/res.c.o \
-       	      kos/hal/irq/all.c.o \
        	      kos/hal/irq/slot.c.o \
        	      kos/hal/irq/bus.c.o \
        	      kos/hal/irq/root.c.o \

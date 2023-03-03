@@ -1,8 +1,12 @@
 #include "debug.h"
+
 #include "mm/all.h"
 #include "arch/all.h"
-#include "hal/all.h"
-#include "dev/all.h"
+
+#include "hal/module.h"
+#include "hal/timer.h"
+#include "hal/irq/bus.h"
+#include "hal/irq/slot.h"
 
 #include <arch/once.h>
 #include <core/assert.h>
@@ -20,7 +24,6 @@ static void early_init(struct kboot_info *boot_info)
     // Initialize
     debug_init();
     mm_init(boot_info);
-    hal_init();
 
     once_end(&once, ONCE_SYNC);
   }
@@ -47,7 +50,7 @@ static struct irq_slot     on_tick_slot     = IRQ_SLOT_INIT("main:on tick", &on_
 // TODO: postpone these initialization task to the first schedulable process kinit
 static void kinit()
 {
-  dev_init();
+  module_init();
 
   KASSERT(irq_bus_set_output(IRQ_BUS_EXCEPTIONS, 7, &device_not_available_slot) == 0);
 

@@ -5,8 +5,7 @@
 
 #include "hal/module.h"
 #include "hal/timer.h"
-#include "hal/irq/bus.h"
-#include "hal/irq/slot.h"
+#include "hal/irq.h"
 
 #include <arch/once.h>
 #include <core/assert.h>
@@ -24,42 +23,54 @@ static void early_init(struct kboot_info *boot_info)
     // Initialize
     debug_init();
     mm_init(boot_info);
+    irq_init();
 
     once_end(&once, ONCE_SYNC);
   }
 }
 
-bool on_device_not_available(struct irq_slot *)
+bool on_device_not_available(struct slot *)
 {
   debug_printf("device not available\n");
   return false;
 }
 
-bool on_tick(struct irq_slot *)
+bool on_tick(struct slot *)
 {
   debug_printf("on tick\n");
   return false;
 }
 
-static struct irq_slot_ops device_not_available_slot_ops = { .on_emit = &on_device_not_available, };
-static struct irq_slot     device_not_available_slot     = IRQ_SLOT_INIT("main:on device not available", &device_not_available_slot_ops, NULL);
+static struct slot_ops on_device_not_available_slot_ops = { .on_emit = &on_device_not_available, };
+static struct slot_ops on_tick_slot_ops                 = { .on_emit = &on_tick, };
 
-static struct irq_slot_ops on_tick_slot_ops = { .on_emit = &on_tick, };
-static struct irq_slot     on_tick_slot     = IRQ_SLOT_INIT("main:on tick", &on_tick_slot_ops, NULL);
+static struct slot on_device_not_available_slot;
+static struct slot on_tick_slot;
 
 // TODO: postpone these initialization task to the first schedulable process kinit
 static void kinit()
 {
   module_init();
 
-  KASSERT(irq_bus_set_output(IRQ_BUS_EXCEPTIONS, 7, &device_not_available_slot) == 0);
-
   struct timer *timer = timer_alloc();
-  irq_slot_connect(&timer->slot, &on_tick_slot);
-  irq_slot_unmask(&on_tick_slot);
   KASSERT(timer);
   timer->configure(timer, TIMER_MODE_PERIODIC);
   timer->reload(timer, 64000000);
+
+  // Initialize slots
+  slot_init(&on_device_not_available_slot);
+  slot_init(&on_tick_slot);
+  on_device_not_available_slot.name = "main:on device not available";
+  on_tick_slot                .name = "main:on tick";
+  on_device_not_available_slot.ops  = &on_device_not_available_slot_ops;
+  on_tick_slot                .ops  = &on_tick_slot_ops;
+
+  // Connect slots
+  slot_connect(irq_slot(IRQ_BUS_EXCEPTION, 7), &on_device_not_available_slot);
+  slot_connect(&timer->slot,                   &on_tick_slot);
+
+  slot_activate(&on_device_not_available_slot);
+  slot_activate(&on_tick_slot);
 
   asm volatile ("int $0x7");
   asm volatile ("int $0x80");

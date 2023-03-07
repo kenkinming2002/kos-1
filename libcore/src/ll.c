@@ -23,6 +23,11 @@ void ll_delete(struct ll_node *node)
   node->prev = node->next = node;
 }
 
+bool ll_empty(struct ll *ll)
+{
+  return &ll->sentinel == ll->sentinel.next;
+}
+
 void ll_prepend(struct ll *ll, struct ll_node *node)
 {
   ll_insert_after(&ll->sentinel, node);

@@ -1,6 +1,6 @@
 #include "i8259.h"
 
-#include "hal/irq/bus.h"
+#include "hal/irq.h"
 #include "hal/module.h"
 #include "hal/res.h"
 
@@ -33,10 +33,10 @@ struct i8259
   uint8_t  config;
   uint8_t  mask;
 
-  struct irq_slot slots[8];
+  struct slot slots[8];
 };
 
-static void i8259_slot_on_unmask(struct irq_slot *slot)
+static void i8259_slot_on_enable(struct slot *slot)
 {
   struct i8259 *pic = slot->data;
   unsigned      irq = pic->slots - slot;
@@ -48,7 +48,7 @@ static void i8259_slot_on_unmask(struct irq_slot *slot)
   outb(data_port, mask);
 }
 
-static void i8259_slot_on_mask(struct irq_slot *slot)
+static void i8259_slot_on_disable(struct slot *slot)
 {
   struct i8259 *pic = slot->data;
   unsigned      irq = pic->slots - slot;
@@ -60,7 +60,7 @@ static void i8259_slot_on_mask(struct irq_slot *slot)
   outb(data_port, mask);
 }
 
-static bool i8259_slot_on_emit(struct irq_slot *slot)
+static bool i8259_slot_on_emit(struct slot *slot)
 {
   struct i8259 *pic = slot->data;
 
@@ -73,9 +73,9 @@ static bool i8259_slot_on_emit(struct irq_slot *slot)
   return true;
 }
 
-struct irq_slot_ops i8259_slot_ops = {
-  .on_unmask = &i8259_slot_on_unmask,
-  .on_mask   = &i8259_slot_on_mask,
+struct slot_ops i8259_slot_ops = {
+  .on_enable = &i8259_slot_on_enable,
+  .on_disable   = &i8259_slot_on_disable,
   .on_emit   = &i8259_slot_on_emit,
 };
 
@@ -88,20 +88,22 @@ static int i8259_init(struct i8259 *pic, struct i8259 *master, uint16_t ports, u
   pic->config    = config;
   pic->mask      = mask;
   for(unsigned i=0; i<8; ++i)
-    pic->slots[i] = IRQ_SLOT_INIT("i8259", &i8259_slot_ops, pic);
+  {
+    slot_init(&pic->slots[i]);
+    pic->slots[i].name = "i8259";
+    pic->slots[i].ops  = &i8259_slot_ops;
+    pic->slots[i].data = pic;
+  }
 
   if(res_acquire(RES_IRQ_BUS_ROOT_OUTPUT, THIS_MODULE, pic->base_root, 8) != 0) return -1;
   if(res_acquire(RES_IRQ_BUS_ISA_INPUT,   THIS_MODULE, pic->base_isa,  8) != 0) return -1;
   if(res_acquire(RES_IOPORT,              THIS_MODULE, pic->ports,     2) != 0) return -1;
 
   for(unsigned i=0; i<8; ++i)
-    if(irq_bus_set_output(IRQ_BUS_ROOT, pic->base_root + i, &pic->slots[i]) != 0)
-      return -1;
-
-  for(unsigned i=0; i<8; ++i)
-    if(irq_bus_set_input(IRQ_BUS_ISA, pic->base_isa + i, &pic->slots[i]) != 0)
-      return -1;
-
+  {
+    slot_connect(irq_slot(IRQ_BUS_ROOT, pic->base_root + i), &pic->slots[i]);
+    slot_connect(&pic->slots[i], irq_slot(IRQ_BUS_ISA, pic->base_isa + i));
+  }
 
   uint16_t command_port = pic->ports;
   uint16_t data_port    = pic->ports + 1;

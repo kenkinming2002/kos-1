@@ -11,12 +11,8 @@ KERNEL_SRCS = kos/debug.c \
        	      kos/arch/interrupt.S \
        	      kos/hal/module.c \
        	      kos/hal/res.c \
-       	      kos/hal/irq/slot.c \
-       	      kos/hal/irq/bus.c \
-       	      kos/hal/irq/root.c \
+       	      kos/hal/irq.c \
        	      kos/hal/timer.c \
-	      kos/dev/all.c \
-       	      kos/dev/exceptions.c \
        	      kos/dev/i8253.c \
        	      kos/dev/i8259.c
 

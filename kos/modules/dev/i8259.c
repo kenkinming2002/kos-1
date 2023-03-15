@@ -1,5 +1,3 @@
-#include "i8259.h"
-
 #include "core/hal/irq.h"
 #include "core/hal/module.h"
 #include "core/hal/res.h"

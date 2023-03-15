@@ -1,5 +1,5 @@
-#ifndef HAL_TIMER_H
-#define HAL_TIMER_H
+#ifndef COER_HAL_TIMER_H
+#define COER_HAL_TIMER_H
 
 #include <core/ll.h>
 #include <core/slot.h>
@@ -27,4 +27,4 @@ void timer_deregister(struct timer *timer);
 struct timer *timer_alloc();
 void timer_free(struct timer *timer);
 
-#endif // HAL_TIMER_H
+#endif // CORE_HAL_TIMER_H

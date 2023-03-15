@@ -1,5 +1,5 @@
-#ifndef MM_MALLOC_H
-#define MM_MALLOC_H
+#ifndef CORE_MM_MALLOC_H
+#define CORE_MM_MALLOC_H
 
 #include <stddef.h>
 
@@ -8,4 +8,4 @@ void *krealloc(void *ptr, size_t size);
 void *kcalloc(size_t nmemb, size_t size);
 void kfree(void *ptr);
 
-#endif // MM_MALLOC_H
+#endif // CORE_MM_MALLOC_H

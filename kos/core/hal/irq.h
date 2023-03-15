@@ -1,5 +1,5 @@
-#ifndef HAL_IRQ_H
-#define HAL_IRQ_H
+#ifndef CORE_HAL_IRQ_H
+#define CORE_HAL_IRQ_H
 
 #include <core/slot.h>
 
@@ -14,4 +14,4 @@ enum irq_bus_tag
 int irq_init();
 struct slot *irq_slot(enum irq_bus_tag tag, unsigned n);
 
-#endif // HAL_IRQ_H
+#endif // CORE_HAL_IRQ_H

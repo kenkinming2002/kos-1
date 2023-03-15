@@ -1,5 +1,5 @@
-#ifndef MODULE_H
-#define MODULE_H
+#ifndef COER_HAL_MODULE_H
+#define COER_HAL_MODULE_H
 
 #include <core/ll.h>
 #include <stdbool.h>
@@ -35,5 +35,5 @@ void module_deregister(struct module *module);
 void module_init();
 void module_update();
 
-#endif // MODULE_H
+#endif // CORE_HAL_MODULE_H
 

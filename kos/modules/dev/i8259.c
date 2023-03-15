@@ -95,9 +95,8 @@ static int i8259_init(struct i8259 *pic, struct i8259 *master, uint16_t ports, u
     pic->slots[i].data = pic;
   }
 
-  if(res_acquire(RES_IRQ_BUS_ROOT_OUTPUT, THIS_MODULE, pic->base_root, 8) != 0) return -1;
-  if(res_acquire(RES_IRQ_BUS_ISA_INPUT,   THIS_MODULE, pic->base_isa,  8) != 0) return -1;
-  if(res_acquire(RES_IOPORT,              THIS_MODULE, pic->ports,     2) != 0) return -1;
+  if(res_acquire(RES_IRQ_VECTOR, THIS_MODULE, pic->base_root, 8) != 0) return -1;
+  if(res_acquire(RES_IOPORT,     THIS_MODULE, pic->ports,     2) != 0) return -1;
 
   for(unsigned i=0; i<8; ++i)
   {

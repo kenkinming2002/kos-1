@@ -23,31 +23,17 @@ struct res_pool
 
 #define DEFINE_RES_POOL(name, limit) struct res_pool name##_pool = { LL_INIT(name##_pool.res_list), limit }
 
-#define IRQ_BUS_ROOT_COUNT 256
-#define IRQ_BUS_ISA_COUNT  16
-#define IRQ_BUS_GSI_COUNT  0 // TODO: Maybe determine this dynamically?
-
-DEFINE_RES_POOL(irq_bus_root_input,  IRQ_BUS_ROOT_COUNT - 1);
-DEFINE_RES_POOL(irq_bus_root_output, IRQ_BUS_ROOT_COUNT - 1);
-DEFINE_RES_POOL(irq_bus_isa_input,   IRQ_BUS_ISA_COUNT - 1);
-DEFINE_RES_POOL(irq_bus_isa_output,  IRQ_BUS_ISA_COUNT - 1);
-DEFINE_RES_POOL(irq_bus_gsi_input,   IRQ_BUS_GSI_COUNT - 1);
-DEFINE_RES_POOL(irq_bus_gsi_output,  IRQ_BUS_GSI_COUNT - 1);
-DEFINE_RES_POOL(ioport, UINT16_MAX);
-DEFINE_RES_POOL(mmio,   SIZE_MAX);
+DEFINE_RES_POOL(irq_vector, UINT8_MAX);
+DEFINE_RES_POOL(ioport,     UINT16_MAX);
+DEFINE_RES_POOL(mmio,       SIZE_MAX);
 
 static struct res_pool *res_pool_get(enum res_type type)
 {
   switch(type)
   {
-  case RES_IRQ_BUS_ROOT_INPUT:  return &irq_bus_root_input_pool;
-  case RES_IRQ_BUS_ROOT_OUTPUT: return &irq_bus_root_output_pool;
-  case RES_IRQ_BUS_ISA_INPUT:   return &irq_bus_isa_input_pool;
-  case RES_IRQ_BUS_ISA_OUTPUT:  return &irq_bus_isa_output_pool;
-  case RES_IRQ_BUS_GSI_INPUT:   return &irq_bus_gsi_input_pool;
-  case RES_IRQ_BUS_GSI_OUTPUT:  return &irq_bus_gsi_output_pool;
-  case RES_IOPORT:          return &ioport_pool;
-  case RES_MMIO:            return &mmio_pool;
+  case RES_IRQ_VECTOR: return &irq_vector_pool;
+  case RES_IOPORT:     return &ioport_pool;
+  case RES_MMIO:       return &mmio_pool;
   default:
     KASSERT_UNREACHABLE;
   }

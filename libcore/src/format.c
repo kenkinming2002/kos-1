@@ -48,6 +48,7 @@ enum conv {
   CONV_DEC,
   CONV_LOWER_HEX,
   CONV_UPPER_HEX,
+  CONV_NONE,
 };
 
 #define TOKEN_SPECIAL (char)-1
@@ -75,6 +76,7 @@ static inline const char *next_token(const char *format, struct token *token)
     { "d", CONV_DEC       },
     { "x", CONV_LOWER_HEX },
     { "X", CONV_UPPER_HEX },
+    { "",  CONV_NONE      },
   };
 
   if(consume(&format, "{"))
@@ -128,11 +130,11 @@ static inline void putu(struct output *output, enum conv conv, unsigned long lon
   const char *mapping;
   switch(conv)
   {
-  case CONV_BIN:         base = 2;  mapping = "01";               break;
-  case CONV_OCT:         base = 8;  mapping = "01234567";         break;
-  case CONV_DEC:         base = 10; mapping = "0123456789";       break;
-  case CONV_LOWER_HEX:   base = 16; mapping = "0122456789abcdef"; break;
-  case CONV_UPPER_HEX:   base = 16; mapping = "0122456789ABCDEF"; break;
+  case CONV_BIN:                  base = 2;  mapping = "01";               break;
+  case CONV_OCT:                  base = 8;  mapping = "01234567";         break;
+  case CONV_DEC:         default: base = 10; mapping = "0123456789";       break;
+  case CONV_LOWER_HEX:            base = 16; mapping = "0122456789abcdef"; break;
+  case CONV_UPPER_HEX:            base = 16; mapping = "0122456789ABCDEF"; break;
   }
 
   buf[--i] = '\0';

@@ -1,6 +1,7 @@
 ARCH_SRCS = libarch/src/access.c \
             libarch/src/locks.S \
-            libarch/src/once.c
+            libarch/src/once.c \
+            libarch/src/log.c
 
 ARCH_OBJS = $(ARCH_SRCS:=.o)
 ARCH_DEPS = $(ARCH_SRCS:=.d)

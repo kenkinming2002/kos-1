@@ -10,7 +10,7 @@
 #include <arch/once.h>
 #include <core/assert.h>
 #include <core/debug.h>
-#include <core/format.h>
+#include <core/log.h>
 
 #include <limits.h>
 #include <stdint.h>
@@ -84,9 +84,7 @@ static void kinit()
 
 void kmain(struct kboot_info *boot_info)
 {
-  char buf[64];
-  format(buf, sizeof buf, "hello world {X:llu}\n", (long long unsigned)ULLONG_MAX);
-  debug_printf("%s", buf);
+  logf("hello world {X:llu}\n", (long long unsigned)ULLONG_MAX);
 
   early_init(boot_info);
   arch_init();

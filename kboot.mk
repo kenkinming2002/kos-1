@@ -14,10 +14,10 @@ BOOT_SRCS = kboot/src/entry.S \
 BOOT_OBJS = $(BOOT_SRCS:=.o)
 BOOT_DEPS = $(BOOT_SRCS:=.d)
 
-iso/boot/kboot.elf: CFLAGS  += -Iinclude -Ilibarch/include -Ilibcore/include -Ikboot/include -Ikboot/src
+iso/boot/kboot.elf: CFLAGS  += -Iinclude -Ilibcore/include -Ilibarch/include -Ikboot/include -Ikboot/src
 iso/boot/kboot.elf: LDFLAGS += -Tkboot/link.ld
-iso/boot/kboot.elf: LIBS    += -larch -lcore
-iso/boot/kboot.elf: kboot/link.ld libarch.a libcore.a $(BOOT_OBJS)
+iso/boot/kboot.elf: LIBS    += -lcore -larch
+iso/boot/kboot.elf: kboot/link.ld libcore.a libarch.a $(BOOT_OBJS)
 
 ALL_OBJS += $(BOOT_OBJS)
 ALL_DEPS += $(BOOT_DEPS)

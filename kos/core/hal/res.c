@@ -1,6 +1,6 @@
 #include "res.h"
 
-#include "mm/all.h"
+#include "core/mm/all.h"
 
 #include <core/assert.h>
 #include <core/ll.h>

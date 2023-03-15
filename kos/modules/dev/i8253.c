@@ -1,9 +1,9 @@
 #include "i8253.h"
 
-#include "hal/irq.h"
-#include "hal/module.h"
-#include "hal/res.h"
-#include "hal/timer.h"
+#include "core/hal/irq.h"
+#include "core/hal/module.h"
+#include "core/hal/res.h"
+#include "core/hal/timer.h"
 
 #include <arch/access.h>
 #include <core/assert.h>

@@ -1,19 +1,19 @@
 KERNEL_SRCS = kos/kmain.c \
-       	      kos/mm/all.c \
-       	      kos/mm/pages.c \
-       	      kos/mm/liballoc_1_1.c \
-       	      kos/mm/liballoc_hooks.c \
        	      kos/arch/all.c \
        	      kos/arch/segmentation.c \
        	      kos/arch/segmentation.S \
        	      kos/arch/interrupt.c \
        	      kos/arch/interrupt.S \
-       	      kos/hal/module.c \
-       	      kos/hal/res.c \
-       	      kos/hal/irq.c \
-       	      kos/hal/timer.c \
-       	      kos/dev/i8253.c \
-       	      kos/dev/i8259.c
+       	      kos/core/mm/all.c \
+       	      kos/core/mm/pages.c \
+       	      kos/core/mm/liballoc_1_1.c \
+       	      kos/core/mm/liballoc_hooks.c \
+       	      kos/core/hal/module.c \
+       	      kos/core/hal/res.c \
+       	      kos/core/hal/irq.c \
+       	      kos/core/hal/timer.c \
+       	      kos/modules/dev/i8253.c \
+       	      kos/modules/dev/i8259.c
 
 KERNEL_OBJS = $(KERNEL_SRCS:=.o)
 KERNEL_DEPS = $(KERNEL_SRCS:=.d)

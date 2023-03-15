@@ -1,11 +1,12 @@
-#include "mm/all.h"
 #include "arch/all.h"
 
-#include "hal/module.h"
-#include "hal/timer.h"
-#include "hal/irq.h"
+#include "core/mm/all.h"
+#include "core/hal/module.h"
+#include "core/hal/timer.h"
+#include "core/hal/irq.h"
 
 #include <arch/once.h>
+
 #include <core/assert.h>
 #include <core/log.h>
 

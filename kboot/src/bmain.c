@@ -1,5 +1,4 @@
 #include "multiboot2_extra.h"
-#include "debug.h"
 #include "initrd.h"
 #include "kernel.h"
 #include "kboot/all.h"
@@ -20,7 +19,6 @@ void bmain(struct multiboot_boot_information *boot_info)
   if(!__atomic_exchange_n(&once, 1, __ATOMIC_RELAXED))
   {
     // Initialize
-    debug_init();
     load_kernel(boot_info, &entry);
     load_initrd(boot_info, &initrd_data, &initrd_length);
     kboot_init(boot_info, &kboot_info);

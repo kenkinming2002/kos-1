@@ -1,5 +1,3 @@
-#include "debug.h"
-
 #include "mm/all.h"
 #include "arch/all.h"
 
@@ -9,7 +7,6 @@
 
 #include <arch/once.h>
 #include <core/assert.h>
-#include <core/debug.h>
 #include <core/log.h>
 
 #include <limits.h>
@@ -23,7 +20,6 @@ static void early_init(struct kboot_info *boot_info)
   if(once_begin(&once, ONCE_SYNC))
   {
     // Initialize
-    debug_init();
     mm_init(boot_info);
     irq_init();
 
@@ -33,13 +29,13 @@ static void early_init(struct kboot_info *boot_info)
 
 bool on_device_not_available(struct slot *)
 {
-  debug_printf("device not available\n");
+  logf("device not available\n");
   return false;
 }
 
 bool on_tick(struct slot *)
 {
-  debug_printf("on tick\n");
+  logf("on tick\n");
   return false;
 }
 

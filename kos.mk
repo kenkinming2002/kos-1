@@ -1,5 +1,4 @@
-KERNEL_SRCS = kos/debug.c \
-       	      kos/kmain.c \
+KERNEL_SRCS = kos/kmain.c \
        	      kos/mm/all.c \
        	      kos/mm/pages.c \
        	      kos/mm/liballoc_1_1.c \

@@ -1,7 +1,6 @@
 BOOT_SRCS = kboot/src/entry.S \
 	    kboot/src/trampoline.S \
 	    kboot/src/multiboot2.S \
-	    kboot/src/debug.c \
 	    kboot/src/bmain.c \
 	    kboot/src/kboot/all.c \
 	    kboot/src/kboot/alloc.c \

@@ -1,6 +1,7 @@
 CORE_SRCS = libcore/src/assert.c \
             libcore/src/bitmap.c \
             libcore/src/debug.c \
+            libcore/src/format.c \
             libcore/src/slot.c \
             libcore/src/string.c \
             libcore/src/ll.c

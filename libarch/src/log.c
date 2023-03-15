@@ -1,6 +1,5 @@
-#include "debug.h"
-
 #include <arch/access.h>
+#include <arch/once.h>
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -15,7 +14,7 @@ static const uint16_t SERIAL_MODEM_COMMAND_PORT = SERIAL_COM1_BASE + 4;
 
 static const uint16_t SERIAL_LINE_STATUS_PORT   = SERIAL_COM1_BASE + 5;
 
-void debug_init()
+static void serial_init()
 {
   uint16_t divisor = 1;
 
@@ -28,14 +27,26 @@ void debug_init()
   outb(SERIAL_MODEM_COMMAND_PORT, 0x03);
 }
 
-static bool is_transmitter_empty()
+static bool serial_is_transmitter_empty()
 {
   return inb(SERIAL_LINE_STATUS_PORT) & 0x20;
 }
 
-void debug_put(char c)
+static void serial_transmit(char c)
 {
-  while(!is_transmitter_empty());
+  while(!serial_is_transmitter_empty());
   outb(SERIAL_DATA_PORT, c);
 }
+
+void arch_logc(char c)
+{
+  static struct once once;
+  if(once_begin(&once, ONCE_SYNC))
+  {
+    serial_init();
+    once_end(&once, ONCE_SYNC);
+  }
+  serial_transmit(c);
+}
+
 

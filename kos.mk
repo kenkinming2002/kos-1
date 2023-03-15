@@ -1,5 +1,4 @@
-KERNEL_SRCS = kos/debug.c \
-       	      kos/kmain.c \
+KERNEL_SRCS = kos/kmain.c \
        	      kos/mm/all.c \
        	      kos/mm/pages.c \
        	      kos/mm/liballoc_1_1.c \
@@ -19,10 +18,10 @@ KERNEL_SRCS = kos/debug.c \
 KERNEL_OBJS = $(KERNEL_SRCS:=.o)
 KERNEL_DEPS = $(KERNEL_SRCS:=.d)
 
-iso/boot/kos.elf: CFLAGS  += -Iinclude -Ilibarch/include -Ilibcore/include -Ikboot/include -Ikos
+iso/boot/kos.elf: CFLAGS  += -Iinclude -Ilibcore/include -Ilibarch/include -Ikboot/include -Ikos
 iso/boot/kos.elf: LDFLAGS += -Tkos/link.ld -pie -Wl,--no-dynamic-linker
-iso/boot/kos.elf: LIBS    += -larch -lcore
-iso/boot/kos.elf: kos/link.ld libarch.a libcore.a $(KERNEL_OBJS)
+iso/boot/kos.elf: LIBS    += -lcore -larch
+iso/boot/kos.elf: kos/link.ld libcore.a libarch.a $(KERNEL_OBJS)
 
 ALL_OBJS += $(KERNEL_OBJS)
 ALL_DEPS += $(KERNEL_DEPS)

@@ -78,6 +78,13 @@ char *strcpy(char *restrict dst, const char *restrict src)
   return res;
 }
 
+char *strncpy(char *restrict dst, const char *restrict src, size_t n)
+{
+  char *res = dst;
+  while(n-- && (*dst++ = *src++) != '\0');
+  return res;
+}
+
 size_t strlen(const char *s)
 {
   size_t i=0;
@@ -85,15 +92,11 @@ size_t strlen(const char *s)
   return i;
 }
 
-size_t kstrcpy(char *restrict dst, const char *restrict src, size_t size)
+size_t strnlen(const char *s, size_t n)
 {
-  size_t len = strlen(src);
-  if(len >= size - 1)
-    len = size - 1;
-
-  memcpy(dst, src, len);
-  dst[len] = '\0';
-  return len;
+  size_t i=0;
+  while(n-- && *s++) ++i;
+  return i;
 }
 
 static int _strcmp(const unsigned char *s1, const unsigned char *s2)
@@ -105,5 +108,30 @@ static int _strcmp(const unsigned char *s1, const unsigned char *s2)
 int strcmp(const char *s1, const char *s2)
 {
   return _strcmp((const unsigned char *)s1, (const unsigned char *)s2);
+}
+
+static int _strncmp(const unsigned char *s1, const unsigned char *s2, size_t n)
+{
+  while(n-- && *s1 && *s2 && *s1 == *s2) ++s1, ++s2;
+  if(n == (size_t)-1)
+    return 0;
+
+  return (int)*s1 - (int)*s2;
+}
+
+int strncmp(const char *s1, const char *s2, size_t n)
+{
+  return _strncmp((const unsigned char *)s1, (const unsigned char *)s2, n);
+}
+
+size_t kstrcpy(char *restrict dst, const char *restrict src, size_t size)
+{
+  size_t len = strlen(src);
+  if(len >= size - 1)
+    len = size - 1;
+
+  memcpy(dst, src, len);
+  dst[len] = '\0';
+  return len;
 }
 

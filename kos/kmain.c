@@ -29,13 +29,13 @@ static void early_init(struct kboot_info *boot_info)
 
 bool on_device_not_available(struct slot *)
 {
-  logf("device not available\n");
+  logf(LOG_WARN "device not available\n");
   return false;
 }
 
 bool on_tick(struct slot *)
 {
-  logf("on tick\n");
+  logf(LOG_TRACE "on tick\n");
   return false;
 }
 
@@ -80,8 +80,6 @@ static void kinit()
 
 void kmain(struct kboot_info *boot_info)
 {
-  logf("hello world {X:llu}\n", (long long unsigned)ULLONG_MAX);
-
   early_init(boot_info);
   arch_init();
 

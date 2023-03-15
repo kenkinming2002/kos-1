@@ -34,7 +34,7 @@ void module_update()
     if(!module->initialized)
     {
       // TODO: LOG_* macro for log level
-      logf("\033[91m" "INFO" "\033[37m" ": initializing module {:s}\n", module->name);
+      logf(LOG_INFO "module initializing - name = {:s}\n", module->name);
       module->initialized = true;
       module->init();
     }

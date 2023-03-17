@@ -121,9 +121,14 @@ static int i8253_init(struct i8253 *pit)
   pit->timer.slot.name = "i8253";
 
   if(res_acquire(RES_IOPORT, I8253_PORTS, I8253_PORT_COUNT) != 0) return -1;
-
   slot_connect(irq_slot(IRQ_BUS_ISA, 0), &pit->timer.slot);
   return 0;
+}
+
+static void i8253_fini(struct i8253 *pit)
+{
+  slot_disconnect(irq_slot(IRQ_BUS_ISA, 0), &pit->timer.slot);
+  res_release(RES_IOPORT, I8253_PORTS, I8253_PORT_COUNT);
 }
 
 static struct i8253 i8253;
@@ -138,5 +143,8 @@ int i8253_module_init()
 
 void i8253_module_fini()
 {
+  timer_deregister(&i8253.timer);
+  device_del(&i8253.device);
+  i8253_fini(&i8253);
 }
 

@@ -127,6 +127,18 @@ static int i8259_init(struct i8259 *pic, struct i8259 *master, uint16_t ports, u
   return 0;
 }
 
+static void i8259_fini(struct i8259 *pic)
+{
+  res_release(RES_IRQ_VECTOR, pic->base_root, 8);
+  res_release(RES_IOPORT,     pic->ports,     2);
+
+  for(unsigned i=0; i<8; ++i)
+  {
+    slot_disconnect(irq_slot(IRQ_BUS_ROOT, pic->base_root + i), &pic->slots[i]);
+    slot_disconnect(&pic->slots[i], irq_slot(IRQ_BUS_ISA, pic->base_isa + i));
+  }
+}
+
 static struct i8259 i8259_master;
 static struct i8259 i8259_slave;
 
@@ -141,5 +153,11 @@ int i8259_module_init()
 
 void i8259_module_fini()
 {
+  // How do we ensure that we are no longer used or referred to?
+  device_del(&i8259_master.device);
+  device_del(&i8259_slave.device);
+
+  i8259_fini(&i8259_master);
+  i8259_fini(&i8259_slave);
 }
 

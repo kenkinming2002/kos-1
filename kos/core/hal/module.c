@@ -32,5 +32,13 @@ void module_init()
   for(struct module **module = module_begin; module != module_end; ++module)
     if(*module)
       module_add(*module);
+
+  for(struct module **module = module_begin; module != module_end; ++module)
+    if(*module)
+      module_del(*module);
+
+  for(struct module **module = module_begin; module != module_end; ++module)
+    if(*module)
+      module_add(*module);
 }
 

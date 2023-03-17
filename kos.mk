@@ -9,6 +9,7 @@ KERNEL_SRCS = kos/kmain.c \
        	      kos/core/mm/liballoc_1_1.c \
        	      kos/core/mm/liballoc_hooks.c \
        	      kos/core/hal/module.c \
+       	      kos/core/hal/device.c \
        	      kos/core/hal/res.c \
        	      kos/core/hal/irq.c \
        	      kos/core/hal/timer.c \

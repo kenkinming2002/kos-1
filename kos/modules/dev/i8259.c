@@ -1,6 +1,7 @@
 #include "core/hal/irq.h"
-#include "core/hal/module.h"
 #include "core/hal/res.h"
+#include "core/hal/module.h"
+#include "core/hal/device.h"
 
 #include <arch/access.h>
 #include <core/assert.h>
@@ -24,6 +25,8 @@ DEFINE_MODULE(i8259)
 
 struct i8259
 {
+  struct device device;
+
   struct i8259 *master;
   uint16_t ports;
   uint8_t  base_root;
@@ -72,13 +75,32 @@ static bool i8259_slot_on_emit(struct slot *slot)
 }
 
 struct slot_ops i8259_slot_ops = {
-  .on_enable = &i8259_slot_on_enable,
-  .on_disable   = &i8259_slot_on_disable,
-  .on_emit   = &i8259_slot_on_emit,
+  .on_enable  = &i8259_slot_on_enable,
+  .on_disable = &i8259_slot_on_disable,
+  .on_emit    = &i8259_slot_on_emit,
+};
+
+static void i8259_reset(struct device *device)
+{
+  struct i8259 *pic = (struct i8259 *)device; // TODO: container_of
+  uint16_t command_port = pic->ports;
+  uint16_t data_port    = pic->ports + 1;
+  outb(command_port, ICW1_INIT | ICW1_ICW4); io_wait();
+  outb(data_port,    pic->base_root);        io_wait();
+  outb(data_port,    pic->config);           io_wait();
+  outb(data_port,    ICW4_8086);             io_wait();
+  outb(data_port,    pic->mask);             io_wait();
+}
+
+struct device_ops i8259_device_ops = {
+  .reset = i8259_reset,
 };
 
 static int i8259_init(struct i8259 *pic, struct i8259 *master, uint16_t ports, uint8_t base_root, uint8_t base_isa, uint8_t config, uint8_t mask)
 {
+  pic->device.name = "i8259";
+  pic->device.ops  = &i8259_device_ops;
+
   pic->master    = master;
   pic->base_root = base_root;
   pic->base_isa  = base_isa;
@@ -102,13 +124,6 @@ static int i8259_init(struct i8259 *pic, struct i8259 *master, uint16_t ports, u
     slot_connect(&pic->slots[i], irq_slot(IRQ_BUS_ISA, pic->base_isa + i));
   }
 
-  uint16_t command_port = pic->ports;
-  uint16_t data_port    = pic->ports + 1;
-  outb(command_port, ICW1_INIT | ICW1_ICW4); io_wait();
-  outb(data_port,    pic->base_root);        io_wait();
-  outb(data_port,    pic->config);           io_wait();
-  outb(data_port,    ICW4_8086);             io_wait();
-  outb(data_port,    pic->mask);             io_wait();
   return 0;
 }
 
@@ -119,6 +134,9 @@ int i8259_module_init()
 {
   i8259_init(&i8259_master, NULL,          PIC_MASTER, 0x20, 0x0, 1 << 2, 0xFB);
   i8259_init(&i8259_slave,  &i8259_master, PIC_SLAVE,  0x28, 0x8, 2,      0xFF);
+
+  device_add(&i8259_master.device);
+  device_add(&i8259_slave.device);
 }
 
 int i8259_module_fini()

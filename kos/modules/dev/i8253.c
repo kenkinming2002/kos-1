@@ -1,6 +1,7 @@
 #include "core/hal/irq.h"
-#include "core/hal/module.h"
 #include "core/hal/res.h"
+#include "core/hal/module.h"
+#include "core/hal/device.h"
 #include "core/hal/timer.h"
 
 #include <arch/access.h>
@@ -65,7 +66,8 @@ enum i8253_operating_mode
 
 struct i8253
 {
-  struct timer timer;
+  struct device device;
+  struct timer  timer;
 };
 
 static uint64_t _i8253_reload_value_from_duration(uint64_t duration)
@@ -110,8 +112,10 @@ static void i8253_reload(struct timer *, unsigned duration)
 
 static int i8253_init(struct i8253 *pit)
 {
-  pit->timer.configure = &i8253_configure;
-  pit->timer.reload    = &i8253_reload;
+  pit->device.name       = "i8253";
+  pit->device.ops        = NULL;
+  pit->timer.configure   = &i8253_configure;
+  pit->timer.reload      = &i8253_reload;
 
   slot_init(&pit->timer.slot);
   pit->timer.slot.name = "i8253";
@@ -123,9 +127,11 @@ static int i8253_init(struct i8253 *pit)
 }
 
 static struct i8253 i8253;
+
 int i8253_module_init()
 {
   i8253_init(&i8253);
+  device_add(&i8253.device);
   timer_register(&i8253.timer);
   return 0;
 }

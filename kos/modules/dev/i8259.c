@@ -98,7 +98,7 @@ struct device_ops i8259_device_ops = {
 
 static int i8259_init(struct i8259 *pic, struct i8259 *master, uint16_t ports, uint8_t base_root, uint8_t base_isa, uint8_t config, uint8_t mask)
 {
-  pic->device.name = "i8259";
+  pic->device.name = master ? "i8259:slave" : "i8259:master";
   pic->device.ops  = &i8259_device_ops;
 
   pic->master    = master;

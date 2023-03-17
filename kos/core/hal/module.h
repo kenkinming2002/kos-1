@@ -15,8 +15,6 @@ struct module
   bool initialized;
 };
 
-#define MODULE_ATTRIBUTE
-
 #define DEFINE_MODULE(_name)                                                                      \
   int _name##_module_init();                                                                      \
   int _name##_module_fini();                                                                      \

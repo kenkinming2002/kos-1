@@ -137,13 +137,13 @@ int i8253_module_init()
 {
   i8253_init(&i8253);
   device_add(&i8253.device);
-  timer_register(&i8253.timer);
+  timer_add(&i8253.timer);
   return 0;
 }
 
 void i8253_module_fini()
 {
-  timer_deregister(&i8253.timer);
+  timer_del(&i8253.timer);
   device_del(&i8253.device);
   i8253_fini(&i8253);
 }

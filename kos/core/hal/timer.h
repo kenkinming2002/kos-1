@@ -21,8 +21,8 @@ struct timer
   struct slot slot;
 };
 
-void timer_register(struct timer *timer);
-void timer_deregister(struct timer *timer);
+void timer_add(struct timer *timer);
+void timer_del(struct timer *timer);
 
 struct timer *timer_alloc();
 void timer_free(struct timer *timer);

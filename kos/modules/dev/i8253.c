@@ -70,24 +70,6 @@ struct i8253
   struct timer  timer;
 };
 
-static uint64_t _i8253_reload_value_from_duration(uint64_t duration)
-{
-  // Duration specified in ns
-  return duration * 1193192 / 1000000000;
-}
-
-static uint16_t i8253_reload_value_from_duration(unsigned duration)
-{
-  uint64_t reload_value = _i8253_reload_value_from_duration(duration);
-  if(reload_value >= UINT16_MAX)
-    reload_value = UINT16_MAX;
-
-  if(reload_value == 0)
-    reload_value = 1;
-
-  return reload_value;
-}
-
 static void i8253_configure(struct timer *, enum timer_mode mode)
 {
   switch(mode)
@@ -105,7 +87,9 @@ static void i8253_configure(struct timer *, enum timer_mode mode)
 
 static void i8253_reload(struct timer *, unsigned duration)
 {
-  uint16_t reload_value = i8253_reload_value_from_duration(duration);
+  uint64_t reload_value = (uint64_t)duration * 1193192 / 1000000000;
+  if(reload_value >= UINT16_MAX) reload_value = UINT16_MAX;
+  if(reload_value == 0)          reload_value = 1;
   outb(I8253_CHANNEL0, (reload_value >> 0) & 0xFF);
   outb(I8253_CHANNEL0, (reload_value >> 8) & 0xFF);
 }

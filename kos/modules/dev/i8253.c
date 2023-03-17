@@ -94,12 +94,16 @@ static void i8253_reload(struct timer *, unsigned duration)
   outb(I8253_CHANNEL0, (reload_value >> 8) & 0xFF);
 }
 
+struct timer_ops i8253_timer_ops = {
+  .configure = &i8253_configure,
+  .reload    = &i8253_reload,
+};
+
 static int i8253_init(struct i8253 *pit)
 {
   pit->device.name       = "i8253";
   pit->device.ops        = NULL;
-  pit->timer.configure   = &i8253_configure;
-  pit->timer.reload      = &i8253_reload;
+  pit->timer.ops         = &i8253_timer_ops;
 
   slot_init(&pit->timer.slot);
   pit->timer.slot.name = "i8253";

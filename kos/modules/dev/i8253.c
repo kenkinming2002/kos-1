@@ -120,7 +120,7 @@ static int i8253_init(struct i8253 *pit)
   slot_init(&pit->timer.slot);
   pit->timer.slot.name = "i8253";
 
-  if(res_acquire(RES_IOPORT, THIS_MODULE, I8253_PORTS, I8253_PORT_COUNT) != 0) return -1;
+  if(res_acquire(RES_IOPORT, I8253_PORTS, I8253_PORT_COUNT) != 0) return -1;
 
   slot_connect(irq_slot(IRQ_BUS_ISA, 0), &pit->timer.slot);
   return 0;

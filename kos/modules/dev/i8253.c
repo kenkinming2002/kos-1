@@ -1,6 +1,7 @@
 #include "core/hal/irq.h"
-#include "core/hal/module.h"
 #include "core/hal/res.h"
+#include "core/hal/module.h"
+#include "core/hal/device.h"
 #include "core/hal/timer.h"
 
 #include <arch/access.h>
@@ -65,26 +66,9 @@ enum i8253_operating_mode
 
 struct i8253
 {
-  struct timer timer;
+  struct device device;
+  struct timer  timer;
 };
-
-static uint64_t _i8253_reload_value_from_duration(uint64_t duration)
-{
-  // Duration specified in ns
-  return duration * 1193192 / 1000000000;
-}
-
-static uint16_t i8253_reload_value_from_duration(unsigned duration)
-{
-  uint64_t reload_value = _i8253_reload_value_from_duration(duration);
-  if(reload_value >= UINT16_MAX)
-    reload_value = UINT16_MAX;
-
-  if(reload_value == 0)
-    reload_value = 1;
-
-  return reload_value;
-}
 
 static void i8253_configure(struct timer *, enum timer_mode mode)
 {
@@ -103,35 +87,52 @@ static void i8253_configure(struct timer *, enum timer_mode mode)
 
 static void i8253_reload(struct timer *, unsigned duration)
 {
-  uint16_t reload_value = i8253_reload_value_from_duration(duration);
+  uint64_t reload_value = (uint64_t)duration * 1193192 / 1000000000;
+  if(reload_value >= UINT16_MAX) reload_value = UINT16_MAX;
+  if(reload_value == 0)          reload_value = 1;
   outb(I8253_CHANNEL0, (reload_value >> 0) & 0xFF);
   outb(I8253_CHANNEL0, (reload_value >> 8) & 0xFF);
 }
 
+struct timer_ops i8253_timer_ops = {
+  .configure = &i8253_configure,
+  .reload    = &i8253_reload,
+};
+
 static int i8253_init(struct i8253 *pit)
 {
-  pit->timer.configure = &i8253_configure;
-  pit->timer.reload    = &i8253_reload;
+  pit->device.name       = "i8253";
+  pit->device.ops        = NULL;
+  pit->timer.ops         = &i8253_timer_ops;
 
   slot_init(&pit->timer.slot);
   pit->timer.slot.name = "i8253";
 
-  if(res_acquire(RES_IOPORT, THIS_MODULE, I8253_PORTS, I8253_PORT_COUNT) != 0) return -1;
-
+  if(res_acquire(RES_IOPORT, I8253_PORTS, I8253_PORT_COUNT) != 0) return -1;
   slot_connect(irq_slot(IRQ_BUS_ISA, 0), &pit->timer.slot);
   return 0;
 }
 
+static void i8253_fini(struct i8253 *pit)
+{
+  slot_disconnect(irq_slot(IRQ_BUS_ISA, 0), &pit->timer.slot);
+  res_release(RES_IOPORT, I8253_PORTS, I8253_PORT_COUNT);
+}
+
 static struct i8253 i8253;
+
 int i8253_module_init()
 {
   i8253_init(&i8253);
-  timer_register(&i8253.timer);
+  device_add(&i8253.device);
+  timer_add(&i8253.timer);
   return 0;
 }
 
-int i8253_module_fini()
+void i8253_module_fini()
 {
-  return -1;
+  timer_del(&i8253.timer);
+  device_del(&i8253.device);
+  i8253_fini(&i8253);
 }
 

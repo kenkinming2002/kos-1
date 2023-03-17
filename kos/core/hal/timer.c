@@ -4,12 +4,12 @@
 
 struct ll timer_list = LL_INIT(timer_list);
 
-void timer_register(struct timer *timer)
+void timer_add(struct timer *timer)
 {
   ll_append(&timer_list, &timer->node);
 }
 
-void timer_deregister(struct timer *timer)
+void timer_del(struct timer *timer)
 {
   ll_delete(&timer->node);
 }

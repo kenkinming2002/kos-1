@@ -10,8 +10,6 @@
 struct res
 {
   struct ll_node node;
-
-  struct module *module;
   size_t base, limit;
 };
 
@@ -39,7 +37,7 @@ static struct res_pool *res_pool_get(enum res_type type)
   }
 }
 
-static int _res_acquire(enum res_type type, struct module *module, size_t base, size_t limit)
+static int _res_acquire(enum res_type type, size_t base, size_t limit)
 {
   struct res_pool *pool = res_pool_get(type);
   LL_FOREACH(pool->res_list, node)
@@ -50,20 +48,19 @@ static int _res_acquire(enum res_type type, struct module *module, size_t base, 
   }
 
   struct res *res = kmalloc(sizeof *res);
-  res->module = module;
   res->base   = base;
   res->limit  = limit;
   ll_append(&pool->res_list, &res->node);
   return 0;
 }
 
-static void _res_release(enum res_type type, struct module *module, size_t base, size_t limit)
+static void _res_release(enum res_type type, size_t base, size_t limit)
 {
   struct res_pool *pool = res_pool_get(type);
   LL_FOREACH(pool->res_list, node)
   {
     struct res *res = (struct res *)node;
-    if(module == res->module && base == res->base && limit == res->limit)
+    if(base == res->base && limit == res->limit)
     {
       ll_delete(&res->node);
       kfree(res);
@@ -73,14 +70,14 @@ static void _res_release(enum res_type type, struct module *module, size_t base,
   KASSERT_UNREACHABLE;
 }
 
-int res_acquire(enum res_type type, struct module *module, size_t index, size_t count)
+int res_acquire(enum res_type type, size_t index, size_t count)
 {
   KASSERT(count != 0);
-  return _res_acquire(type, module, index, count - 1);
+  return _res_acquire(type, index, count - 1);
 }
 
-void res_release(enum res_type type, struct module *module, size_t index, size_t count)
+void res_release(enum res_type type, size_t index, size_t count)
 {
   KASSERT(count != 0);
-  _res_release(type, module, index, count - 1);
+  _res_release(type, index, count - 1);
 }

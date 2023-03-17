@@ -42,8 +42,8 @@ static void kinit(struct kboot_info *boot_info)
 
   struct timer *timer = timer_alloc();
   KASSERT(timer);
-  timer->configure(timer, TIMER_MODE_PERIODIC);
-  timer->reload(timer, 64000000);
+  timer->ops->configure(timer, TIMER_MODE_PERIODIC);
+  timer->ops->reload(timer, 64000000);
 
   // Initialize slots
   slot_init(&on_device_not_available_slot);

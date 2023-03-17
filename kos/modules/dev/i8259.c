@@ -1,6 +1,7 @@
 #include "core/hal/irq.h"
-#include "core/hal/module.h"
 #include "core/hal/res.h"
+#include "core/hal/module.h"
+#include "core/hal/device.h"
 
 #include <arch/access.h>
 #include <core/assert.h>
@@ -24,6 +25,8 @@ DEFINE_MODULE(i8259)
 
 struct i8259
 {
+  struct device device;
+
   struct i8259 *master;
   uint16_t ports;
   uint8_t  base_root;
@@ -72,13 +75,32 @@ static bool i8259_slot_on_emit(struct slot *slot)
 }
 
 struct slot_ops i8259_slot_ops = {
-  .on_enable = &i8259_slot_on_enable,
-  .on_disable   = &i8259_slot_on_disable,
-  .on_emit   = &i8259_slot_on_emit,
+  .on_enable  = &i8259_slot_on_enable,
+  .on_disable = &i8259_slot_on_disable,
+  .on_emit    = &i8259_slot_on_emit,
+};
+
+static void i8259_reset(struct device *device)
+{
+  struct i8259 *pic = (struct i8259 *)device; // TODO: container_of
+  uint16_t command_port = pic->ports;
+  uint16_t data_port    = pic->ports + 1;
+  outb(command_port, ICW1_INIT | ICW1_ICW4); io_wait();
+  outb(data_port,    pic->base_root);        io_wait();
+  outb(data_port,    pic->config);           io_wait();
+  outb(data_port,    ICW4_8086);             io_wait();
+  outb(data_port,    pic->mask);             io_wait();
+}
+
+struct device_ops i8259_device_ops = {
+  .reset = &i8259_reset,
 };
 
 static int i8259_init(struct i8259 *pic, struct i8259 *master, uint16_t ports, uint8_t base_root, uint8_t base_isa, uint8_t config, uint8_t mask)
 {
+  pic->device.name = master ? "i8259:slave" : "i8259:master";
+  pic->device.ops  = &i8259_device_ops;
+
   pic->master    = master;
   pic->base_root = base_root;
   pic->base_isa  = base_isa;
@@ -93,8 +115,8 @@ static int i8259_init(struct i8259 *pic, struct i8259 *master, uint16_t ports, u
     pic->slots[i].data = pic;
   }
 
-  if(res_acquire(RES_IRQ_VECTOR, THIS_MODULE, pic->base_root, 8) != 0) return -1;
-  if(res_acquire(RES_IOPORT,     THIS_MODULE, pic->ports,     2) != 0) return -1;
+  if(res_acquire(RES_IRQ_VECTOR, pic->base_root, 8) != 0) return -1;
+  if(res_acquire(RES_IOPORT,     pic->ports,     2) != 0) return -1;
 
   for(unsigned i=0; i<8; ++i)
   {
@@ -102,14 +124,19 @@ static int i8259_init(struct i8259 *pic, struct i8259 *master, uint16_t ports, u
     slot_connect(&pic->slots[i], irq_slot(IRQ_BUS_ISA, pic->base_isa + i));
   }
 
-  uint16_t command_port = pic->ports;
-  uint16_t data_port    = pic->ports + 1;
-  outb(command_port, ICW1_INIT | ICW1_ICW4); io_wait();
-  outb(data_port,    pic->base_root);        io_wait();
-  outb(data_port,    pic->config);           io_wait();
-  outb(data_port,    ICW4_8086);             io_wait();
-  outb(data_port,    pic->mask);             io_wait();
   return 0;
+}
+
+static void i8259_fini(struct i8259 *pic)
+{
+  res_release(RES_IRQ_VECTOR, pic->base_root, 8);
+  res_release(RES_IOPORT,     pic->ports,     2);
+
+  for(unsigned i=0; i<8; ++i)
+  {
+    slot_disconnect(irq_slot(IRQ_BUS_ROOT, pic->base_root + i), &pic->slots[i]);
+    slot_disconnect(&pic->slots[i], irq_slot(IRQ_BUS_ISA, pic->base_isa + i));
+  }
 }
 
 static struct i8259 i8259_master;
@@ -119,10 +146,18 @@ int i8259_module_init()
 {
   i8259_init(&i8259_master, NULL,          PIC_MASTER, 0x20, 0x0, 1 << 2, 0xFB);
   i8259_init(&i8259_slave,  &i8259_master, PIC_SLAVE,  0x28, 0x8, 2,      0xFF);
+
+  device_add(&i8259_master.device);
+  device_add(&i8259_slave.device);
 }
 
-int i8259_module_fini()
+void i8259_module_fini()
 {
-  return -1;
+  // How do we ensure that we are no longer used or referred to?
+  device_del(&i8259_master.device);
+  device_del(&i8259_slave.device);
+
+  i8259_fini(&i8259_master);
+  i8259_fini(&i8259_slave);
 }
 

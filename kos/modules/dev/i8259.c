@@ -93,7 +93,7 @@ static void i8259_reset(struct device *device)
 }
 
 struct device_ops i8259_device_ops = {
-  .reset = i8259_reset,
+  .reset = &i8259_reset,
 };
 
 static int i8259_init(struct i8259 *pic, struct i8259 *master, uint16_t ports, uint8_t base_root, uint8_t base_isa, uint8_t config, uint8_t mask)

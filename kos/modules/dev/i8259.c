@@ -139,8 +139,7 @@ int i8259_module_init()
   device_add(&i8259_slave.device);
 }
 
-int i8259_module_fini()
+void i8259_module_fini()
 {
-  return -1;
 }
 

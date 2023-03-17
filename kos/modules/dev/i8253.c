@@ -136,8 +136,7 @@ int i8253_module_init()
   return 0;
 }
 
-int i8253_module_fini()
+void i8253_module_fini()
 {
-  return -1;
 }
 

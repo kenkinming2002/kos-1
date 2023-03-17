@@ -15,19 +15,6 @@
 
 #define TEST_COUNT 10
 
-static void early_init(struct kboot_info *boot_info)
-{
-  static struct once once;
-  if(once_begin(&once, ONCE_SYNC))
-  {
-    // Initialize
-    mm_init(boot_info);
-    irq_init();
-
-    once_end(&once, ONCE_SYNC);
-  }
-}
-
 bool on_device_not_available(struct slot *)
 {
   logf(LOG_WARN "device not available\n");
@@ -47,8 +34,10 @@ static struct slot on_device_not_available_slot;
 static struct slot on_tick_slot;
 
 // TODO: postpone these initialization task to the first schedulable process kinit
-static void kinit()
+static void kinit(struct kboot_info *boot_info)
 {
+  mm_init(boot_info);
+  irq_init();
   module_init();
 
   struct timer *timer = timer_alloc();
@@ -81,7 +70,6 @@ static void kinit()
 
 void kmain(struct kboot_info *boot_info)
 {
-  early_init(boot_info);
   arch_init();
 
   // Hacky way to restrict to a single core until until we have a proper
@@ -91,6 +79,6 @@ void kmain(struct kboot_info *boot_info)
     for(;;)
       asm volatile ("hlt");
 
-  kinit();
+  kinit(boot_info);
 }
 

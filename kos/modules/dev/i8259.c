@@ -139,25 +139,33 @@ static void i8259_fini(struct i8259 *pic)
   }
 }
 
-static struct i8259 i8259_master;
-static struct i8259 i8259_slave;
+struct i8259 i8259_master;
+struct i8259 i8259_slave;
 
 int i8259_module_init()
 {
   i8259_init(&i8259_master, NULL,          PIC_MASTER, 0x20, 0x0, 1 << 2, 0xFB);
   i8259_init(&i8259_slave,  &i8259_master, PIC_SLAVE,  0x28, 0x8, 2,      0xFF);
+  return 0;
+}
 
+int i8259_module_fini()
+{
+  // TODO: Check device reference count
+  i8259_fini(&i8259_master);
+  i8259_fini(&i8259_slave);
+  return 0;
+}
+
+void i8259_module_up()
+{
   device_add(&i8259_master.device);
   device_add(&i8259_slave.device);
 }
 
-void i8259_module_fini()
+void i8259_module_down()
 {
-  // How do we ensure that we are no longer used or referred to?
   device_del(&i8259_master.device);
   device_del(&i8259_slave.device);
-
-  i8259_fini(&i8259_master);
-  i8259_fini(&i8259_slave);
 }
 

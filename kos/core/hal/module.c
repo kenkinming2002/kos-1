@@ -1,27 +1,47 @@
 #include "module.h"
 
 #include <core/log.h>
+#include <arch/locks.h>
 
-static struct ll module_list = LL_INIT(module_list);
+struct spin_lock module_lock;
+struct ll        module_list = LL_INIT(module_list);
 
 int module_add(struct module *module)
 {
+  int error = 0;
+
   logf(LOG_INFO "adding module - name = {:s}\n", module->name);
 
-  int status;
-  if((status = module->init()) != 0)
-    return status;
-
+  spin_lock(&module_lock);
   ll_append(&module_list, &module->node);
-  return 0;
+  error = module->init();
+  if(error != 0)
+    goto out;
+
+  module->up();
+
+out:
+  spin_unlock(&module_lock);
+  return error;
 }
 
-void module_del(struct module *module)
+int module_del(struct module *module)
 {
   logf(LOG_INFO "deleting module - name = {:s}\n", module->name);
 
+  int error = 0;
+
+  spin_lock(&module_lock);
+  module->down();
+  error = module->fini();
+  if(error != 0)
+    goto out;
+
   ll_delete(&module->node);
-  module->fini();
+
+out:
+  spin_unlock(&module_lock);
+  return error;
 }
 
 void module_init()

@@ -1,6 +1,8 @@
 #ifndef ARCH_LOCKS_H
 #define ARCH_LOCKS_H
 
+#include <stdint.h>
+
 struct local_lock
 {
   uint64_t flags;

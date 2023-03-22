@@ -119,20 +119,30 @@ static void i8253_fini(struct i8253 *pit)
   res_release(RES_IOPORT, I8253_PORTS, I8253_PORT_COUNT);
 }
 
-static struct i8253 i8253;
+struct i8253 i8253;
 
 int i8253_module_init()
 {
   i8253_init(&i8253);
-  device_add(&i8253.device);
-  timer_add(&i8253.timer);
   return 0;
 }
 
-void i8253_module_fini()
+int i8253_module_fini()
+{
+  // TODO: Check device ref count
+  i8253_fini(&i8253);
+  return 0;
+}
+
+void i8253_module_up()
+{
+  device_add(&i8253.device);
+  timer_add(&i8253.timer);
+}
+
+void i8253_module_down()
 {
   timer_del(&i8253.timer);
   device_del(&i8253.device);
-  i8253_fini(&i8253);
 }
 

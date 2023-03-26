@@ -1,5 +1,5 @@
-#ifndef ARCH_LOCKS_H
-#define ARCH_LOCKS_H
+#ifndef RT_CORE_LOCKS_H
+#define RT_CORE_LOCKS_H
 
 #include <stdint.h>
 
@@ -24,4 +24,4 @@ void spin_unlock(struct spin_lock *lock);
 
 #define SPIN_LOCK_INIT (struct spin_lock){0, 0}
 
-#endif // ARCH_LOCKS_H
+#endif // RT_CORE_LOCKS_H

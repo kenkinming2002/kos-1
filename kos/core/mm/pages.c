@@ -1,7 +1,7 @@
 #include "pages.h"
 
-#include <core/assert.h>
-#include <core/bitmap.h>
+#include <rt/core/assert.h>
+#include <rt/core/bitmap.h>
 
 #define PAGE_SIZE 0x1000
 

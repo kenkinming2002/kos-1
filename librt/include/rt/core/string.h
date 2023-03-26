@@ -1,5 +1,5 @@
-#ifndef STRING_H
-#define STRING_H
+#ifndef CORE_STRING_H
+#define CORE_STRING_H
 
 #include <stddef.h>
 
@@ -21,4 +21,4 @@ int strncmp(const char *s1, const char *s2, size_t n);
  * Return the length of string copied. */
 size_t kstrcpy(char *restrict dst, const char *restrict src, size_t size);
 
-#endif // STRING_H
+#endif // CORE_STRING_H

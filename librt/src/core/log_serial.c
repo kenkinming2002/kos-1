@@ -1,5 +1,5 @@
-#include <arch/access.h>
-#include <arch/once.h>
+#include <rt/core/once.h>
+#include <rt/asm/io.h>
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -48,5 +48,4 @@ void arch_logc(char c)
   }
   serial_transmit(c);
 }
-
 

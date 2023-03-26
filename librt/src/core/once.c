@@ -1,4 +1,4 @@
-#include <arch/once.h>
+#include <rt/core/once.h>
 
 int once_begin(struct once *once, unsigned flag)
 {

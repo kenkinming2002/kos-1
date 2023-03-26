@@ -2,8 +2,8 @@
 
 #include "alloc.h"
 
-#include <core/assert.h>
-#include <core/string.h>
+#include <rt/core/assert.h>
+#include <rt/core/string.h>
 
 static struct kboot_mmap_entry entries[256];
 static size_t                  count;

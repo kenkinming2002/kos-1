@@ -1,7 +1,7 @@
 #include "module.h"
 
-#include <core/log.h>
-#include <arch/locks.h>
+#include <rt/core/locks.h>
+#include <rt/core/log.h>
 
 struct spin_lock module_lock;
 struct ll        module_list = LL_INIT(module_list);

@@ -1,7 +1,7 @@
-#ifndef CORE_SLOT_H
-#define CORE_SLOT_H
+#ifndef RT_CORE_SLOT_H
+#define RT_CORE_SLOT_H
 
-#include <core/ll.h>
+#include <rt/core/ll.h>
 #include <stdbool.h>
 
 struct slot;
@@ -37,4 +37,4 @@ void slot_disconnect(struct slot *parent, struct slot *child);
 
 void slot_emit(struct slot *slot);
 
-#endif // CORE_SLOT_H
+#endif // RT_CORE_SLOT_H

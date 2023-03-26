@@ -1,7 +1,7 @@
 #ifndef COER_HAL_MODULE_H
 #define COER_HAL_MODULE_H
 
-#include <core/ll.h>
+#include <rt/core/ll.h>
 #include <stdbool.h>
 
 /* There are four functions that are provided by any module

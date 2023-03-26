@@ -1,4 +1,4 @@
-#include <arch/access.h>
+#include <rt/asm/io.h>
 
 uint8_t inb(uint16_t port)
 {
@@ -16,4 +16,5 @@ void io_wait()
 {
   outb(0x80, 0);
 }
+
 

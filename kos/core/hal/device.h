@@ -1,7 +1,7 @@
 #ifndef CORE_HAL_DEVICE_H
 #define CORE_HAL_DEVICE_H
 
-#include <core/ll.h>
+#include <rt/core/ll.h>
 
 struct device
 {

@@ -1,5 +1,5 @@
-#ifndef CORE_BITMAP_H
-#define CORE_BITMAP_H
+#ifndef RT_CORE_BITMAP_H
+#define RT_CORE_BITMAP_H
 
 #include <stddef.h>
 #include <stdbool.h>

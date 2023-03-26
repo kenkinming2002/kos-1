@@ -1,6 +1,6 @@
 #include "device.h"
 
-#include <core/log.h>
+#include <rt/core/log.h>
 
 struct ll device_list = LL_INIT(device_list);
 

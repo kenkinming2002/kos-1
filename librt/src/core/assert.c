@@ -1,6 +1,6 @@
-#include <core/assert.h>
+#include <rt/core/assert.h>
 
-#include <core/log.h>
+#include <rt/core/log.h>
 
 void kassert(const char *file, int line)
 {

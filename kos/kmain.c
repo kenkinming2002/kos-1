@@ -5,10 +5,9 @@
 #include "core/hal/timer.h"
 #include "core/hal/irq.h"
 
-#include <arch/once.h>
-
-#include <core/assert.h>
-#include <core/log.h>
+#include <rt/core/assert.h>
+#include <rt/core/log.h>
+#include <rt/core/once.h>
 
 #include <limits.h>
 #include <stdint.h>

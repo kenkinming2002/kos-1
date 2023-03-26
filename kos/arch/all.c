@@ -1,6 +1,6 @@
 #include "all.h"
 
-#include <arch/once.h>
+#include <rt/core/once.h>
 
 void arch_init()
 {

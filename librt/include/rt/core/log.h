@@ -1,5 +1,5 @@
-#ifndef CORE_LOG_H
-#define CORE_LOG_H
+#ifndef RT_CORE_LOG_H
+#define RT_CORE_LOG_H
 
 #include <stdarg.h>
 
@@ -14,4 +14,4 @@ void logs(const char *s);
 void logf(const char *format, ...);
 void vlogf(const char *format, va_list ap);
 
-#endif // CORE_LOG_H
+#endif // RT_CORE_LOG_H

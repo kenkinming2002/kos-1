@@ -3,8 +3,8 @@
 #include "core/hal/module.h"
 #include "core/hal/device.h"
 
-#include <arch/access.h>
-#include <core/assert.h>
+#include <rt/asm/io.h>
+#include <rt/core/assert.h>
 
 DEFINE_MODULE(i8259)
 

@@ -1,6 +1,6 @@
 #include "irq.h"
 
-#include <core/assert.h>
+#include <rt/core/assert.h>
 
 #include <stddef.h>
 #include <stdint.h>

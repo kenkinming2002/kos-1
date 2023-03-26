@@ -1,5 +1,5 @@
-#ifndef CORE_LL_H
-#define CORE_LL_H
+#ifndef RT_CORE_LL_H
+#define RT_CORE_LL_H
 
 #include <stdbool.h>
 
@@ -24,4 +24,4 @@ bool ll_empty(struct ll *ll);
 void ll_prepend(struct ll *ll, struct ll_node *node);
 void ll_append(struct ll *ll, struct ll_node *node);
 
-#endif // CORE_LL_H
+#endif // RT_CORE_LL_H

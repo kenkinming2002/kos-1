@@ -3,8 +3,8 @@
 #include "config.h"
 #include "file.h"
 
-#include <core/assert.h>
-#include <core/string.h>
+#include <rt/core/assert.h>
+#include <rt/core/string.h>
 
 __attribute__((section(".initrd"))) static char initrd_area[INITRD_MAX];
 

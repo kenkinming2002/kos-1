@@ -1,4 +1,4 @@
-#include <core/bitmap.h>
+#include <rt/core/bitmap.h>
 
 void bm_set(struct bitmap bm, size_t i, bool value)
 {

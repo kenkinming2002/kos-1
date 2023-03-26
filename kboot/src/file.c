@@ -1,7 +1,7 @@
 #include "file.h"
 
-#include <core/assert.h>
-#include <core/string.h>
+#include <rt/core/assert.h>
+#include <rt/core/string.h>
 
 #define INT_ADD_OVERFLOW_P(a, b) __builtin_add_overflow_p (a, b, (__typeof__ ((a) + (b))) 0)
 

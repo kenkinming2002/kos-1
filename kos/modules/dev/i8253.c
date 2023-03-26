@@ -4,8 +4,8 @@
 #include "core/hal/device.h"
 #include "core/hal/timer.h"
 
-#include <arch/access.h>
-#include <core/assert.h>
+#include <rt/asm/io.h>
+#include <rt/core/assert.h>
 
 DEFINE_MODULE(i8253)
 

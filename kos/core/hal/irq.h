@@ -1,7 +1,7 @@
 #ifndef CORE_HAL_IRQ_H
 #define CORE_HAL_IRQ_H
 
-#include <core/slot.h>
+#include <rt/core/slot.h>
 
 enum irq_bus_tag
 {

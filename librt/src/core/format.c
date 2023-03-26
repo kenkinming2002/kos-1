@@ -1,6 +1,6 @@
-#include <core/format.h>
+#include <rt/core/format.h>
 
-#include <core/string.h>
+#include <rt/core/string.h>
 #include <stdbool.h>
 
 struct rule

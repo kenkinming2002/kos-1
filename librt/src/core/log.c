@@ -1,6 +1,6 @@
-#include <core/log.h>
+#include <rt/core/log.h>
 
-#include <core/format.h>
+#include <rt/core/format.h>
 
 #define LOG_MAX 256
 
@@ -31,3 +31,4 @@ void vlogf(const char *format, va_list ap)
   vformat(buf, sizeof buf, format, ap);
   logs(buf);
 }
+

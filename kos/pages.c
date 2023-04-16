@@ -3,14 +3,12 @@
 #include <rt/core/assert.h>
 #include <rt/core/bitmap.h>
 
-#define PAGE_SIZE 0x1000
-
 static struct bitmap bm;
 
 #define ALIGN_UP(value, align)   ((value + align - 1) / align * align)
 #define ALIGN_DOWN(value, align) (value / align * align)
 
-static void *mm_alloc_initial(struct kboot_info *boot_info, size_t size)
+static void *pages_alloc_initial(struct kboot_info *boot_info, size_t size)
 {
   for(size_t i=0; i<boot_info->mmap->count; ++i)
     if(boot_info->mmap->entries[i].type == KBOOT_CONVENTIONAL_MEMORY)
@@ -20,7 +18,7 @@ static void *mm_alloc_initial(struct kboot_info *boot_info, size_t size)
   KASSERT_UNREACHABLE;
 }
 
-void mm_init_pages(struct kboot_info *boot_info)
+void pages_init(struct kboot_info *boot_info)
 {
   uint64_t max_addr = 0;
   for(size_t i=0; i<boot_info->mmap->count; ++i)
@@ -31,7 +29,7 @@ void mm_init_pages(struct kboot_info *boot_info)
   size_t page_count  = (max_addr   + PAGE_SIZE - 1) / PAGE_SIZE;
   size_t bitmap_size = (page_count + UINT_BIT  - 1) / UINT_BIT;
   bm.size = page_count;
-  bm.bits = mm_alloc_initial(boot_info, bitmap_size * sizeof *bm.bits);
+  bm.bits = pages_alloc_initial(boot_info, bitmap_size * sizeof *bm.bits);
 
   bm_fill(bm, 0, bm.size, true);
   for(size_t i=0; i<boot_info->mmap->count; ++i)

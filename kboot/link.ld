@@ -1,9 +1,8 @@
-ENTRY(bsp_entry)
+ENTRY(entry)
 
 SECTIONS {
   /* Multiboot2 */
   . = 0x0;    .multiboot2 : { KEEP(*(.multiboot2)) }
-  . = 0x8000; .trampoline : { *(.trampoline) }
 
   . = 0x00100000; /* Skip over low memory */
 

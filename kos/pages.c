@@ -48,7 +48,7 @@ void pages_init(struct kboot_info *boot_info)
   bm_fill(bm, begin_index, end_index - begin_index, true);
 }
 
-void *alloc_pages(unsigned count)
+void *pages_alloc(size_t count)
 {
   size_t n = bm_search(bm, count, false);
   if(n == BM_SEARCH_NONE)
@@ -58,7 +58,7 @@ void *alloc_pages(unsigned count)
   return (void *)(PAGE_SIZE * n);
 }
 
-void free_pages(void *pages, unsigned count)
+void pages_free(void *pages, size_t count)
 {
   size_t n = (uintptr_t)pages / PAGE_SIZE;
   bm_fill(bm, n, count, false);
